@@ -86,6 +86,10 @@ namespace Logic.Editor
     {
         public string OnlyId;
         /// <summary>
+        /// 
+        /// </summary>
+        public string Title;
+        /// <summary>
         /// 逻辑图名
         /// </summary>
         public string LogicName;
@@ -106,8 +110,28 @@ namespace Logic.Editor
         /// </summary>
         public List<LNInfoCache> Nodes = new List<LNInfoCache>();
 
+        /// <summary>
+        /// 逻辑图信息
+        /// </summary>
         [NonSerialized]
         public BaseLogicGraph Graph;
+        /// <summary>
+        /// 逻辑图面板
+        /// </summary>
+        [NonSerialized]
+        public LGPanelView View;
+
+        public LGInfoCache()
+        {
+
+        }
+
+        public LGInfoCache(BaseLogicGraph graph)
+        {
+            Graph = graph;
+            OnlyId = graph.OnlyId;
+            GraphClassName = graph.GetType().FullName;
+        }
     }
 
     /// <summary>
@@ -117,6 +141,7 @@ namespace Logic.Editor
     [Serializable]
     public sealed class LNInfoCache
     {
+
         /// <summary>
         /// 唯一Id
         /// </summary>
@@ -125,6 +150,16 @@ namespace Logic.Editor
         public Vector2 Pos;
         [NonSerialized]
         public BaseLogicNode Node;
+        public LNInfoCache(BaseLogicNode node)
+        {
+            Node = node;
+            OnlyId = node.OnlyId;
+        }
+
+        public LNInfoCache()
+        {
+
+        }
     }
 
     /// <summary>
@@ -165,7 +200,7 @@ namespace Logic.Editor
                 _curType = typeof(BaseLogicNode).Assembly.GetType(GraphClassName);
                 if (_curType == null)
                 {
-                    _curType = typeof(BaseLNView).Assembly.GetType(GraphClassName);
+                    _curType = typeof(BaseLogicNodeView).Assembly.GetType(GraphClassName);
                 }
             }
             return _curType;

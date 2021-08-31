@@ -20,7 +20,7 @@ namespace Logic.Editor
             var entries = new List<SearchTreeEntry>();
             entries.Add(new SearchTreeGroupEntry(new GUIContent("创建逻辑图")));
 
-            foreach (var item in Instance.LGEditorList)
+            foreach (LGEditorCache item in Instance.LGEditorList)
             {
                 entries.Add(new SearchTreeEntry(new GUIContent(item.GraphName)) { level = 1, userData = item });
             }

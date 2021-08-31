@@ -16,7 +16,7 @@ namespace Logic
         private string _onlyId = "";
         public string OnlyId => _onlyId;
 
-        [SerializeField]
+        [SerializeReference]
         private List<BaseLogicNode> _logicNodeList = new List<BaseLogicNode>();
         /// <summary>
         /// 逻辑图节点
@@ -27,6 +27,7 @@ namespace Logic
         /// 逻辑图开始节点
         /// 一切罪恶的开始
         /// </summary>
+        [SerializeReference]
         public BaseLogicNode StartNode;
 
         public BaseLogicGraph()

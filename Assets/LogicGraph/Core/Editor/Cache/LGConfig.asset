@@ -12,7 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 218715c67e90d3e438b336af649425f9, type: 3}
   m_Name: LGConfig
   m_EditorClassIdentifier: 
-  _lgInfoList: []
+  _lgInfoList:
+  - OnlyId: cb14bcd3-c434-4226-af5a-91f8e52f06c2
+    Title: LogicGraph
+    LogicName: 
+    GraphClassName: Logic.DefaultLogicGraph
+    FileName: 
+    AssetPath: Assets/LogicGraph.asset
+    Nodes:
+    - OnlyId: 45efb895-4cea-4df4-9c7f-aee22db91ac2
+      Title: "\u5F00\u59CB"
+      Pos: {x: 0, y: 0}
   _lgEditorList:
   - GraphName: "\u9ED8\u8BA4\u903B\u8F91\u56FE"
     GraphClassName: Logic.DefaultLogicGraph

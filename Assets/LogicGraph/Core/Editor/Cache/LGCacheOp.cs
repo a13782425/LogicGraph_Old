@@ -22,6 +22,14 @@ namespace Logic.Editor
        => Instance.LGEditorList.FirstOrDefault(a => a.GraphClassName == info.GraphClassName);
 
         /// <summary>
+        /// 获取逻辑图
+        /// </summary>
+        /// <param name="info"></param>
+        /// <returns></returns>
+        internal static BaseLogicGraph GetLogicGraph(LGInfoCache info) => AssetDatabase.LoadAssetAtPath<BaseLogicGraph>(info.AssetPath);
+
+
+        /// <summary>
         /// 保存缓存文件
         /// </summary>
         public static void Save()
@@ -32,7 +40,7 @@ namespace Logic.Editor
         internal static void Refresh()
         {
             List<Type> types = new List<Type>();
-            types.AddRange(typeof(BaseLNView).Assembly.GetTypes());
+            types.AddRange(typeof(BaseLogicNodeView).Assembly.GetTypes());
             types.AddRange(typeof(BaseLogicNode).Assembly.GetTypes());
             m_checkTypes(types);
             EditorUtility.SetDirty(Instance);
@@ -77,6 +85,7 @@ namespace Logic.Editor
 
             }
         }
+
         /// <summary>
         /// 刷新逻辑图
         /// </summary>
@@ -119,7 +128,7 @@ namespace Logic.Editor
         private static void m_refreshLogicNode(List<Type> types)
         {
             //逻辑图节点类型
-            Type _logicNodeViewType = typeof(BaseLNView);
+            Type _logicNodeViewType = typeof(BaseLogicNodeView);
             Type _logicNodeAttr = typeof(LogicNodeAttribute);
             //循环查询逻辑图节点视图
             foreach (var item in types)

@@ -9,10 +9,15 @@ namespace Logic.Editor
 {
     public sealed class LGWindow : EditorWindow
     {
+
+        private LGPanelView _view;
+
         public LGInfoCache LGInfoCache => _lgInfoCache;
         private LGInfoCache _lgInfoCache;
         public LGEditorCache LGEditorCache => _lgEditorCache;
         private LGEditorCache _lgEditorCache;
+
+        private bool _isInit = false;
 
         [MenuItem("Framework/逻辑图/打开逻辑图")]
         private static void OpenLogic()
@@ -27,15 +32,25 @@ namespace Logic.Editor
         public static void ShowLGPanel(LGInfoCache info)
         {
             LGWindow panel = CreateWindow<LGWindow>();
-            if (info != null)
-            {
-                panel._lgInfoCache = info;
-                panel._lgEditorCache = LGCacheOp.GetEditorCache(info);
-            }
             panel.Show();
             panel.Focus();
+            panel.SetLogic(info);
         }
 
+
+        public void SetLogic(LGInfoCache info)
+        {
+            if (info != null)
+            {
+                this._lgInfoCache = info;
+                this._lgEditorCache = LGCacheOp.GetEditorCache(info);
+                this._lgInfoCache.Graph = LGCacheOp.GetLogicGraph(info);
+                if (this._isInit)
+                {
+                    this._view.ShowLogic();
+                }
+            }
+        }
 
 
         #region 内置函数
@@ -44,6 +59,14 @@ namespace Logic.Editor
         {
             titleContent = new GUIContent("逻辑图");
             ShowGui();
+            if (!_isInit)
+            {
+                _isInit = !_isInit;
+            }
+            if (this._lgInfoCache != null)
+            {
+                this._view.ShowLogic();
+            }
         }
 
         /// <summary>
@@ -52,8 +75,8 @@ namespace Logic.Editor
         private void ShowGui()
         {
             VisualElement root = rootVisualElement;
-            var panelView = new LGPanelView(this);
-            this.rootVisualElement.Add(panelView);
+            _view = new LGPanelView(this);
+            this.rootVisualElement.Add(_view);
         }
         private void OnDestroy()
         {
