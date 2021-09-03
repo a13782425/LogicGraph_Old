@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Logic.Editor
 {
-    public sealed class StartNodeView : BaseNodeView
+    public sealed class PortData
     {
     }
 }

@@ -17,11 +17,11 @@ namespace Logic
         public string OnlyId => _onlyId;
 
         [SerializeReference]
-        private List<BaseLogicNode> _logicNodeList = new List<BaseLogicNode>();
+        private List<BaseLogicNode> _nodes = new List<BaseLogicNode>();
         /// <summary>
         /// 逻辑图节点
         /// </summary>
-        public List<BaseLogicNode> LogicNodeList => _logicNodeList;
+        public List<BaseLogicNode> Nodes => _nodes;
 
         /// <summary>
         /// 逻辑图开始节点

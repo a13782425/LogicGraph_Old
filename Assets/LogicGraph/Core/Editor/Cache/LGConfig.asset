@@ -13,18 +13,47 @@ MonoBehaviour:
   m_Name: LGConfig
   m_EditorClassIdentifier: 
   _lgInfoList:
-  - OnlyId: cb14bcd3-c434-4226-af5a-91f8e52f06c2
-    Title: LogicGraph
-    LogicName: 
+  - OnlyId: 48207157-f159-493c-8d83-8a22a5b1204f
+    LogicName: LogicGraph
     GraphClassName: Logic.DefaultLogicGraph
     FileName: 
     AssetPath: Assets/LogicGraph.asset
+    Position: {x: -156, y: 103, z: 0}
+    Scale: {x: 1.157625, y: 1.157625, z: 1}
     Nodes:
-    - OnlyId: 45efb895-4cea-4df4-9c7f-aee22db91ac2
+    - OnlyId: 6fe6e07c-3a07-4dd6-9080-6965e7853dc4
       Title: "\u5F00\u59CB"
-      Pos: {x: 0, y: 0}
+      Pos: {x: 232.26408, y: 155.2254}
+    - OnlyId: 92a3b659-f999-4531-89e8-112305aacd53
+      Title: "\u96FE\u6548"
+      Pos: {x: 383.058, y: 87}
+    - OnlyId: 7f621598-8f52-4832-aaa6-42c3bb122a9b
+      Title: "\u5929\u6C14"
+      Pos: {x: 735.06146, y: 115.491165}
   _lgEditorList:
   - GraphName: "\u9ED8\u8BA4\u903B\u8F91\u56FE"
     GraphClassName: Logic.DefaultLogicGraph
     IsRefresh: 1
-    LogicNodes: []
+    Nodes:
+    - NodeName: "\u5F00\u59CB"
+      NodeFullName: "\u7CFB\u7EDF/\u5F00\u59CB"
+      NodeLayers:
+      - "\u7CFB\u7EDF"
+      - "\u5F00\u59CB"
+      NodeClassName: Logic.StartNode
+      NodeViewClassName: Logic.Editor.StartNodeView
+      PortType: 2
+      IsRefresh: 1
+      IsShow: 0
+      UseCount: -2147483648
+    - NodeName: "\u6253\u5370\u65E5\u5FD7"
+      NodeFullName: "\u7CFB\u7EDF/\u6253\u5370\u65E5\u5FD7"
+      NodeLayers:
+      - "\u7CFB\u7EDF"
+      - "\u6253\u5370\u65E5\u5FD7"
+      NodeClassName: DebugNode
+      NodeViewClassName: DebugNodeView
+      PortType: 3
+      IsRefresh: 1
+      IsShow: 1
+      UseCount: -2147483648

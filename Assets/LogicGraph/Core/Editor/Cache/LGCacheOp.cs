@@ -40,7 +40,7 @@ namespace Logic.Editor
         internal static void Refresh()
         {
             List<Type> types = new List<Type>();
-            types.AddRange(typeof(BaseLogicNodeView).Assembly.GetTypes());
+            types.AddRange(typeof(BaseNodeView).Assembly.GetTypes());
             types.AddRange(typeof(BaseLogicNode).Assembly.GetTypes());
             m_checkTypes(types);
             EditorUtility.SetDirty(Instance);
@@ -53,7 +53,7 @@ namespace Logic.Editor
             foreach (var item in Instance.LGEditorList)
             {
                 item.IsRefresh = false;
-                foreach (var node in item.LogicNodes)
+                foreach (var node in item.Nodes)
                 {
                     node.IsRefresh = false;
                 }
@@ -62,10 +62,12 @@ namespace Logic.Editor
             m_refreshLogicNode(types);
 
             Instance.LGEditorList.RemoveAll(a => !a.IsRefresh);
+            m_refreshStartNode();
+          
             foreach (var item in Instance.LGEditorList)
             {
-                item.LogicNodes.RemoveAll(a => !a.IsRefresh);
-                item.LogicNodes.Sort((entry1, entry2) =>
+                item.Nodes.RemoveAll(a => !a.IsRefresh);
+                item.Nodes.Sort((entry1, entry2) =>
                 {
                     for (var i = 0; i < entry1.NodeLayers.Length; i++)
                     {
@@ -83,6 +85,32 @@ namespace Logic.Editor
                     return 0;
                 });
 
+            }
+        }
+
+        /// <summary>
+        /// 刷新开始节点
+        /// </summary>
+        private static void m_refreshStartNode()
+        {
+            string fullname = typeof(StartNodeView).FullName;
+            foreach (var item in Instance.LGEditorList)
+            {
+                var nodeCache = item.Nodes.FirstOrDefault(a => a.NodeClassName == fullname);
+                if (nodeCache == null)
+                {
+                    nodeCache = new LNEditorCache();
+                    nodeCache.NodeClassName = typeof(StartNode).FullName;
+                    nodeCache.NodeViewClassName = fullname;
+                    nodeCache.UseCount = int.MinValue;
+                    nodeCache.NodeLayers = new string[] { "系统", "开始" };
+                    nodeCache.NodeName = "开始";
+                    nodeCache.NodeFullName = "系统/开始";
+                    item.Nodes.Add(nodeCache);
+                }
+                nodeCache.PortType = PortEnum.Out;
+                nodeCache.IsRefresh = true;
+                nodeCache.IsShow = false;
             }
         }
 
@@ -128,7 +156,7 @@ namespace Logic.Editor
         private static void m_refreshLogicNode(List<Type> types)
         {
             //逻辑图节点类型
-            Type _logicNodeViewType = typeof(BaseLogicNodeView);
+            Type _logicNodeViewType = typeof(BaseNodeView);
             Type _logicNodeAttr = typeof(LogicNodeAttribute);
             //循环查询逻辑图节点视图
             foreach (var item in types)
@@ -147,19 +175,20 @@ namespace Logic.Editor
                             {
                                 if (logicNode.HasType(graphData.GetGraphType()))
                                 {
-                                    LNEditorCache nodeData = graphData.LogicNodes.FirstOrDefault(a => a.NodeClassName == nodeType.FullName);
+                                    LNEditorCache nodeData = graphData.Nodes.FirstOrDefault(a => a.NodeClassName == nodeType.FullName);
                                     if (nodeData == null)
                                     {
                                         nodeData = new LNEditorCache();
                                         nodeData.NodeClassName = nodeType.FullName;
                                         nodeData.NodeViewClassName = item.FullName;
                                         nodeData.UseCount = int.MinValue;
-                                        graphData.LogicNodes.Add(nodeData);
+                                        graphData.Nodes.Add(nodeData);
                                     }
                                     string[] strs = logicNode.MenuText.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
                                     nodeData.NodeLayers = strs;
                                     nodeData.NodeName = strs[strs.Length - 1];
                                     nodeData.NodeFullName = logicNode.MenuText;
+                                    nodeData.PortType = logicNode.PortType;
                                     nodeData.IsRefresh = true;
                                 }
                             }

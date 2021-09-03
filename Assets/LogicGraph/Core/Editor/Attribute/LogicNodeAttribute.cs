@@ -27,6 +27,12 @@ namespace Logic.Editor
         /// 节点名称
         /// </summary>
         public string MenuText { get; private set; }
+
+        /// <summary>
+        /// 拥有什么端口
+        /// </summary>
+        public PortEnum PortType = PortEnum.All;
+
         /// <summary>
         /// 
         /// </summary>
@@ -51,5 +57,26 @@ namespace Logic.Editor
             }
             return _logicGraphs.Contains(type);
         }
+    }
+
+    /// <summary>
+    /// 端口枚举
+    /// </summary>
+    [Flags]
+    public enum PortEnum : byte
+    {
+        None = 0,
+        /// <summary>
+        /// 只有进
+        /// </summary>
+        In = 1,
+        /// <summary>
+        /// 只有出
+        /// </summary>
+        Out = 2,
+        /// <summary>
+        /// 二者皆有
+        /// </summary>
+        All = In | Out
     }
 }
