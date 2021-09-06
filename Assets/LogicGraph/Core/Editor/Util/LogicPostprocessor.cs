@@ -29,14 +29,40 @@ namespace Logic.Editor
         /// <param name="movedFromAssetPaths">移动前资源路径</param>
         public static void OnPostprocessAllAssets(string[] importedAsset, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
         {
-
+            foreach (var str in movedFromAssetPaths)
+            {
+                //移动前资源路径
+                string ext = Path.GetExtension(str);
+                if (ext == ".asset")
+                {
+                    LGCacheOp.RemoveLogicGraph(str);
+                }
+            }
+            foreach (var str in movedAssets)
+            {
+                //移动后资源路径
+                string ext = Path.GetExtension(str);
+                if (ext == ".asset")
+                {
+                    LGCacheOp.AddLogicGraph(str);
+                    //Debug.LogError("importedAsset:" + str);
+                }
+            }
+            foreach (string str in importedAsset)
+            {
+                string ext = Path.GetExtension(str);
+                if (ext == ".asset")
+                {
+                    LGCacheOp.AddLogicGraph(str);
+                    //Debug.LogError("importedAsset:" + str);
+                }
+            }
             foreach (string str in deletedAssets)
             {
                 string ext = Path.GetExtension(str);
                 if (ext == ".asset")
                 {
-                    Debug.LogError(str);
-                    //LogicEditorConfig.RemoveLogicGraph(str);
+                    LGCacheOp.RemoveLogicGraph(str);
                 }
             }
         }

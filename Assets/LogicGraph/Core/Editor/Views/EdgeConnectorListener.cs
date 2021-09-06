@@ -21,7 +21,7 @@ namespace Logic.Editor
 
             if (edgeView?.input == null || edgeView?.output == null)
                 return;
-            bool wasOnTheSamePort = false;
+            //bool wasOnTheSamePort = false;
             graphView.AddElement(edgeView);
             PortView output = edgeView.output as PortView;
             PortView input = edgeView.input as PortView;

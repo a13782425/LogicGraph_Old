@@ -10,7 +10,11 @@ namespace Logic.Editor
 {
     public sealed class PortView : Port
     {
-
+        /// <summary>
+        /// 是否是默认端口
+        /// 即In和Out端口
+        /// </summary>
+        public bool IsDefault { get; private set; }
         public BaseNodeView Owner { get; private set; }
         private bool _isCube = false;
         public PortView(Orientation portOrientation, Direction portDirection, Capacity portCapacity, Type type) : base(portOrientation, portDirection, portCapacity, type)
@@ -24,11 +28,11 @@ namespace Logic.Editor
             port.portName = labelName;
             port.styleSheets.Add(LogicUtils.GetPortStyle());
             port._isCube = isCube;
-          
+
 
             return port;
         }
-        public void Initialize(BaseNodeView nodeView, string name)
+        public void Initialize(BaseNodeView nodeView)
         {
             this.Owner = nodeView;
             if (_isCube)
@@ -42,5 +46,14 @@ namespace Logic.Editor
             }
         }
 
+        /// <summary>
+        /// 是否可以链接到
+        /// </summary>
+        /// <param name="waitLinkPort"></param>
+        /// <returns></returns>
+        public bool CanLink(PortView waitLinkPort)
+        {
+            return Owner.CanLink(this, waitLinkPort);
+        }
     }
 }

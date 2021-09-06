@@ -109,20 +109,33 @@ namespace Logic.Editor
         /// 当前图的缩放
         /// </summary>
         public Vector3 Scale = Vector3.one;
-        /// <summary>
-        /// 当前逻辑图节点缓存
-        /// </summary>
-        public List<LNInfoCache> Nodes = new List<LNInfoCache>();
+        ///// <summary>
+        ///// 当前逻辑图节点缓存
+        ///// </summary>
+        //public List<LNInfoCache> Nodes = new List<LNInfoCache>();
         /// <summary>
         /// 方便查找缓存
         /// </summary>
         [NonSerialized]
-        public Dictionary<string, LNInfoCache> NodeDic = new Dictionary<string, LNInfoCache>();
+        public Dictionary<string, BaseNodeView> NodeDic = new Dictionary<string, BaseNodeView>();
         /// <summary>
         /// 逻辑图信息
         /// </summary>
         [NonSerialized]
         public BaseLogicGraph Graph;
+
+        public LGInfoCache Clone()
+        {
+            LGInfoCache cache = new LGInfoCache();
+            cache.GraphClassName = this.GraphClassName;
+
+            //foreach (var item in Nodes)
+            //{
+            //    cache.Nodes.Add(item.Clone());
+            //}
+            return cache;
+        }
+
         /// <summary>
         /// 逻辑图面板
         /// </summary>
@@ -130,6 +143,9 @@ namespace Logic.Editor
         public LogicGraphView View;
 
         public LGInfoCache() { }
+
+        public BaseNodeView GetNodeView(BaseLogicNode item) => NodeDic.ContainsKey(item.OnlyId) ? NodeDic[item.OnlyId] : null;
+
 
         public LGInfoCache(BaseLogicGraph graph)
         {
@@ -139,39 +155,48 @@ namespace Logic.Editor
         }
     }
 
-    /// <summary>
-    /// 逻辑节点缓存
-    /// 存放当前逻辑节点的信息
-    /// </summary>
-    [Serializable]
-    public sealed class LNInfoCache
-    {
+    ///// <summary>
+    ///// 逻辑节点缓存
+    ///// 存放当前逻辑节点的信息
+    ///// </summary>
+    //[Serializable]
+    //public sealed class LNInfoCache
+    //{
 
-        /// <summary>
-        /// 唯一Id
-        /// </summary>
-        public string OnlyId;
-        public string Title;
-        public Vector2 Pos;
+    //    /// <summary>
+    //    /// 唯一Id
+    //    /// </summary>
+    //    public string OnlyId;
+    //    public string Title;
+    //    public Vector2 Pos;
 
-        [NonSerialized]
-        public string FullName;
-        [NonSerialized]
-        public BaseLogicNode Node;
-        [NonSerialized]
-        public BaseNodeView View;
-        public LNInfoCache(BaseLogicNode node)
-        {
-            Node = node;
-            OnlyId = node.OnlyId;
-            FullName = node.GetType().FullName;
-        }
+    //    [NonSerialized]
+    //    public string FullName;
+    //    [NonSerialized]
+    //    public BaseLogicNode Node;
+    //    [NonSerialized]
+    //    public BaseNodeView View;
+    //    public LNInfoCache(BaseLogicNode node)
+    //    {
+    //        Node = node;
+    //        OnlyId = node.OnlyId;
+    //        FullName = node.GetType().FullName;
+    //    }
 
-        public LNInfoCache()
-        {
+    //    public LNInfoCache()
+    //    {
 
-        }
-    }
+    //    }
+
+    //    public LNInfoCache Clone()
+    //    {
+    //        LNInfoCache cache = new LNInfoCache();
+    //        cache.OnlyId = this.OnlyId;
+    //        cache.Title = this.Title;
+    //        cache.Pos = this.Pos;
+    //        return cache;
+    //    }
+    //}
 
     /// <summary>
     /// 逻辑图编辑器信息缓存

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEditor.Experimental.GraphView;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace Logic.Editor
@@ -28,36 +29,36 @@ namespace Logic.Editor
             get { return titleLabel.text; }
             set { titleLabel.text = value; }
         }
-        public bool scrollable
-        {
-            get
-            {
-                return _scrollable;
-            }
-            set
-            {
-                if (_scrollable == value)
-                    return;
+        //public bool scrollable
+        //{
+        //    get
+        //    {
+        //        return _scrollable;
+        //    }
+        //    set
+        //    {
+        //        if (_scrollable == value)
+        //            return;
 
-                _scrollable = value;
+        //        _scrollable = value;
 
-                style.position = Position.Absolute;
-                if (_scrollable)
-                {
-                    content.RemoveFromHierarchy();
-                    root.Add(scrollView);
-                    scrollView.Add(content);
-                    AddToClassList("scrollable");
-                }
-                else
-                {
-                    scrollView.RemoveFromHierarchy();
-                    content.RemoveFromHierarchy();
-                    root.Add(content);
-                    RemoveFromClassList("scrollable");
-                }
-            }
-        }
+        //        style.position = Position.Absolute;
+        //        if (_scrollable)
+        //        {
+        //            content.RemoveFromHierarchy();
+        //            root.Add(scrollView);
+        //            scrollView.Add(content);
+        //            AddToClassList("scrollable");
+        //        }
+        //        else
+        //        {
+        //            scrollView.RemoveFromHierarchy();
+        //            content.RemoveFromHierarchy();
+        //            root.Add(content);
+        //            RemoveFromClassList("scrollable");
+        //        }
+        //    }
+        //}
 
         public PinnedParameterView()
         {
@@ -66,8 +67,8 @@ namespace Logic.Editor
 
             main = tpl.CloneTree();
             main.AddToClassList("mainContainer");
-            scrollView = new ScrollView(ScrollViewMode.VerticalAndHorizontal);
-
+            scrollView = new ScrollView(ScrollViewMode.Vertical);
+            scrollView.horizontalScroller.RemoveFromHierarchy();
             root = main.Q("content");
 
             header = main.Q("header");
@@ -77,38 +78,38 @@ namespace Logic.Editor
 
             hierarchy.Add(main);
 
-            capabilities |= Capabilities.Movable | Capabilities.Resizable;
             style.overflow = Overflow.Hidden;
 
             ClearClassList();
             AddToClassList("pinnedElement");
 
-            //this.AddManipulator(new Dragger { clampToParentEdges = true });
-
-            scrollable = true;
-
-            RegisterCallback<DragUpdatedEvent>(e =>
-            {
-                e.StopPropagation();
-            });
+            style.position = Position.Absolute;
+            content.RemoveFromHierarchy();
+            root.Add(scrollView);
+            scrollView.Add(content);
+            AddToClassList("scrollable");
+            content.style.paddingTop = 6;
+            content.style.paddingLeft = 6;
+            content.style.paddingRight = 6;
+            content.style.paddingBottom = 6;
+            //scrollable = true;
+            //           RegisterCallback<DragUpdatedEvent>(e =>
+            //{
+            //    e.StopPropagation();
+            //});
 
             title = "参数面板";
         }
 
+        public void Repaint()
+        {
+            this.content.Clear();
+        }
+
         public void InitializeGraphView(LogicGraphView graphView)
         {
-            //SetPosition(pinnedElement.position);
-
-            //onResized += () =>
-            //{
-            //    pinnedElement.position.size = layout.size;
-            //};
-
-            //RegisterCallback<MouseUpEvent>(e =>
-            //{
-            //    //pinnedElement.position.position = layout.position;
-            //});
-
+            RegisterCallback<MouseDownEvent>((e) => e.StopPropagation());
+            RegisterCallback<MouseUpEvent>((e) => e.StopPropagation());
         }
 
         public void ResetPosition()
@@ -117,6 +118,22 @@ namespace Logic.Editor
             //SetPosition(pinnedElement.position);
         }
 
+        public void Hide()
+        {
+            this.content.Clear();
+            this.visible = false;
+        }
 
+        public void Show(Rect rect)
+        {
+            this.visible = true;
+            float height = rect.height;
+            this.SetPosition(new Rect(rect.width - 300, 20, 300, height - 20));
+        }
+
+        public void AddUI(VisualElement element)
+        {
+            content.Add(element);
+        }
     }
 }

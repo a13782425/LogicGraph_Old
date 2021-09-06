@@ -1,10 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEditor;
+using UnityEngine;
 using static Logic.Editor.LGCacheData;
+using Object = UnityEngine.Object;
 
 namespace Logic.Editor
 {
@@ -37,7 +41,7 @@ namespace Logic.Editor
             Instance.Save();
         }
 
-        internal static void Refresh()
+        public static void Refresh()
         {
             List<Type> types = new List<Type>();
             types.AddRange(typeof(BaseNodeView).Assembly.GetTypes());
@@ -46,6 +50,59 @@ namespace Logic.Editor
             EditorUtility.SetDirty(Instance);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
+        }
+
+        public static void RemoveLogicGraph(string graphPath)
+        {
+            var graphCache = Instance.LGInfoList.FirstOrDefault(a => a.AssetPath == graphPath);
+            if (graphCache != null)
+            {
+                Object[] panels = Resources.FindObjectsOfTypeAll(typeof(LGWindow));
+                LGWindow panel = null;
+                foreach (var item in panels)
+                {
+                    if (item is LGWindow p)
+                    {
+                        if (p.LGInfoCache == graphCache)
+                        {
+                            panel = p;
+                            break;
+                        }
+                    }
+                }
+                if (panel != null)
+                {
+                    panel.Close();
+                }
+                Instance.LGInfoList.RemoveAll(a => a.AssetPath == graphPath);
+                Save();
+            }
+        }
+
+        internal static void AddLogicGraph(string graphPath, bool newGuid = false)
+        {
+            if (Instance.LGInfoList.FirstOrDefault(a => a.AssetPath == graphPath) != null)
+            {
+                return;
+            }
+            BaseLogicGraph logicGraph = AssetDatabase.LoadAssetAtPath<BaseLogicGraph>(graphPath);
+            if (logicGraph == null)
+                return;
+            string fileName = Path.GetFileNameWithoutExtension(graphPath);
+            string logicTypeName = logicGraph.GetType().FullName;
+            LGInfoCache graphCache = new LGInfoCache();
+            if (Instance.LGInfoList.FirstOrDefault(a => a.OnlyId == logicGraph.OnlyId) != null)
+            {
+                logicGraph.ResetGuid();
+            }
+            graphCache.GraphClassName = logicTypeName;
+            graphCache.LogicName = fileName;
+            graphCache.AssetPath = graphPath;
+            graphCache.OnlyId = logicGraph.OnlyId;
+            Instance.LGInfoList.Add(graphCache);
+            EditorUtility.SetDirty(logicGraph);
+            Save();
+            logicGraph = null;
         }
 
         private static void m_checkTypes(List<Type> types)
@@ -63,7 +120,7 @@ namespace Logic.Editor
 
             Instance.LGEditorList.RemoveAll(a => !a.IsRefresh);
             m_refreshStartNode();
-          
+
             foreach (var item in Instance.LGEditorList)
             {
                 item.Nodes.RemoveAll(a => !a.IsRefresh);

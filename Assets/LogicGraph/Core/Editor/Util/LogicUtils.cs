@@ -27,6 +27,11 @@ namespace Logic.Editor
         /// </summary>
         public readonly static string PORT_CUBE;
 
+        /// <summary>
+        /// 窗口最小大小
+        /// </summary>
+        public readonly static Vector2 MIN_SIZE;
+
         static LogicUtils()
         {
             Type lgType = typeof(LGWindow);
@@ -43,6 +48,7 @@ namespace Logic.Editor
             }
             EDITOR_STYLE_PATH = Path.Combine(EDITOR_PATH, "Style");
             PORT_CUBE = "cube";
+            MIN_SIZE = new Vector2(640, 360);
         }
 
         #region Style静态

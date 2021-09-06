@@ -12,7 +12,9 @@ namespace Logic
     public abstract class BaseLogicNode
     {
         [SerializeField]
-        private string _name;
+        public string Title;
+        [SerializeField]
+        public Vector2 Pos = Vector2.zero;
         [SerializeField]
         private string _onlyId = "";
         public string OnlyId => _onlyId;
@@ -21,9 +23,10 @@ namespace Logic
         private List<BaseLogicNode> _childs = new List<BaseLogicNode>();
         public List<BaseLogicNode> Childs => _childs;
 
+
         public BaseLogicNode()
         {
-            _name = this.GetType().Name;
+            Title = this.GetType().Name;
             _onlyId = Guid.NewGuid().ToString();
         }
     }

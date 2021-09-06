@@ -34,5 +34,12 @@ namespace Logic
         {
             _onlyId = Guid.NewGuid().ToString();
         }
+
+#if UNITY_EDITOR
+        public void ResetGuid()
+        {
+            _onlyId = Guid.NewGuid().ToString();
+        } 
+#endif
     }
 }

@@ -14,6 +14,7 @@ namespace Logic.Editor
     public sealed class LogicGraphView : GraphView
     {
         private bool _hasData = false;
+        private bool _showPinned = false;
         private LGWindow _window;
         public LGInfoCache LGInfoCache => _window.LGInfoCache;
         public LGEditorCache LGEditorCache => _window.LGEditorCache;
@@ -46,7 +47,8 @@ namespace Logic.Editor
             this.AddManipulator(new SelectionDragger());
             this.AddManipulator(new RectangleSelector());
             this.AddManipulator(new ClickSelector());
-            this.RegisterCallback<GeometryChangedEvent>(test);
+            this.RegisterCallback<GeometryChangedEvent>(m_onGeometryChanged);
+            this.RegisterCallback<KeyDownEvent>(m_onKeyDownEvent);
             graphViewChanged = m_onGraphViewChanged;
             viewTransformChanged = m_onViewTransformChanged;
             m_setToolBar();
@@ -56,16 +58,73 @@ namespace Logic.Editor
             _pinnedView = new PinnedParameterView();
             _pinnedView.InitializeGraphView(this);
             this.Add(_pinnedView);
+            _pinnedView.Hide();
+            //m_setPinnedPanel(this.layout);
             _hasData = true;
         }
 
-        private void test(GeometryChangedEvent evt)
+        /// <summary>
+        /// 添加元素到参数界面
+        /// </summary>
+        /// <param name="ui"></param>
+        public void AddParamElement(VisualElement element)
         {
-            float height = evt.newRect.height;
-            _pinnedView.SetPosition(new Rect(evt.newRect.width - 120, 0, 100, height));
+            if (_showPinned)
+            {
+                _pinnedView.AddUI(element);
+            }
+        }
+        public void RepaintParamPanel()
+        {
+            if (_showPinned)
+            {
+                _pinnedView.Repaint();
+            }
+        }
+        /// <summary>
+        /// 保存
+        /// </summary>
+        public void Save()
+        {
+            if (LGInfoCache.Graph != null)
+            {
+                EditorUtility.SetDirty(LGInfoCache.Graph);
+            }
+            LGCacheOp.Save();
+        }
+        #region 重写方法
+        public override void AddToSelection(ISelectable selectable)
+        {
+            base.AddToSelection(selectable);
+            if (selection.Count == 1)
+            {
+                if (selectable is Node node)
+                {
+                    BaseNodeView nodeView = node.userData as BaseNodeView;
+                    if (nodeView.ShowParamPanel)
+                    {
+                        _pinnedView.Show(this.layout);
+                        _showPinned = true;
+                        nodeView.ShowParamUI();
+                    }
+                }
+            }
+            if (selection.Count > 1 && _showPinned)
+            {
+                _pinnedView.Hide();
+                _showPinned = false;
+            }
+        }
+        public override void ClearSelection()
+        {
+            base.ClearSelection();
+            if (_showPinned)
+            {
+                _pinnedView.Hide();
+                _showPinned = false;
+            }
         }
 
-        #region 重写方法
         public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
         {
             if (!_hasData)
@@ -92,22 +151,32 @@ namespace Logic.Editor
             {
                 return compatiblePorts;
             }
-            //LogicNodeBaseView startNodeView = startPort.node as LogicNodeBaseView;
-            foreach (var port in ports.ToList())
+            if (startPort is PortView portView)
             {
-                if (port.direction == Direction.Output)
+                //LogicNodeBaseView startNodeView = startPort.node as LogicNodeBaseView;
+                foreach (var port in ports.ToList())
                 {
-                    continue;
+                    if (port.direction == Direction.Output)
+                    {
+                        continue;
+                    }
+                    if (portView.node == port.node)
+                    {
+                        continue;
+                    }
+                    if (portView.connections.FirstOrDefault(a => a.input == port) != null)
+                    {
+                        continue;
+                    }
+                    if (port is PortView tarPort)
+                    {
+                        if (tarPort.CanLink(portView))
+                        {
+                            compatiblePorts.Add(port);
+                        }
+                    }
+
                 }
-                if (startPort.node == port.node)
-                {
-                    continue;
-                }
-                if (startPort.connections.FirstOrDefault(a => a.input == port) != null)
-                {
-                    continue;
-                }
-                compatiblePorts.Add(port);
             }
             return compatiblePorts;
         }
@@ -165,15 +234,14 @@ namespace Logic.Editor
             BaseLogicGraph graph = ScriptableObject.CreateInstance(configData.GraphClassName) as BaseLogicGraph;
             graph.name = file;
             path = path.Replace(Application.dataPath, "Assets");
-            var (start, startCache) = m_createStartNode();
+            var start = m_createStartNode();
             graph.StartNode = start;
             graph.Nodes.Add(start);
-            AssetDatabase.CreateAsset(graph, path);
             LGInfoCache graphCache = new LGInfoCache(graph);
             graphCache.LogicName = file;
             graphCache.AssetPath = path;
-            graphCache.Nodes.Add(startCache);
             Instance.LGInfoList.Add(graphCache);
+            AssetDatabase.CreateAsset(graph, path);
             LGCacheOp.Save();
             _window.SetLogic(graphCache);
             return true;
@@ -185,13 +253,12 @@ namespace Logic.Editor
             return true;
         }
 
-        private (StartNode, LNInfoCache) m_createStartNode()
+        private StartNode m_createStartNode()
         {
             StartNode start = new StartNode();
-            LNInfoCache cache = new LNInfoCache(start);
-            cache.Pos = Vector2.zero;
-            cache.Title = "开始";
-            return (start, cache);
+            start.Pos = Vector2.zero;
+            start.Title = "开始";
+            return start;
         }
 
 
@@ -226,14 +293,12 @@ namespace Logic.Editor
         {
             BaseLogicNode logicNode = Activator.CreateInstance(nodeEditor.GetNodeType()) as BaseLogicNode;
             this.LGInfoCache.Graph.Nodes.Add(logicNode);
-            LNInfoCache nodeCache = new LNInfoCache(logicNode);
-            nodeCache.Pos = pos;
-            nodeCache.Title = nodeEditor.NodeName;
-            this.LGInfoCache.Nodes.Add(nodeCache);
-            LGCacheOp.Save();
-            m_showNode(nodeCache);
-        }
 
+            logicNode.Pos = pos;
+            logicNode.Title = nodeEditor.NodeName;
+            this.Save();
+            m_showNode(logicNode);
+        }
 
         /// <summary>
         /// 设置工具条
@@ -254,20 +319,21 @@ namespace Logic.Editor
 
         private void m_initializeNodeViews()
         {
-            List<LNInfoCache> nodes = _window.LGInfoCache.Nodes;
+            List<BaseLogicNode> nodes = _window.LGInfoCache.Graph.Nodes;
             nodes.ForEach(a => m_showNode(a));
-            nodes.ForEach(a => a.View.DrawLink());
+            _window.LGInfoCache.NodeDic.Values.ToList().ForEach(a => a.DrawLink());
         }
 
-        private void m_showNode(LNInfoCache nodeCache)
+        private void m_showNode(BaseLogicNode node)
         {
-            LGInfoCache.NodeDic.Add(nodeCache.OnlyId, nodeCache);
-            string fullName = nodeCache.Node.GetType().FullName;
-            var nodeEditor = LGEditorCache.Nodes.FirstOrDefault(a => a.NodeClassName == fullName);
-            nodeCache.View = Activator.CreateInstance(nodeEditor.GetViewType()) as BaseNodeView;
-            nodeCache.View.Initialize(this, nodeCache);
-            nodeCache.View.ShowUI();
+            string fullName = node.GetType().FullName;
+            LNEditorCache nodeEditor = LGEditorCache.Nodes.FirstOrDefault(a => a.NodeClassName == fullName);
+            BaseNodeView nodeView = Activator.CreateInstance(nodeEditor.GetViewType()) as BaseNodeView;
+            LGInfoCache.NodeDic.Add(node.OnlyId, nodeView);
+            nodeView.Initialize(this, node);
+            nodeView.ShowUI();
         }
+
         private GraphViewChange m_onGraphViewChanged(GraphViewChange graphViewChange)
         {
             if (graphViewChange.elementsToRemove != null)
@@ -285,7 +351,6 @@ namespace Logic.Editor
                             break;
                         case Node node:
                             var baseNode = node.userData as BaseNodeView;
-                            LGInfoCache.Nodes.Remove(baseNode.nodeCache);
                             LGInfoCache.Graph.Nodes.Remove(baseNode.Target);
                             break;
                         default:
@@ -303,6 +368,54 @@ namespace Logic.Editor
                 LGInfoCache.Position = viewTransform.position;
                 LGInfoCache.Scale = viewTransform.scale;
             }
+        }
+
+        private void m_onGeometryChanged(GeometryChangedEvent evt)
+        {
+            if (_showPinned)
+            {
+                _pinnedView.Show(evt.newRect);
+            }
+        }
+        private void m_onKeyDownEvent(KeyDownEvent evt)
+        {
+            if (evt.ctrlKey && evt.keyCode == KeyCode.S)
+            {
+                //保存
+                this.Save();
+                evt.StopImmediatePropagation();
+                return;
+            }
+            if (evt.ctrlKey && evt.keyCode == KeyCode.D)
+            {
+                Vector2 screenPos = _window.GetScreenPosition(evt.originalMousePosition);
+                //经过计算得出节点的位置
+                var windowMousePosition = _window.rootVisualElement.ChangeCoordinatesTo(_window.rootVisualElement.parent, screenPos - _window.position.position);
+                var nodePosition = this.contentViewContainer.WorldToLocal(windowMousePosition);
+                //复制
+                foreach (ISelectable item in selection)
+                {
+                    switch (item)
+                    {
+                        case Node node:
+                            m_duplicateNodeView(node.userData as BaseNodeView, nodePosition);
+                            break;
+                        //case LogicGroupView groupView:
+                        //    DuplicateGroupView(groupView, nodePosition);
+                        //    break;
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+
+        private void m_duplicateNodeView(BaseNodeView baseNodeView, Vector2 nodePosition)
+        {
+            string nodeFullName = baseNodeView.Target.GetType().FullName;
+            var nodeEditor = LGEditorCache.Nodes.FirstOrDefault(a => a.NodeClassName == nodeFullName);
+            m_createNodeView(nodeEditor, nodePosition, false);
+
         }
         #endregion
 

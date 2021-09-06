@@ -47,6 +47,7 @@ namespace Logic.Editor
             if (panel == null)
             {
                 panel = CreateWindow<LGWindow>();
+                panel.minSize = LogicUtils.MIN_SIZE;
                 panel.SetLogic(info);
             }
             panel.Show();
@@ -68,16 +69,6 @@ namespace Logic.Editor
                 this._lgInfoCache.Graph = graph;
                 //删除没有的节点
                 graph.Nodes.RemoveAll(n => n == null);
-                //删除对应节点的配置缓存
-                info.Nodes.RemoveAll(n => graph.Nodes.FirstOrDefault(a => a.OnlyId == n.OnlyId) == null);
-                foreach (var item in this._lgInfoCache.Graph.Nodes)
-                {
-                    LNInfoCache nodeCache = this._lgInfoCache.Nodes.FirstOrDefault(a => a.OnlyId == item.OnlyId);
-                    if (nodeCache != null)
-                    {
-                        nodeCache.Node = item;
-                    }
-                }
                 this._view.ShowLogic();
             }
         }
@@ -101,7 +92,7 @@ namespace Logic.Editor
         }
         private void OnDestroy()
         {
-            //this._panelData.Save();
+            _view.Save();
         }
         #endregion
     }

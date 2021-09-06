@@ -13,23 +13,20 @@ MonoBehaviour:
   m_Name: LGConfig
   m_EditorClassIdentifier: 
   _lgInfoList:
-  - OnlyId: 48207157-f159-493c-8d83-8a22a5b1204f
+  - OnlyId: 72a9914c-845a-4a25-9c07-6aec127ac3e3
     LogicName: LogicGraph
     GraphClassName: Logic.DefaultLogicGraph
     FileName: 
     AssetPath: Assets/LogicGraph.asset
-    Position: {x: -156, y: 103, z: 0}
-    Scale: {x: 1.157625, y: 1.157625, z: 1}
-    Nodes:
-    - OnlyId: 6fe6e07c-3a07-4dd6-9080-6965e7853dc4
-      Title: "\u5F00\u59CB"
-      Pos: {x: 232.26408, y: 155.2254}
-    - OnlyId: 92a3b659-f999-4531-89e8-112305aacd53
-      Title: "\u96FE\u6548"
-      Pos: {x: 383.058, y: 87}
-    - OnlyId: 7f621598-8f52-4832-aaa6-42c3bb122a9b
-      Title: "\u5929\u6C14"
-      Pos: {x: 735.06146, y: 115.491165}
+    Position: {x: 166, y: 154, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+  - OnlyId: efd041d0-480a-4c9a-b6bf-fffd22bd8b9a
+    LogicName: LogicGraph 1
+    GraphClassName: Logic.DefaultLogicGraph
+    FileName: 
+    AssetPath: Assets/LogicGraph 1.asset
+    Position: {x: 329, y: 258, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
   _lgEditorList:
   - GraphName: "\u9ED8\u8BA4\u903B\u8F91\u56FE"
     GraphClassName: Logic.DefaultLogicGraph
