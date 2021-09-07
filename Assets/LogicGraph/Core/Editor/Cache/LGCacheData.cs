@@ -226,6 +226,10 @@ namespace Logic.Editor
         public List<LNEditorCache> DefaultNodes = new List<LNEditorCache>();
 
         /// <summary>
+        /// 当前逻辑图适用的格式化
+        /// </summary>
+        public List<LFEditorCache> Formats = new List<LFEditorCache>();
+        /// <summary>
         /// 默认节点的全成类名
         /// </summary>
         [NonSerialized]
@@ -363,5 +367,32 @@ namespace Logic.Editor
             UseCount -= 1;
         }
     }
-
+    /// <summary>
+    /// 逻辑图格式化
+    /// </summary>
+    [Serializable]
+    public sealed class LFEditorCache
+    {
+        /// <summary>
+        /// 格式化名
+        /// </summary>
+        public string FormatName;
+        /// <summary>
+        /// 格式化类型名全称,含命名空间
+        /// </summary>
+        public string FormatClassName;
+        /// <summary>
+        /// 格式化后缀
+        /// </summary>
+        public string Extension;
+        private Type _curType = null;
+        public Type GetFormatType()
+        {
+            if (_curType == null)
+            {
+                _curType = typeof(ILogicFormat).Assembly.GetType(FormatClassName);
+            }
+            return _curType;
+        }
+    }
 }

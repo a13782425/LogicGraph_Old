@@ -20,7 +20,7 @@ namespace Logic.Editor
         public LGEditorCache LGEditorCache => _window.LGEditorCache;
 
         private PinnedParameterView _pinnedView;
-      
+
         private ToolbarView _toolbarView;
 
         private EdgeConnectorListener _connectorListener;
@@ -130,19 +130,22 @@ namespace Logic.Editor
         {
             if (!_hasData)
             {
-                evt.menu.AppendAction("创建逻辑图", m_onCreateLogic);
-                evt.menu.AppendAction("打开逻辑图", m_onOpenLogic);
+                evt.menu.AppendAction("创建逻辑图", m_onCreateLogic, DropdownMenuAction.AlwaysEnabled);
+                evt.menu.AppendAction("打开逻辑图", m_onOpenLogic, DropdownMenuAction.AlwaysEnabled);
             }
             else
             {
-                evt.menu.AppendAction("创建节点", m_onCreateNode);
-                evt.menu.AppendAction("创建分组", m_onCreateGroup);
-                evt.menu.AppendAction("创建默认节点", m_onCreateDefaultNode);
+                evt.menu.AppendAction("创建节点", m_onCreateNode, DropdownMenuAction.AlwaysEnabled);
+                evt.menu.AppendAction("创建分组", m_onCreateGroup, DropdownMenuAction.AlwaysEnabled);
+                evt.menu.AppendAction("创建默认节点", m_onCreateDefaultNode, DropdownMenuAction.AlwaysEnabled);
                 evt.menu.AppendSeparator();
-                evt.menu.AppendAction("保存", null);
-                evt.menu.AppendAction("另存为", null);
+                evt.menu.AppendAction("保存", m_onSaveCallback, DropdownMenuAction.AlwaysEnabled);
                 evt.menu.AppendSeparator();
-                evt.menu.AppendAction("导出", null);
+                foreach (var item in LGEditorCache.Formats)
+                {
+                    evt.menu.AppendAction("导出: " + item.FormatName, m_onFormatCallback, DropdownMenuAction.AlwaysEnabled, item);
+                }
+                //evt.menu.AppendAction("导出", null);
             }
         }
 
@@ -326,7 +329,33 @@ namespace Logic.Editor
                 _window.ShowNotification(new GUIContent("当前逻辑图已创建所有默认节点"));
             }
         }
-
+        private void m_onSaveCallback(DropdownMenuAction obj)
+        {
+            Save();
+        }
+        private void m_onFormatCallback(DropdownMenuAction obj)
+        {
+            LFEditorCache formatConfig = obj.userData as LFEditorCache;
+            if (formatConfig != null)
+            {
+                string filePath = EditorUtility.SaveFilePanel("导出", Application.dataPath, "undefined", formatConfig.Extension);
+                if (string.IsNullOrWhiteSpace(filePath))
+                {
+                    _window.ShowNotification(new GUIContent("请选择导出路径"));
+                    return;
+                }
+                var logicFormat = Activator.CreateInstance(formatConfig.GetFormatType()) as ILogicFormat;
+                bool res = logicFormat.ToFormat(LGInfoCache.Graph, filePath);
+                if (res)
+                {
+                    _window.ShowNotification(new GUIContent($"导出: {formatConfig.FormatName} 成功"));
+                }
+                else
+                {
+                    _window.ShowNotification(new GUIContent($"导出: {formatConfig.FormatName} 失败"));
+                }
+            }
+        }
         private void m_showLogic()
         {
             m_initializeEdgeConnectorListener();

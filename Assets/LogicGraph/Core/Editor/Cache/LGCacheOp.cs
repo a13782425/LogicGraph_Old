@@ -119,7 +119,7 @@ namespace Logic.Editor
             }
             m_refreshLogicGraph(types);
             m_refreshLogicNode(types);
-
+            m_refreshFormat(types);
             Instance.LGEditorList.RemoveAll(a => !a.IsRefresh);
             //m_refreshStartNode();
 
@@ -261,6 +261,44 @@ namespace Logic.Editor
                                     }
                                 }
                             }
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 刷新格式化信息
+        /// </summary>
+        /// <param name="types"></param>
+        private static void m_refreshFormat(List<Type> types)
+        {
+            //逻辑图格式化类型
+            Type _logicFormatType = typeof(ILogicFormat);
+            Type _logicFormatAttr = typeof(LogicFormatAttribute);
+            foreach (var item in types)
+            {
+                if (!item.IsAbstract && !item.IsInterface)
+                {
+                    if (_logicFormatType.IsAssignableFrom(item))
+                    {
+                        //如果当前类型是逻辑图节点
+                        object[] formatAttrs = item.GetCustomAttributes(_logicFormatAttr, false);
+                        if (formatAttrs != null && formatAttrs.Length > 0)
+                        {
+                            LogicFormatAttribute logicFormat = formatAttrs[0] as LogicFormatAttribute;
+                            Type graphType = logicFormat.LogicGraphType;
+                            var graphEditor = Instance.LGEditorList.FirstOrDefault(a => a.GraphClassName == graphType.FullName);
+                            var formatConfig = graphEditor.Formats.FirstOrDefault(a => a.FormatName == logicFormat.Name);
+                            if (formatConfig != null)
+                            {
+                                Debug.LogError($"格式化名称相同:{logicFormat.Name}");
+                            }
+                            formatConfig = new LFEditorCache();
+                            formatConfig.FormatName = logicFormat.Name;
+                            formatConfig.FormatClassName = item.FullName;
+                            formatConfig.Extension = logicFormat.Extension;
+                            graphEditor.Formats.Add(formatConfig);
                         }
                     }
                 }
