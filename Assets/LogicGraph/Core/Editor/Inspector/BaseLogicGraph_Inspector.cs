@@ -8,17 +8,21 @@ using UnityEngine;
 
 namespace Logic.Editor
 {
-    [CustomEditor(typeof(LGCacheData))]
-    sealed class LGCacheData_Inspector : UnityEditor.Editor
+    [CustomEditor(typeof(BaseLogicGraph), true)]
+    public sealed class BaseLogicGraph_Inspector : UnityEditor.Editor
     {
-        private LGCacheData _cacheData;
+        private BaseLogicGraph _logic;
 
         void OnEnable()
         {
-            _cacheData = target as LGCacheData;
+            _logic = target as BaseLogicGraph;
         }
         public override void OnInspectorGUI()
         {
+            if (GUILayout.Button("打开"))
+            {
+                LGWindow.ShowLGPanel(LGCacheOp.GetLogicInfo(_logic));
+            }
             UnityEditor.EditorGUI.BeginDisabledGroup(true);
             base.OnInspectorGUI();
             UnityEditor.EditorGUI.EndDisabledGroup();

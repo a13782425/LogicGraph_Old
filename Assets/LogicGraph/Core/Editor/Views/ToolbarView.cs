@@ -9,26 +9,23 @@ using UnityEngine.UIElements;
 
 namespace Logic.Editor
 {
-    public class ToolbarView : VisualElement
+    public sealed class ToolbarView : VisualElement
     {
+        public event Action onDrawLeft;
+        public event Action onDrawRight;
         public ToolbarView()
         {
             Add(new IMGUIContainer(DrawImGUIToolbar));
         }
-		void DrawImGUIButtonList()
-		{
-            GUILayout.Button("测试Bar", EditorStyles.toolbarButton);
-
-        }
-		protected virtual void DrawImGUIToolbar()
+        private void DrawImGUIToolbar()
         {
             GUILayout.BeginHorizontal(EditorStyles.toolbar);
 
-            DrawImGUIButtonList();
+            onDrawLeft?.Invoke();
 
             GUILayout.FlexibleSpace();
 
-            DrawImGUIButtonList();
+            onDrawRight?.Invoke();
 
             GUILayout.EndHorizontal();
         }

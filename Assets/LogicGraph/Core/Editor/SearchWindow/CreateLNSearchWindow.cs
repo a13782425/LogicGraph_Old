@@ -67,21 +67,21 @@ namespace Logic.Editor
                 searchTrees.Add(new SearchTreeEntry(new GUIContent(nodeConfig.NodeFullName)) { level = 2, userData = nodeConfig });
             }
         }
-       
+
         /// <summary>
         /// 添加节点树
         /// </summary>
         /// <param name="searchTrees"></param>
         private void AddNodeTree(List<SearchTreeEntry> searchTrees)
         {
-            Type startType = typeof(StartNode);
             List<string> groups = new List<string>();
             foreach (LNEditorCache nodeConfig in _editorData.Nodes)
             {
-                if (nodeConfig.GetNodeType() == startType)
+                if (_editorData.DefaultNodes.Contains(nodeConfig))
                 {
                     continue;
                 }
+
                 int createIndex = int.MaxValue;
 
                 for (int i = 0; i < nodeConfig.NodeLayers.Length - 1; i++)

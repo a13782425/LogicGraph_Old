@@ -20,7 +20,7 @@ namespace Logic.Editor
         public LGEditorCache LGEditorCache => _window.LGEditorCache;
 
         private PinnedParameterView _pinnedView;
-
+      
         private ToolbarView _toolbarView;
 
         private EdgeConnectorListener _connectorListener;
@@ -33,6 +33,8 @@ namespace Logic.Editor
         {
             _window = lgWindow;
             _toolbarView = new ToolbarView();
+            _toolbarView.onDrawLeft += toolbarView_onDrawLeft;
+            _toolbarView.onDrawRight += toolbarView_onDrawRight;
             this.Add(_toolbarView);
             //扩展大小与父对象相同
             this.StretchToParentSize();
@@ -51,7 +53,6 @@ namespace Logic.Editor
             this.RegisterCallback<KeyDownEvent>(m_onKeyDownEvent);
             graphViewChanged = m_onGraphViewChanged;
             viewTransformChanged = m_onViewTransformChanged;
-            m_setToolBar();
             m_showLogic();
             viewTransform.position = LGInfoCache.Position;
             viewTransform.scale = LGInfoCache.Scale;
@@ -135,7 +136,8 @@ namespace Logic.Editor
             else
             {
                 evt.menu.AppendAction("创建节点", m_onCreateNode);
-                //evt.menu.AppendAction("创建便笺", null);
+                evt.menu.AppendAction("创建分组", m_onCreateGroup);
+                evt.menu.AppendAction("创建默认节点", m_onCreateDefaultNode);
                 evt.menu.AppendSeparator();
                 evt.menu.AppendAction("保存", null);
                 evt.menu.AppendAction("另存为", null);
@@ -183,13 +185,6 @@ namespace Logic.Editor
 
         #endregion
 
-        #region 子类重写
-
-
-
-        #endregion
-
-
         #region 私有方法
         /// <summary>
         /// 创建逻辑图
@@ -234,9 +229,6 @@ namespace Logic.Editor
             BaseLogicGraph graph = ScriptableObject.CreateInstance(configData.GraphClassName) as BaseLogicGraph;
             graph.name = file;
             path = path.Replace(Application.dataPath, "Assets");
-            var start = m_createStartNode();
-            graph.StartNode = start;
-            graph.Nodes.Add(start);
             LGInfoCache graphCache = new LGInfoCache(graph);
             graphCache.LogicName = file;
             graphCache.AssetPath = path;
@@ -252,15 +244,6 @@ namespace Logic.Editor
             _window.SetLogic(graphCache);
             return true;
         }
-
-        private StartNode m_createStartNode()
-        {
-            StartNode start = new StartNode();
-            start.Pos = Vector2.zero;
-            start.Title = "开始";
-            return start;
-        }
-
 
         /// <summary>
         /// 创建节点面板
@@ -288,28 +271,67 @@ namespace Logic.Editor
 
             return true;
         }
+        private void m_onCreateGroup(DropdownMenuAction obj)
+        {
+            //经过计算得出节点的位置
+
+            Vector2 screenPos = _window.GetScreenPosition(obj.eventInfo.mousePosition);
+            //经过计算得出节点的位置
+            var windowMousePosition = _window.rootVisualElement.ChangeCoordinatesTo(_window.rootVisualElement.parent, screenPos - _window.position.position);
+            var nodePosition = this.contentViewContainer.WorldToLocal(windowMousePosition);
+            var logicGroup = new BaseLogicGroup();
+            this.LGInfoCache.Graph.Groups.Add(logicGroup);
+            m_showGroup(logicGroup, nodePosition);
+
+        }
 
         private void m_createNodeView(LNEditorCache nodeEditor, Vector2 pos, bool record = true)
         {
             BaseLogicNode logicNode = Activator.CreateInstance(nodeEditor.GetNodeType()) as BaseLogicNode;
             this.LGInfoCache.Graph.Nodes.Add(logicNode);
+            if (this.LGEditorCache.DefaultNodes.Contains(nodeEditor))
+            {
+                this.LGInfoCache.Graph.StartNodes.Add(logicNode);
+            }
 
             logicNode.Pos = pos;
             logicNode.Title = nodeEditor.NodeName;
             this.Save();
-            m_showNode(logicNode);
+            m_showNode(logicNode, record);
         }
 
-        /// <summary>
-        /// 设置工具条
-        /// </summary>
-        private void m_setToolBar()
+        private void m_onCreateDefaultNode(DropdownMenuAction obj)
         {
+            if (LGEditorCache.DefaultNodes.Count == 0)
+            {
+                _window.ShowNotification(new GUIContent("当前逻辑图没有默认节点,请联系程序员设置"));
+                return;
+            }
+            int createNum = 0;
+            Vector2 screenPos = _window.GetScreenPosition(obj.eventInfo.mousePosition);
+            //经过计算得出节点的位置
+            var windowMousePosition = _window.rootVisualElement.ChangeCoordinatesTo(_window.rootVisualElement.parent, screenPos - _window.position.position);
+            var nodePosition = this.contentViewContainer.WorldToLocal(windowMousePosition);
+            foreach (var item in LGEditorCache.DefaultNodes)
+            {
+                if (LGInfoCache.Graph.StartNodes.FirstOrDefault(a => a.GetType() == item.GetNodeType()) != null)
+                {
+                    continue;
+                }
+                m_createNodeView(item, nodePosition, false);
+                createNum++;
+            }
+            if (createNum == 0)
+            {
+                _window.ShowNotification(new GUIContent("当前逻辑图已创建所有默认节点"));
+            }
         }
+
         private void m_showLogic()
         {
             m_initializeEdgeConnectorListener();
             m_initializeNodeViews();
+            m_initializeGroupViews();
         }
 
         private void m_initializeEdgeConnectorListener()
@@ -320,11 +342,15 @@ namespace Logic.Editor
         private void m_initializeNodeViews()
         {
             List<BaseLogicNode> nodes = _window.LGInfoCache.Graph.Nodes;
-            nodes.ForEach(a => m_showNode(a));
+            nodes.ForEach(a => m_showNode(a, false));
             _window.LGInfoCache.NodeDic.Values.ToList().ForEach(a => a.DrawLink());
         }
-
-        private void m_showNode(BaseLogicNode node)
+        private void m_initializeGroupViews()
+        {
+            List<BaseLogicGroup> groups = _window.LGInfoCache.Graph.Groups;
+            groups.ForEach(a => m_showGroup(a, a.Pos));
+        }
+        private void m_showNode(BaseLogicNode node, bool record = true)
         {
             string fullName = node.GetType().FullName;
             LNEditorCache nodeEditor = LGEditorCache.Nodes.FirstOrDefault(a => a.NodeClassName == fullName);
@@ -332,14 +358,31 @@ namespace Logic.Editor
             LGInfoCache.NodeDic.Add(node.OnlyId, nodeView);
             nodeView.Initialize(this, node);
             nodeView.ShowUI();
+            if (record)
+            {
+                nodeEditor.AddUseCount();
+                LGEditorCache.Nodes.ForEach(a =>
+                  {
+                      if (a != nodeEditor)
+                      {
+                          a.SubUseCount();
+                      }
+                  });
+            }
+        }
+
+        private void m_showGroup(BaseLogicGroup group, Vector2 pos)
+        {
+            group.Pos = pos;
+            GroupView groupView = new GroupView();
+            groupView.Initialize(this, group);
+            this.AddElement(groupView);
         }
 
         private GraphViewChange m_onGraphViewChanged(GraphViewChange graphViewChange)
         {
             if (graphViewChange.elementsToRemove != null)
             {
-                graphViewChange.elementsToRemove.RemoveAll(a => a.userData is StartNodeView);
-
                 foreach (var item in graphViewChange.elementsToRemove)
                 {
                     switch (item)
@@ -352,6 +395,9 @@ namespace Logic.Editor
                         case Node node:
                             var baseNode = node.userData as BaseNodeView;
                             LGInfoCache.Graph.Nodes.Remove(baseNode.Target);
+                            break;
+                        case GroupView groupView:
+                            LGInfoCache.Graph.Groups.Remove(groupView.group);
                             break;
                         default:
                             break;
@@ -415,8 +461,52 @@ namespace Logic.Editor
             string nodeFullName = baseNodeView.Target.GetType().FullName;
             var nodeEditor = LGEditorCache.Nodes.FirstOrDefault(a => a.NodeClassName == nodeFullName);
             m_createNodeView(nodeEditor, nodePosition, false);
-
         }
+
+        /// <summary>
+        /// 绘制左边工具条
+        /// </summary>
+        private void toolbarView_onDrawLeft()
+        {
+            if (_hasData)
+            {
+                GUILayout.Label("逻辑图:");
+                var logicName = EditorGUILayout.TextField(LGInfoCache.LogicName, EditorStyles.toolbarTextField, GUILayout.MaxWidth(100));
+                if (logicName != LGInfoCache.LogicName)
+                {
+                    LGInfoCache.LogicName = logicName;
+                    LGInfoCache.Graph.SetTitle(logicName);
+                }
+                EditorGUILayout.Separator();
+            }
+            else
+                GUILayout.Label("逻辑图:空");
+        }
+        /// <summary>
+        /// 绘制右边工具条
+        /// </summary>
+        private void toolbarView_onDrawRight()
+        {
+            if (_hasData)
+            {
+                EditorGUILayout.BeginHorizontal();
+                if (GUILayout.Button("居中", EditorStyles.toolbarButton))
+                {
+                    LGInfoCache.Position = Vector3.zero;
+                    LGInfoCache.Scale = Vector3.one;
+                    UpdateViewTransform(Vector3.zero, Vector3.one);
+                }
+                EditorGUILayout.Separator();
+                if (GUILayout.Button("在项目中选中", EditorStyles.toolbarButton))
+                {
+                    UnityEditor.EditorGUIUtility.PingObject(LGInfoCache.Graph);
+                    UnityEditor.Selection.activeObject = LGInfoCache.Graph;
+                }
+                EditorGUILayout.EndHorizontal();
+            }
+        }
+
+
         #endregion
 
 

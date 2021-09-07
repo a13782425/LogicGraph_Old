@@ -5,8 +5,10 @@ using UnityEngine;
 
 namespace Logic
 {
-    [LogicGraph("默认逻辑图")]
-    public class DefaultLogicGraph : BaseLogicGraph
+#if UNITY_EDITOR
+    [LogicGraph("{CLASS_NAME}")]
+#endif
+    public class {CLASS_NAME} : BaseLogicGraph
     {
     }
 }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEditor;
+using UnityEditor.Callbacks;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
@@ -13,6 +14,7 @@ namespace Logic.Editor
 {
     public static class LogicUtils
     {
+        private static Texture2D scriptIcon = (EditorGUIUtility.IconContent("cs Script Icon").image as Texture2D);
         /// <summary>
         /// 编辑器路径
         /// </summary>
@@ -65,11 +67,15 @@ namespace Logic.Editor
         {
             return AssetDatabase.LoadAssetAtPath<StyleSheet>(Path.Combine(EDITOR_STYLE_PATH, "EdgeView.uss"));
         }
+        public static StyleSheet GetGridStyle()
+        {
+            return AssetDatabase.LoadAssetAtPath<StyleSheet>(Path.Combine(EDITOR_STYLE_PATH, "GroupView.uss"));
+        }
         public static VisualTreeAsset GetPinnedView()
         {
             return AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(Path.Combine(EDITOR_STYLE_PATH, "PinnedElement.uxml"));
         }
-        public static StyleSheet GetPinnedStyle ()
+        public static StyleSheet GetPinnedStyle()
         {
             return AssetDatabase.LoadAssetAtPath<StyleSheet>(Path.Combine(EDITOR_STYLE_PATH, "PinnedElementView.uss"));
         }
@@ -86,5 +92,136 @@ namespace Logic.Editor
             return window.position.position + localPos;
         }
         #endregion
+
+
+        [OnOpenAsset(0)]
+        public static bool OnBaseGraphOpened(int instanceID, int line)
+        {
+            var asset = EditorUtility.InstanceIDToObject(instanceID) as BaseLogicGraph;
+
+            if (asset != null)
+            {
+                LGWindow.ShowLGPanel(LGCacheOp.GetLogicInfo(asset));
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 刷新
+        /// </summary>
+        [MenuItem("Framework/逻辑图/扫描逻辑图")]
+        private static void RefreshLogic()
+        {
+            LGCacheOp.Refresh();
+            LGCacheData.Instance.LGInfoList.Clear();
+            string[] strs = Directory.GetFiles(Application.dataPath, "*.asset", SearchOption.AllDirectories);
+            foreach (var item in strs)
+            {
+                string fileName = item.Replace(Application.dataPath, "Assets");
+                BaseLogicGraph logicGraph = AssetDatabase.LoadAssetAtPath<BaseLogicGraph>(fileName);
+                if (logicGraph != null)
+                {
+                    LGInfoCache infoCache = new LGInfoCache();
+                    infoCache.AssetPath = fileName.Replace('\\', '/');
+                    infoCache.FileName = Path.GetFileNameWithoutExtension(infoCache.AssetPath);
+                    infoCache.LogicName = logicGraph.Title;
+                    infoCache.GraphClassName = logicGraph.GetType().FullName;
+                    infoCache.OnlyId = logicGraph.OnlyId;
+                    LGCacheData.Instance.LGInfoList.Add(infoCache);
+                }
+            }
+            LGCacheOp.Save();
+        }
+
+        /// <summary>
+        /// 创建节点
+        /// </summary>
+        [MenuItem("Assets/Create/LogicGraph/Node C# Script", false, 89)]
+        private static void CreateNode()
+        {
+            string path = Path.Combine(EDITOR_PATH, "Template/LogicNodeTemplate.cs");
+            CreateFromTemplate<DoCreateNodeCodeFile>(
+                "NewNode.cs",
+                path
+            );
+        }
+        /// <summary>
+        /// 创建逻辑图
+        /// </summary>
+        [MenuItem("Assets/Create/LogicGraph/Graph C# Script", false, 89)]
+        private static void CreateGraph()
+        {
+            string path = Path.Combine(EDITOR_PATH, "Template/LogicGraphTemplate.cs");
+            CreateFromTemplate<DoCreateGraphCodeFile>(
+                "NewGraph.cs",
+                path
+            );
+        }
+        public static void CreateFromTemplate<T>(string initialName, string templatePath) where T : UnityEditor.ProjectWindowCallback.EndNameEditAction
+        {
+            ProjectWindowUtil.StartNameEditingIfProjectWindowExists(
+                0,
+                ScriptableObject.CreateInstance<T>(),
+                initialName,
+                scriptIcon,
+                templatePath
+            );
+        }
+        /// <summary>
+        /// 创建脚本
+        /// </summary>
+        /// <param name="pathName"></param>
+        /// <param name="templatePath">模板路径</param>
+        /// <returns></returns>
+        internal static UnityEngine.Object CreateScript(string className, string pathName, string templatePath)
+        {
+            string templateText = string.Empty;
+
+            UTF8Encoding encoding = new UTF8Encoding(true, false);
+            templatePath = templatePath += ".txt";
+            if (File.Exists(templatePath))
+            {
+                /// Read procedures.
+                StreamReader reader = new StreamReader(templatePath);
+                templateText = reader.ReadToEnd();
+                reader.Close();
+
+                templateText = templateText.Replace("{CLASS_NAME}", className);
+
+                StreamWriter writer = new StreamWriter(Path.GetFullPath(pathName), false, encoding);
+                writer.Write(templateText);
+                writer.Close();
+
+                AssetDatabase.ImportAsset(pathName);
+                return AssetDatabase.LoadAssetAtPath(pathName, typeof(Object));
+            }
+            else
+            {
+                Debug.LogError(string.Format("The template file was not found: {0}", templatePath));
+                return null;
+            }
+        }
+        private class DoCreateGraphCodeFile : UnityEditor.ProjectWindowCallback.EndNameEditAction
+        {
+            public override void Action(int instanceId, string pathName, string resourceFile)
+            {
+                Object o = CreateScript(Path.GetFileNameWithoutExtension(pathName).Replace(" ", string.Empty), pathName, resourceFile);
+                ProjectWindowUtil.ShowCreatedAsset(o);
+            }
+        }
+        private class DoCreateNodeCodeFile : UnityEditor.ProjectWindowCallback.EndNameEditAction
+        {
+            public override void Action(int instanceId, string pathName, string resourceFile)
+            {
+                string className = Path.GetFileNameWithoutExtension(pathName).Replace(" ", string.Empty);
+                Object o = CreateScript(className, pathName, resourceFile);
+                string fileName = Path.GetFileNameWithoutExtension(pathName);
+                string tempPath = Path.Combine(Path.GetDirectoryName(resourceFile), "LogicNodeViewTemplate.cs.txt");
+                string viewPath = Path.Combine(Path.GetDirectoryName(pathName), $"{fileName}View.cs");
+                CreateScript(className, viewPath, tempPath);
+                ProjectWindowUtil.ShowCreatedAsset(o);
+            }
+        }
     }
 }

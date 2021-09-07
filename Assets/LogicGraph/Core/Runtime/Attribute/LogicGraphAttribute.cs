@@ -18,9 +18,15 @@ namespace Logic
         /// </summary>
         public string LogicName { get; private set; }
 
-        public LogicGraphAttribute(string str)
+        /// <summary>
+        /// 默认节点名
+        /// </summary>
+        public Type[] DefaultNodes { get;private set; }
+
+        public LogicGraphAttribute(string str,params Type[] nodeType)
         {
             LogicName = str;
+            DefaultNodes = nodeType ?? new Type[0];
         }
     }
 }

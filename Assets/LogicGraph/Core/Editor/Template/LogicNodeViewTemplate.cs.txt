@@ -1,0 +1,21 @@
+//using System;
+//using System.Collections.Generic;
+//using System.Linq;
+//using System.Text;
+//using UnityEngine.UIElements;
+//
+//namespace Logic.Editor
+//{
+//
+//    [LogicNode(typeof({CLASS_NAME}), "{CLASS_NAME}")]
+//    public class {CLASS_NAME}View : BaseNodeView
+//    {
+//
+//        public override void ShowUI()
+//        {
+//            //显示UI
+//            //请使用this.AddUI(UIElement)添加UI
+//        }
+//
+//    }
+//}

@@ -32,7 +32,6 @@ namespace Logic.Editor
 
         public void OnDropOutsidePort(Edge edge, Vector2 position)
         {
-            Debug.LogError("OnDropOutsidePort");
         }
     }
 }

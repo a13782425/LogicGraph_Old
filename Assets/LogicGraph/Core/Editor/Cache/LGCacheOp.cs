@@ -22,7 +22,7 @@ namespace Logic.Editor
         /// </summary>
         /// <param name="info"></param>
         /// <returns></returns>
-        internal static LGEditorCache GetEditorCache(LGInfoCache info)
+        public static LGEditorCache GetEditorCache(LGInfoCache info)
        => Instance.LGEditorList.FirstOrDefault(a => a.GraphClassName == info.GraphClassName);
 
         /// <summary>
@@ -30,9 +30,9 @@ namespace Logic.Editor
         /// </summary>
         /// <param name="info"></param>
         /// <returns></returns>
-        internal static BaseLogicGraph GetLogicGraph(LGInfoCache info) => AssetDatabase.LoadAssetAtPath<BaseLogicGraph>(info.AssetPath);
+        public static BaseLogicGraph GetLogicGraph(LGInfoCache info) => AssetDatabase.LoadAssetAtPath<BaseLogicGraph>(info.AssetPath);
 
-
+        public static LGInfoCache GetLogicInfo(BaseLogicGraph logic) => Instance.LGInfoList.FirstOrDefault(a => a.OnlyId == logic.OnlyId);
         /// <summary>
         /// 保存缓存文件
         /// </summary>
@@ -79,7 +79,7 @@ namespace Logic.Editor
             }
         }
 
-        internal static void AddLogicGraph(string graphPath, bool newGuid = false)
+        public static void AddLogicGraph(string graphPath, bool newGuid = false)
         {
             if (Instance.LGInfoList.FirstOrDefault(a => a.AssetPath == graphPath) != null)
             {
@@ -105,6 +105,8 @@ namespace Logic.Editor
             logicGraph = null;
         }
 
+
+
         private static void m_checkTypes(List<Type> types)
         {
             foreach (var item in Instance.LGEditorList)
@@ -119,7 +121,7 @@ namespace Logic.Editor
             m_refreshLogicNode(types);
 
             Instance.LGEditorList.RemoveAll(a => !a.IsRefresh);
-            m_refreshStartNode();
+            //m_refreshStartNode();
 
             foreach (var item in Instance.LGEditorList)
             {
@@ -145,31 +147,31 @@ namespace Logic.Editor
             }
         }
 
-        /// <summary>
-        /// 刷新开始节点
-        /// </summary>
-        private static void m_refreshStartNode()
-        {
-            string fullname = typeof(StartNodeView).FullName;
-            foreach (var item in Instance.LGEditorList)
-            {
-                var nodeCache = item.Nodes.FirstOrDefault(a => a.NodeClassName == fullname);
-                if (nodeCache == null)
-                {
-                    nodeCache = new LNEditorCache();
-                    nodeCache.NodeClassName = typeof(StartNode).FullName;
-                    nodeCache.NodeViewClassName = fullname;
-                    nodeCache.UseCount = int.MinValue;
-                    nodeCache.NodeLayers = new string[] { "系统", "开始" };
-                    nodeCache.NodeName = "开始";
-                    nodeCache.NodeFullName = "系统/开始";
-                    item.Nodes.Add(nodeCache);
-                }
-                nodeCache.PortType = PortEnum.Out;
-                nodeCache.IsRefresh = true;
-                nodeCache.IsShow = false;
-            }
-        }
+        ///// <summary>
+        ///// 刷新开始节点
+        ///// </summary>
+        //private static void m_refreshStartNode()
+        //{
+        //    string fullname = typeof(StartNodeView).FullName;
+        //    foreach (var item in Instance.LGEditorList)
+        //    {
+        //        var nodeCache = item.Nodes.FirstOrDefault(a => a.NodeClassName == fullname);
+        //        if (nodeCache == null)
+        //        {
+        //            nodeCache = new LNEditorCache();
+        //            nodeCache.NodeClassName = typeof(StartNode).FullName;
+        //            nodeCache.NodeViewClassName = fullname;
+        //            nodeCache.UseCount = int.MinValue;
+        //            nodeCache.NodeLayers = new string[] { "系统", "开始" };
+        //            nodeCache.NodeName = "开始";
+        //            nodeCache.NodeFullName = "系统/开始";
+        //            item.Nodes.Add(nodeCache);
+        //        }
+        //        nodeCache.PortType = PortEnum.Out;
+        //        nodeCache.IsRefresh = true;
+        //        nodeCache.IsShow = false;
+        //    }
+        //}
 
         /// <summary>
         /// 刷新逻辑图
@@ -198,6 +200,12 @@ namespace Logic.Editor
                                 graphData = new LGEditorCache();
                                 graphData.GraphClassName = item.FullName;
                                 Instance.LGEditorList.Add(graphData);
+                            }
+                            graphData.DefaultClasses.Clear();
+                            graphData.DefaultNodes.Clear();
+                            foreach (var nodeType in logicGraph.DefaultNodes)
+                            {
+                                graphData.DefaultClasses.Add(nodeType.FullName);
                             }
                             graphData.GraphName = logicGraph.LogicName;
                             graphData.IsRefresh = true;
@@ -247,6 +255,10 @@ namespace Logic.Editor
                                     nodeData.NodeFullName = logicNode.MenuText;
                                     nodeData.PortType = logicNode.PortType;
                                     nodeData.IsRefresh = true;
+                                    if (graphData.DefaultClasses.Contains(nodeType.FullName))
+                                    {
+                                        graphData.DefaultNodes.Add(nodeData);
+                                    }
                                 }
                             }
                         }

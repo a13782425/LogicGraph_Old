@@ -5,8 +5,8 @@ using UnityEngine;
 
 namespace Logic
 {
-    [Serializable]
-    public sealed class StartNode : BaseLogicNode
+    public class {CLASS_NAME} : BaseLogicNode
     {
+
     }
 }

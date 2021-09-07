@@ -15,7 +15,11 @@ namespace Logic
         [SerializeField]
         private string _onlyId = "";
         public string OnlyId => _onlyId;
-
+#if UNITY_EDITOR
+        [SerializeField]
+        private string _title = "";
+        public string Title => _title;
+#endif
         [SerializeReference]
         private List<BaseLogicNode> _nodes = new List<BaseLogicNode>();
         /// <summary>
@@ -23,12 +27,23 @@ namespace Logic
         /// </summary>
         public List<BaseLogicNode> Nodes => _nodes;
 
+
+        [SerializeReference]
+        private List<BaseLogicNode> _startNodes = new List<BaseLogicNode>();
         /// <summary>
         /// 逻辑图开始节点
         /// 一切罪恶的开始
+        /// </summary>       
+        public List<BaseLogicNode> StartNodes => _startNodes;
+
+#if UNITY_EDITOR
+        [SerializeField]
+        private List<BaseLogicGroup> _groups = new List<BaseLogicGroup>();
+        /// <summary>
+        /// 逻辑图组
         /// </summary>
-        [SerializeReference]
-        public BaseLogicNode StartNode;
+        public List<BaseLogicGroup> Groups => _groups;
+#endif
 
         public BaseLogicGraph()
         {
@@ -39,7 +54,11 @@ namespace Logic
         public void ResetGuid()
         {
             _onlyId = Guid.NewGuid().ToString();
-        } 
+        }
+        public void SetTitle(string title)
+        {
+            _title = title;
+        }
 #endif
     }
 }

@@ -31,19 +31,7 @@ namespace Logic.Editor
         /// <param name="p"></param>
         public static void ShowLGPanel(LGInfoCache info)
         {
-            Object[] panels = Resources.FindObjectsOfTypeAll(typeof(LGWindow));
-            LGWindow panel = null;
-            foreach (var item in panels)
-            {
-                if (item is LGWindow p)
-                {
-                    if (p._lgInfoCache == info)
-                    {
-                        panel = p;
-                        break;
-                    }
-                }
-            }
+            LGWindow panel = GetLGWindow(info);
             if (panel == null)
             {
                 panel = CreateWindow<LGWindow>();
@@ -63,14 +51,44 @@ namespace Logic.Editor
         {
             if (info != null)
             {
-                this._lgInfoCache = info;
-                this._lgEditorCache = LGCacheOp.GetEditorCache(info);
-                BaseLogicGraph graph = LGCacheOp.GetLogicGraph(info);
-                this._lgInfoCache.Graph = graph;
-                //删除没有的节点
-                graph.Nodes.RemoveAll(n => n == null);
-                this._view.ShowLogic();
+                LGWindow panel = GetLGWindow(info);
+                if (panel == null)
+                {
+                    panel = this;
+                    this._lgInfoCache = info;
+                    this._lgEditorCache = LGCacheOp.GetEditorCache(info);
+                    BaseLogicGraph graph = LGCacheOp.GetLogicGraph(info);
+                    this._lgInfoCache.Graph = graph;
+                    //删除没有的节点
+                    graph.Nodes.RemoveAll(n => n == null);
+                    this._view.ShowLogic();
+                }
+                else
+                {
+                    panel.Show();
+                }
+                panel.Focus();
+
+
             }
+        }
+
+        private static LGWindow GetLGWindow(LGInfoCache info)
+        {
+            Object[] panels = Resources.FindObjectsOfTypeAll(typeof(LGWindow));
+            LGWindow panel = null;
+            foreach (var item in panels)
+            {
+                if (item is LGWindow p)
+                {
+                    if (p._lgInfoCache == info)
+                    {
+                        panel = p;
+                        break;
+                    }
+                }
+            }
+            return panel;
         }
 
         #region 内置函数

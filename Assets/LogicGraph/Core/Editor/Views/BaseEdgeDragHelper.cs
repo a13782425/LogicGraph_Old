@@ -20,7 +20,7 @@ namespace Logic.Editor
         internal const float k_MaxPanSpeed = k_MaxSpeedFactor * k_PanSpeed;
         internal const float kPortDetectionWidth = 30;
 
-        protected Dictionary<BaseNodeView, List<PortView>> compatiblePorts = new Dictionary<BaseNodeView, List<PortView>>();
+        private Dictionary<BaseNodeView, List<PortView>> compatiblePorts = new Dictionary<BaseNodeView, List<PortView>>();
         private Edge ghostEdge;
         private GraphView graphView;
         private static NodeAdapter nodeAdapter = new NodeAdapter();

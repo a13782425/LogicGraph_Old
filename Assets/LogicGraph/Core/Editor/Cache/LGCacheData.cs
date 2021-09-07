@@ -85,6 +85,7 @@ namespace Logic.Editor
     public sealed class LGInfoCache
     {
         public string OnlyId;
+
         /// <summary>
         /// 逻辑图名
         /// </summary>
@@ -109,10 +110,6 @@ namespace Logic.Editor
         /// 当前图的缩放
         /// </summary>
         public Vector3 Scale = Vector3.one;
-        ///// <summary>
-        ///// 当前逻辑图节点缓存
-        ///// </summary>
-        //public List<LNInfoCache> Nodes = new List<LNInfoCache>();
         /// <summary>
         /// 方便查找缓存
         /// </summary>
@@ -141,6 +138,7 @@ namespace Logic.Editor
         /// </summary>
         [NonSerialized]
         public LogicGraphView View;
+
 
         public LGInfoCache() { }
 
@@ -222,7 +220,16 @@ namespace Logic.Editor
         /// </summary>
         public List<LNEditorCache> Nodes = new List<LNEditorCache>();
 
+        /// <summary>
+        /// 当前逻辑图对应的默认节点
+        /// </summary>
+        public List<LNEditorCache> DefaultNodes = new List<LNEditorCache>();
 
+        /// <summary>
+        /// 默认节点的全成类名
+        /// </summary>
+        [NonSerialized]
+        public List<string> DefaultClasses = new List<string>();
 
         private Type _curType = null;
         /// <summary>
@@ -335,6 +342,25 @@ namespace Logic.Editor
                 }
             }
             return _curViewType;
+        }
+
+        public void AddUseCount()
+        {
+            if (UseCount == int.MaxValue)
+            {
+                UseCount = int.MaxValue;
+                return;
+            }
+            UseCount += 10;
+        }
+        public void SubUseCount()
+        {
+            if (UseCount == int.MinValue)
+            {
+                UseCount = int.MinValue;
+                return;
+            }
+            UseCount -= 1;
         }
     }
 
