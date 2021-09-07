@@ -41,7 +41,6 @@ namespace Logic.Editor
         /// <param name="logicNodes"></param>
         private void AddRecommendTree(List<SearchTreeEntry> searchTrees)
         {
-            Type startType = typeof(StartNode);
             List<LNEditorCache> logicNodes = _editorData.Nodes.ToList();
             logicNodes.Sort((a, b) =>
             {
@@ -60,7 +59,7 @@ namespace Logic.Editor
             searchTrees.Add(new SearchTreeGroupEntry(new GUIContent("常用")) { level = 1 });
             foreach (LNEditorCache nodeConfig in recommends)
             {
-                if (nodeConfig.GetNodeType() == startType)
+                if (_editorData.DefaultNodes.Contains(nodeConfig))
                 {
                     continue;
                 }
