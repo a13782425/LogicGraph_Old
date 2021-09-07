@@ -8,6 +8,7 @@ using UnityEditor.Experimental.GraphView;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Object = UnityEngine.Object;
 
 namespace Logic.Editor
 {
@@ -255,86 +256,134 @@ namespace Logic.Editor
         }
         protected TextField GetInputField(string titleText, string defaultValue)
         {
-            TextField textField = new TextField();
-            textField.label = titleText;
-            SetBaseFieldStyle(textField);
-            textField.multiline = true;
-            textField.value = defaultValue;
-            return textField;
+            TextField field = new TextField();
+            field.label = titleText;
+            SetBaseFieldStyle(field);
+            field.multiline = true;
+            field.value = defaultValue;
+            return field;
         }
         protected IntegerField GetInputField(string titleText, int defaultValue)
         {
-            IntegerField intField = new IntegerField();
-            intField.label = titleText;
-            SetBaseFieldStyle(intField);
-            intField.value = defaultValue;
-            return intField;
+            IntegerField field = new IntegerField();
+            field.label = titleText;
+            SetBaseFieldStyle(field);
+            field.value = defaultValue;
+            return field;
         }
         protected FloatField GetInputField(string titleText, float defaultValue)
         {
-            FloatField floatField = new FloatField();
-            floatField.label = titleText;
-            SetBaseFieldStyle(floatField);
-            floatField.value = defaultValue;
-            return floatField;
+            FloatField field = new FloatField();
+            field.label = titleText;
+            SetBaseFieldStyle(field);
+            field.value = defaultValue;
+            return field;
         }
         protected DoubleField GetInputField(string titleText, double defaultValue)
         {
-            DoubleField doubleField = new DoubleField();
-            doubleField.label = titleText;
-            SetBaseFieldStyle(doubleField);
-            doubleField.value = defaultValue;
-            return doubleField;
+            DoubleField field = new DoubleField();
+            field.label = titleText;
+            SetBaseFieldStyle(field);
+            field.value = defaultValue;
+            return field;
         }
         protected EnumField GetInputField(string titleText, Enum defaultValue)
         {
-            EnumField enumField = new EnumField();
-            enumField.Init(defaultValue);
-            enumField.label = titleText;
-            SetBaseFieldStyle(enumField);
-            enumField.value = defaultValue;
-            return enumField;
+            EnumField field = new EnumField();
+            field.Init(defaultValue);
+            field.label = titleText;
+            SetBaseFieldStyle(field);
+            field.value = defaultValue;
+            return field;
         }
         protected Vector2Field GetInputField(string titleText, Vector2 defaultValue)
         {
-            Vector2Field vector2Field = new Vector2Field();
-            vector2Field.label = titleText;
-            SetBaseFieldStyle(vector2Field);
+            Vector2Field field = new Vector2Field();
+            field.label = titleText;
+            SetBaseFieldStyle(field);
 
-            vector2Field.value = defaultValue;
-            return vector2Field;
+            field.value = defaultValue;
+            return field;
         }
         protected Vector3Field GetInputField(string titleText, Vector3 defaultValue)
         {
-            Vector3Field vector3Field = new Vector3Field();
-            vector3Field.label = titleText;
-            SetBaseFieldStyle(vector3Field);
-            vector3Field.value = defaultValue;
-            return vector3Field;
+            Vector3Field field = new Vector3Field();
+            field.label = titleText;
+            SetBaseFieldStyle(field);
+            field.value = defaultValue;
+            return field;
         }
         protected Vector4Field GetInputField(string titleText, Vector4 defaultValue)
         {
-            Vector4Field vector4Field = new Vector4Field();
-            vector4Field.label = titleText;
-            SetBaseFieldStyle(vector4Field);
-            vector4Field.value = defaultValue;
-            return vector4Field;
+            Vector4Field field = new Vector4Field();
+            field.label = titleText;
+            SetBaseFieldStyle(field);
+            field.value = defaultValue;
+            return field;
         }
         protected Vector2IntField GetInputField(string titleText, Vector2Int defaultValue)
         {
-            Vector2IntField vector2IntField = new Vector2IntField();
-            vector2IntField.label = titleText;
-            SetBaseFieldStyle(vector2IntField);
-            vector2IntField.value = defaultValue;
-            return vector2IntField;
+            Vector2IntField field = new Vector2IntField();
+            field.label = titleText;
+            SetBaseFieldStyle(field);
+            field.value = defaultValue;
+            return field;
         }
         protected Vector3IntField GetInputField(string titleText, Vector3Int defaultValue)
         {
-            Vector3IntField vector3IntField = new Vector3IntField();
-            vector3IntField.label = titleText;
-            SetBaseFieldStyle(vector3IntField);
-            vector3IntField.value = defaultValue;
-            return vector3IntField;
+            Vector3IntField field = new Vector3IntField();
+            field.label = titleText;
+            SetBaseFieldStyle(field);
+            field.value = defaultValue;
+            return field;
+        }
+        protected ColorField GetInputField(string titleText, Color defaultValue)
+        {
+            ColorField field = new ColorField();
+            field.label = titleText;
+            SetBaseFieldStyle(field);
+            field.value = defaultValue;
+            return field;
+        }
+        protected GradientField GetInputField(string titleText, Gradient defaultValue)
+        {
+            GradientField field = new GradientField();
+            field.label = titleText;
+            SetBaseFieldStyle(field);
+            field.value = defaultValue;
+            return field;
+        }
+        protected CurveField GetInputField(string titleText, AnimationCurve defaultValue)
+        {
+            CurveField field = new CurveField();
+            field.label = titleText;
+            SetBaseFieldStyle(field);
+            field.value = defaultValue;
+            return field;
+        }
+        protected BoundsField GetInputField(string titleText, Bounds defaultValue)
+        {
+            BoundsField field = new BoundsField();
+            field.label = titleText;
+            SetBaseFieldStyle(field);
+            field.value = defaultValue;
+            return field;
+        }
+        protected BoundsIntField GetInputField(string titleText, BoundsInt defaultValue)
+        {
+            BoundsIntField field = new BoundsIntField();
+            field.label = titleText;
+            SetBaseFieldStyle(field);
+            field.value = defaultValue;
+            return field;
+        }
+        protected ObjectField GetInputField(string titleText, Object defaultValue)
+        {
+            ObjectField field = new ObjectField();
+            field.label = titleText;
+            SetBaseFieldStyle(field);
+            field.value = defaultValue;
+            return field;
         }
 
         /// <summary>
