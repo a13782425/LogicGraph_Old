@@ -244,12 +244,12 @@ namespace Logic.Editor
                                     if (nodeData == null)
                                     {
                                         nodeData = new LNEditorCache();
-                                        nodeData.NodeClassName = nodeType.FullName;
-                                        nodeData.NodeViewClassName = item.FullName;
                                         nodeData.UseCount = int.MinValue;
                                         graphData.Nodes.Add(nodeData);
                                     }
                                     string[] strs = logicNode.MenuText.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+                                    nodeData.NodeClassName = nodeType.FullName;
+                                    nodeData.NodeViewClassName = item.FullName;
                                     nodeData.NodeLayers = strs;
                                     nodeData.NodeName = strs[strs.Length - 1];
                                     nodeData.NodeFullName = logicNode.MenuText;
@@ -290,15 +290,14 @@ namespace Logic.Editor
                             Type graphType = logicFormat.LogicGraphType;
                             var graphEditor = Instance.LGEditorList.FirstOrDefault(a => a.GraphClassName == graphType.FullName);
                             var formatConfig = graphEditor.Formats.FirstOrDefault(a => a.FormatName == logicFormat.Name);
-                            if (formatConfig != null)
+                            if (formatConfig == null)
                             {
-                                Debug.LogError($"格式化名称相同:{logicFormat.Name}");
+                                formatConfig = new LFEditorCache();
+                                graphEditor.Formats.Add(formatConfig);
                             }
-                            formatConfig = new LFEditorCache();
                             formatConfig.FormatName = logicFormat.Name;
                             formatConfig.FormatClassName = item.FullName;
                             formatConfig.Extension = logicFormat.Extension;
-                            graphEditor.Formats.Add(formatConfig);
                         }
                     }
                 }

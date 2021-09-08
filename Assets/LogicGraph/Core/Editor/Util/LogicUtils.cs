@@ -113,6 +113,7 @@ namespace Logic.Editor
         [MenuItem("Framework/逻辑图/扫描逻辑图")]
         private static void RefreshLogic()
         {
+            LGCacheData.Instance.LGEditorList.Clear();
             LGCacheOp.Refresh();
             LGCacheData.Instance.LGInfoList.Clear();
             string[] strs = Directory.GetFiles(Application.dataPath, "*.asset", SearchOption.AllDirectories);

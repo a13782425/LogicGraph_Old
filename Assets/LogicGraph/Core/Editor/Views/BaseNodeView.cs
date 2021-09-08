@@ -80,7 +80,6 @@ namespace Logic.Editor
         }
 
         private static Action<PortView, bool> onPortSetDefault;
-
         #region 公共方法
         static BaseNodeView()
         {
@@ -254,135 +253,151 @@ namespace Logic.Editor
             label.text = defaultValue;
             return label;
         }
-        protected TextField GetInputField(string titleText, string defaultValue)
+
+        protected TextField GetInputField(string titleText, string defaultValue, Action<string> changed = null)
         {
             TextField field = new TextField();
             field.label = titleText;
             SetBaseFieldStyle(field);
             field.multiline = true;
             field.value = defaultValue;
+            field.RegisterCallback<ChangeEvent<string>>((e) => changed?.Invoke(e.newValue));
             return field;
         }
-        protected IntegerField GetInputField(string titleText, int defaultValue)
+        protected IntegerField GetInputField(string titleText, int defaultValue, Action<int> changed = null)
         {
             IntegerField field = new IntegerField();
             field.label = titleText;
             SetBaseFieldStyle(field);
             field.value = defaultValue;
+            field.RegisterCallback<ChangeEvent<int>>((e) => changed?.Invoke(e.newValue));
             return field;
         }
-        protected FloatField GetInputField(string titleText, float defaultValue)
+        protected FloatField GetInputField(string titleText, float defaultValue, Action<float> changed = null)
         {
             FloatField field = new FloatField();
             field.label = titleText;
             SetBaseFieldStyle(field);
             field.value = defaultValue;
+            field.RegisterCallback<ChangeEvent<float>>((e) => changed?.Invoke(e.newValue));
             return field;
         }
-        protected DoubleField GetInputField(string titleText, double defaultValue)
+        protected DoubleField GetInputField(string titleText, double defaultValue, Action<double> changed = null)
         {
             DoubleField field = new DoubleField();
             field.label = titleText;
             SetBaseFieldStyle(field);
             field.value = defaultValue;
+            field.RegisterCallback<ChangeEvent<double>>((e) => changed?.Invoke(e.newValue));
             return field;
         }
-        protected EnumField GetInputField(string titleText, Enum defaultValue)
+        protected EnumField GetInputField(string titleText, Enum defaultValue, Action<Enum> changed = null)
         {
             EnumField field = new EnumField();
             field.Init(defaultValue);
             field.label = titleText;
             SetBaseFieldStyle(field);
             field.value = defaultValue;
+            field.RegisterCallback<ChangeEvent<Enum>>((e) => changed?.Invoke(e.newValue));
             return field;
         }
-        protected Vector2Field GetInputField(string titleText, Vector2 defaultValue)
+        protected Vector2Field GetInputField(string titleText, Vector2 defaultValue, Action<Vector2> changed = null)
         {
             Vector2Field field = new Vector2Field();
             field.label = titleText;
             SetBaseFieldStyle(field);
-
             field.value = defaultValue;
+            field.RegisterCallback<ChangeEvent<Vector2>>((e) => changed?.Invoke(e.newValue));
             return field;
         }
-        protected Vector3Field GetInputField(string titleText, Vector3 defaultValue)
+        protected Vector3Field GetInputField(string titleText, Vector3 defaultValue, Action<Vector3> changed = null)
         {
             Vector3Field field = new Vector3Field();
             field.label = titleText;
             SetBaseFieldStyle(field);
             field.value = defaultValue;
+            field.RegisterCallback<ChangeEvent<Vector3>>((e) => changed?.Invoke(e.newValue));
             return field;
         }
-        protected Vector4Field GetInputField(string titleText, Vector4 defaultValue)
+        protected Vector4Field GetInputField(string titleText, Vector4 defaultValue, Action<Vector4> changed = null)
         {
             Vector4Field field = new Vector4Field();
             field.label = titleText;
             SetBaseFieldStyle(field);
             field.value = defaultValue;
+            field.RegisterCallback<ChangeEvent<Vector4>>((e) => changed?.Invoke(e.newValue));
             return field;
         }
-        protected Vector2IntField GetInputField(string titleText, Vector2Int defaultValue)
+        protected Vector2IntField GetInputField(string titleText, Vector2Int defaultValue, Action<Vector2Int> changed = null)
         {
             Vector2IntField field = new Vector2IntField();
             field.label = titleText;
             SetBaseFieldStyle(field);
             field.value = defaultValue;
+            field.RegisterCallback<ChangeEvent<Vector2Int>>((e) => changed?.Invoke(e.newValue));
             return field;
         }
-        protected Vector3IntField GetInputField(string titleText, Vector3Int defaultValue)
+        protected Vector3IntField GetInputField(string titleText, Vector3Int defaultValue, Action<Vector3Int> changed = null)
         {
             Vector3IntField field = new Vector3IntField();
             field.label = titleText;
             SetBaseFieldStyle(field);
             field.value = defaultValue;
+            field.RegisterCallback<ChangeEvent<Vector3Int>>((e) => changed?.Invoke(e.newValue));
             return field;
         }
-        protected ColorField GetInputField(string titleText, Color defaultValue)
+        protected ColorField GetInputField(string titleText, Color defaultValue, Action<Color> changed = null)
         {
             ColorField field = new ColorField();
             field.label = titleText;
             SetBaseFieldStyle(field);
             field.value = defaultValue;
+            field.RegisterCallback<ChangeEvent<Color>>((e) => changed?.Invoke(e.newValue));
             return field;
         }
-        protected GradientField GetInputField(string titleText, Gradient defaultValue)
+        protected GradientField GetInputField(string titleText, Gradient defaultValue, Action<Gradient> changed = null)
         {
             GradientField field = new GradientField();
             field.label = titleText;
             SetBaseFieldStyle(field);
             field.value = defaultValue;
+            field.RegisterCallback<ChangeEvent<Gradient>>((e) => changed?.Invoke(e.newValue));
             return field;
         }
-        protected CurveField GetInputField(string titleText, AnimationCurve defaultValue)
+        protected CurveField GetInputField(string titleText, AnimationCurve defaultValue, Action<AnimationCurve> changed = null)
         {
             CurveField field = new CurveField();
             field.label = titleText;
             SetBaseFieldStyle(field);
             field.value = defaultValue;
+            field.RegisterCallback<ChangeEvent<AnimationCurve>>((e) => changed?.Invoke(e.newValue));
             return field;
         }
-        protected BoundsField GetInputField(string titleText, Bounds defaultValue)
+        protected BoundsField GetInputField(string titleText, Bounds defaultValue, Action<Bounds> changed = null)
         {
             BoundsField field = new BoundsField();
             field.label = titleText;
             SetBaseFieldStyle(field);
             field.value = defaultValue;
+            field.RegisterCallback<ChangeEvent<Bounds>>((e) => changed?.Invoke(e.newValue));
             return field;
         }
-        protected BoundsIntField GetInputField(string titleText, BoundsInt defaultValue)
+        protected BoundsIntField GetInputField(string titleText, BoundsInt defaultValue, Action<BoundsInt> changed = null)
         {
             BoundsIntField field = new BoundsIntField();
             field.label = titleText;
             SetBaseFieldStyle(field);
             field.value = defaultValue;
+            field.RegisterCallback<ChangeEvent<BoundsInt>>((e) => changed?.Invoke(e.newValue));
             return field;
         }
-        protected ObjectField GetInputField(string titleText, Object defaultValue)
+        protected ObjectField GetInputField(string titleText, Object defaultValue, Action<Object> changed = null)
         {
             ObjectField field = new ObjectField();
             field.label = titleText;
             SetBaseFieldStyle(field);
             field.value = defaultValue;
+            field.RegisterCallback<ChangeEvent<Object>>((e) => changed?.Invoke(e.newValue));
             return field;
         }
 
