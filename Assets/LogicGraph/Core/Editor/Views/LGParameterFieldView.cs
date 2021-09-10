@@ -19,7 +19,9 @@ namespace Logic.Editor
         {
             this.graphView = graphView;
             this.param = param;
-            //this.AddManipulator(new ContextualMenuManipulator(BuildContextualMenu));
+#if !UNITY_2020_1_OR_NEWER
+            this.AddManipulator(new ContextualMenuManipulator(BuildContextualMenu));
+#endif
             this.Q("icon").AddToClassList("parameter-" + param.Value.GetType().Name);
             this.Q("icon").visible = true;
 
@@ -30,6 +32,7 @@ namespace Logic.Editor
             });
         }
 
+#if UNITY_2020_1_OR_NEWER
         protected override void BuildFieldContextualMenu(ContextualMenuPopulateEvent evt)
         {
             evt.menu.AppendAction("重命名", (a) => OpenTextEditor(), DropdownMenuAction.AlwaysEnabled);
@@ -40,5 +43,17 @@ namespace Logic.Editor
 
             evt.StopPropagation();
         }
+#else
+        private void BuildContextualMenu(ContextualMenuPopulateEvent evt)
+        {
+            evt.menu.AppendAction("重命名", (a) => OpenTextEditor(), DropdownMenuAction.AlwaysEnabled);
+            evt.menu.AppendAction("删除", (a) =>
+            {
+                graphView.DelLGParam(param);
+            }, DropdownMenuAction.AlwaysEnabled);
+
+            evt.StopPropagation();
+        }
+#endif
     }
 }

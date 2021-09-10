@@ -17,9 +17,6 @@ namespace Logic.Editor
         {
             this.graphView = graphView;
             this.param = param;
-
-
-
             Add(param.GetUI());
         }
     }

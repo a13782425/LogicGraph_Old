@@ -102,7 +102,7 @@ namespace Logic.Editor
         /// </summary>
         public void Save()
         {
-            if (LGInfoCache.Graph != null)
+            if (LGInfoCache != null && LGInfoCache.Graph != null)
             {
                 EditorUtility.SetDirty(LGInfoCache.Graph);
             }
@@ -294,6 +294,8 @@ namespace Logic.Editor
                 graphCache.ParamCache.Pos = new Vector2(0, 20);
                 graphCache.ParamCache.Size = new Vector2(180, 320);
             }
+            else if (graphCache.ParamCache.Size.magnitude < 350)
+                graphCache.ParamCache.Size = new Vector2(180, 320);
             _window.SetLogic(graphCache);
             return true;
         }
