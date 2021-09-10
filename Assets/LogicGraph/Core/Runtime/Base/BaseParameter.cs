@@ -31,7 +31,7 @@ namespace Logic
     public partial class ColorParameter : BaseParameter
     {
         [SerializeField]
-        private Color val;
+        private Color val = default;
         public override object Value { get => val; set => val = (Color)value; }
 
 #if UNITY_EDITOR
@@ -49,7 +49,7 @@ namespace Logic
     public partial class FloatParameter : BaseParameter
     {
         [SerializeField]
-        private float val;
+        private float val = default;
         public override object Value { get => val; set => val = (float)value; }
 #if UNITY_EDITOR
         public override VisualElement GetUI()
@@ -66,7 +66,7 @@ namespace Logic
     public partial class IntParameter : BaseParameter
     {
         [SerializeField]
-        private int val;
+        private int val = default;
         public override object Value { get => val; set => val = (int)value; }
 #if UNITY_EDITOR
         public override VisualElement GetUI()
@@ -83,7 +83,7 @@ namespace Logic
     public partial class StringParameter : BaseParameter
     {
         [SerializeField]
-        private string val;
+        private string val = "";
         public override object Value { get => val; set => val = (string)value; }
 #if UNITY_EDITOR
         public override VisualElement GetUI()
@@ -101,7 +101,7 @@ namespace Logic
     public partial class Vector2Parameter : BaseParameter
     {
         [SerializeField]
-        private Vector2 val;
+        private Vector2 val = default;
         public override object Value { get => val; set => val = (Vector2)value; }
 #if UNITY_EDITOR
         public override VisualElement GetUI()
@@ -118,7 +118,7 @@ namespace Logic
     public partial class Vector3Parameter : BaseParameter
     {
         [SerializeField]
-        private Vector3 val;
+        private Vector3 val = default;
         public override object Value { get => val; set => val = (Vector3)value; }
 #if UNITY_EDITOR
         public override VisualElement GetUI()
@@ -134,7 +134,7 @@ namespace Logic
     public partial class BoolParameter : BaseParameter
     {
         [SerializeField]
-        private bool val;
+        private bool val = default;
         public override object Value { get => val; set => val = (bool)value; }
 #if UNITY_EDITOR
         public override VisualElement GetUI()
