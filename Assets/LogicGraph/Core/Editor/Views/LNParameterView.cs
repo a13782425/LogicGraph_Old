@@ -12,7 +12,7 @@ namespace Logic.Editor
     /// <summary>
     /// 属性固定界面
     /// </summary>
-    public sealed class PinnedParameterView : GraphElement
+    public sealed class LNParameterView : GraphElement
     {
         private VisualElement main;
         private VisualElement root;
@@ -22,45 +22,14 @@ namespace Logic.Editor
 
         private Label titleLabel;
         private ScrollView scrollView;
-        bool _scrollable;
 
         public override string title
         {
             get { return titleLabel.text; }
             set { titleLabel.text = value; }
         }
-        //public bool scrollable
-        //{
-        //    get
-        //    {
-        //        return _scrollable;
-        //    }
-        //    set
-        //    {
-        //        if (_scrollable == value)
-        //            return;
 
-        //        _scrollable = value;
-
-        //        style.position = Position.Absolute;
-        //        if (_scrollable)
-        //        {
-        //            content.RemoveFromHierarchy();
-        //            root.Add(scrollView);
-        //            scrollView.Add(content);
-        //            AddToClassList("scrollable");
-        //        }
-        //        else
-        //        {
-        //            scrollView.RemoveFromHierarchy();
-        //            content.RemoveFromHierarchy();
-        //            root.Add(content);
-        //            RemoveFromClassList("scrollable");
-        //        }
-        //    }
-        //}
-
-        public PinnedParameterView()
+        public LNParameterView()
         {
             var tpl = LogicUtils.GetPinnedView();
             styleSheets.Add(LogicUtils.GetPinnedStyle());
@@ -92,13 +61,7 @@ namespace Logic.Editor
             content.style.paddingLeft = 6;
             content.style.paddingRight = 6;
             content.style.paddingBottom = 6;
-            //scrollable = true;
-            //           RegisterCallback<DragUpdatedEvent>(e =>
-            //{
-            //    e.StopPropagation();
-            //});
-
-            title = "参数面板";
+            title = "节点参数";
         }
 
         public void Repaint()

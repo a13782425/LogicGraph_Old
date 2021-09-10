@@ -23,7 +23,6 @@ namespace Logic
         private List<BaseLogicNode> _childs = new List<BaseLogicNode>();
         public List<BaseLogicNode> Childs => _childs;
 
-
         public BaseLogicNode()
         {
             Title = this.GetType().Name;

@@ -105,11 +105,15 @@ namespace Logic.Editor
         /// <summary>
         /// 当前图坐标
         /// </summary>
-        public Vector3 Position = Vector3.zero;
+        public Vector3 Pos = Vector3.zero;
         /// <summary>
         /// 当前图的缩放
         /// </summary>
         public Vector3 Scale = Vector3.one;
+
+        [SerializeField]
+        public LGParamCache ParamCache;
+
         /// <summary>
         /// 方便查找缓存
         /// </summary>
@@ -121,24 +125,11 @@ namespace Logic.Editor
         [NonSerialized]
         public BaseLogicGraph Graph;
 
-        public LGInfoCache Clone()
-        {
-            LGInfoCache cache = new LGInfoCache();
-            cache.GraphClassName = this.GraphClassName;
-
-            //foreach (var item in Nodes)
-            //{
-            //    cache.Nodes.Add(item.Clone());
-            //}
-            return cache;
-        }
-
         /// <summary>
         /// 逻辑图面板
         /// </summary>
         [NonSerialized]
         public LogicGraphView View;
-
 
         public LGInfoCache() { }
 
@@ -153,48 +144,25 @@ namespace Logic.Editor
         }
     }
 
-    ///// <summary>
-    ///// 逻辑节点缓存
-    ///// 存放当前逻辑节点的信息
-    ///// </summary>
-    //[Serializable]
-    //public sealed class LNInfoCache
-    //{
-
-    //    /// <summary>
-    //    /// 唯一Id
-    //    /// </summary>
-    //    public string OnlyId;
-    //    public string Title;
-    //    public Vector2 Pos;
-
-    //    [NonSerialized]
-    //    public string FullName;
-    //    [NonSerialized]
-    //    public BaseLogicNode Node;
-    //    [NonSerialized]
-    //    public BaseNodeView View;
-    //    public LNInfoCache(BaseLogicNode node)
-    //    {
-    //        Node = node;
-    //        OnlyId = node.OnlyId;
-    //        FullName = node.GetType().FullName;
-    //    }
-
-    //    public LNInfoCache()
-    //    {
-
-    //    }
-
-    //    public LNInfoCache Clone()
-    //    {
-    //        LNInfoCache cache = new LNInfoCache();
-    //        cache.OnlyId = this.OnlyId;
-    //        cache.Title = this.Title;
-    //        cache.Pos = this.Pos;
-    //        return cache;
-    //    }
-    //}
+    /// <summary>
+    /// 逻辑图参数面板
+    /// </summary>
+    [Serializable]
+    public class LGParamCache
+    {
+        /// <summary>
+        /// 是否显示
+        /// </summary>
+        public bool IsShow = false;
+        /// <summary>
+        /// 当前图坐标
+        /// </summary>
+        public Vector2 Pos = Vector2.zero;
+        /// <summary>
+        /// 当前图的缩放
+        /// </summary>
+        public Vector2 Size = Vector2.one;
+    }
 
     /// <summary>
     /// 逻辑图编辑器信息缓存

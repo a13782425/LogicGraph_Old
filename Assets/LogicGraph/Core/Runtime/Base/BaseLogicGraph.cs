@@ -36,6 +36,14 @@ namespace Logic
         /// </summary>       
         public List<BaseLogicNode> StartNodes => _startNodes;
 
+        [SerializeReference]
+        private List<BaseParameter> _params = new List<BaseParameter>();
+
+        /// <summary>
+        /// 单一逻辑图内部参数,所有节点均可访问
+        /// </summary>       
+        public List<BaseParameter> Params => _params;
+
 #if UNITY_EDITOR
         [SerializeField]
         private List<BaseLogicGroup> _groups = new List<BaseLogicGroup>();

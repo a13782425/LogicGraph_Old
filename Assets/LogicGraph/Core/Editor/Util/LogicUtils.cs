@@ -73,11 +73,15 @@ namespace Logic.Editor
         }
         public static VisualTreeAsset GetPinnedView()
         {
-            return AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(Path.Combine(EDITOR_STYLE_PATH, "PinnedElement.uxml"));
+            return AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(Path.Combine(EDITOR_STYLE_PATH, "ParamElement.uxml"));
         }
         public static StyleSheet GetPinnedStyle()
         {
-            return AssetDatabase.LoadAssetAtPath<StyleSheet>(Path.Combine(EDITOR_STYLE_PATH, "PinnedElementView.uss"));
+            return AssetDatabase.LoadAssetAtPath<StyleSheet>(Path.Combine(EDITOR_STYLE_PATH, "ParamElementView.uss"));
+        }
+        public static StyleSheet GetExposedStyle()
+        {
+            return AssetDatabase.LoadAssetAtPath<StyleSheet>(Path.Combine(EDITOR_STYLE_PATH, "LGParameterView.uss"));
         }
         #endregion
 
@@ -129,6 +133,8 @@ namespace Logic.Editor
                     infoCache.LogicName = logicGraph.Title;
                     infoCache.GraphClassName = logicGraph.GetType().FullName;
                     infoCache.OnlyId = logicGraph.OnlyId;
+                    infoCache.ParamCache.Pos = new Vector2(0, 20);
+                    infoCache.ParamCache.Size = new Vector2(180, 320);
                     LGCacheData.Instance.LGInfoList.Add(infoCache);
                 }
             }

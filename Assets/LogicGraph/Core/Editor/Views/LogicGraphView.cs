@@ -19,7 +19,9 @@ namespace Logic.Editor
         public LGInfoCache LGInfoCache => _window.LGInfoCache;
         public LGEditorCache LGEditorCache => _window.LGEditorCache;
 
-        private PinnedParameterView _pinnedView;
+        private LNParameterView _lnParamView;
+
+        private LGParameterView _lgParamView;
 
         private ToolbarView _toolbarView;
 
@@ -29,6 +31,10 @@ namespace Logic.Editor
         /// </summary>
         public EdgeConnectorListener ConnectorListener => _connectorListener;
 
+        /// <summary>
+        /// 刷新界面数据
+        /// </summary>
+        public event Action onUpdateLGParamView;
         public LogicGraphView(LGWindow lgWindow)
         {
             _window = lgWindow;
@@ -53,13 +59,22 @@ namespace Logic.Editor
             this.RegisterCallback<KeyDownEvent>(m_onKeyDownEvent);
             graphViewChanged = m_onGraphViewChanged;
             viewTransformChanged = m_onViewTransformChanged;
-            m_showLogic();
-            viewTransform.position = LGInfoCache.Position;
+            viewTransform.position = LGInfoCache.Pos;
             viewTransform.scale = LGInfoCache.Scale;
-            _pinnedView = new PinnedParameterView();
-            _pinnedView.InitializeGraphView(this);
-            this.Add(_pinnedView);
-            _pinnedView.Hide();
+            m_showLogic();
+            _lnParamView = new LNParameterView();
+            _lnParamView.InitializeGraphView(this);
+            this.Add(_lnParamView);
+            _lnParamView.Hide();
+
+
+            _lgParamView = new LGParameterView();
+            _lgParamView.InitializeGraphView(this);
+            this.Add(_lgParamView);
+            if (LGInfoCache.ParamCache.IsShow)
+                _lgParamView.Show();
+            else
+                _lgParamView.Hide();
             //m_setPinnedPanel(this.layout);
             _hasData = true;
         }
@@ -72,14 +87,14 @@ namespace Logic.Editor
         {
             if (_showPinned)
             {
-                _pinnedView.AddUI(element);
+                _lnParamView.AddUI(element);
             }
         }
         public void RepaintParamPanel()
         {
             if (_showPinned)
             {
-                _pinnedView.Repaint();
+                _lnParamView.Repaint();
             }
         }
         /// <summary>
@@ -93,6 +108,32 @@ namespace Logic.Editor
             }
             LGCacheOp.Save();
         }
+
+        /// <summary>
+        /// 添加一个逻辑图参数
+        /// </summary>
+        /// <param name="paramName"></param>
+        /// <param name="paramType"></param>
+        public void AddLGParam(string paramName, Type paramType)
+        {
+            var param = Activator.CreateInstance(paramType) as BaseParameter;
+            param.Name = paramName;
+            LGInfoCache.Graph.Params.Add(param);
+            this.onUpdateLGParamView?.Invoke();
+            Save();
+        }
+
+        /// <summary>
+        /// 添加一个逻辑图参数
+        /// </summary>
+        /// <param name="paramName"></param>
+        /// <param name="paramType"></param>
+        public void DelLGParam(BaseParameter param)
+        {
+            LGInfoCache.Graph.Params.Remove(param);
+            this.onUpdateLGParamView?.Invoke();
+            Save();
+        }
         #region 重写方法
         public override void AddToSelection(ISelectable selectable)
         {
@@ -104,7 +145,7 @@ namespace Logic.Editor
                     BaseNodeView nodeView = node.userData as BaseNodeView;
                     if (nodeView.ShowParamPanel)
                     {
-                        _pinnedView.Show(this.layout);
+                        _lnParamView.Show(this.layout);
                         _showPinned = true;
                         nodeView.ShowParamUI();
                     }
@@ -112,7 +153,7 @@ namespace Logic.Editor
             }
             if (selection.Count > 1 && _showPinned)
             {
-                _pinnedView.Hide();
+                _lnParamView.Hide();
                 _showPinned = false;
             }
         }
@@ -121,7 +162,7 @@ namespace Logic.Editor
             base.ClearSelection();
             if (_showPinned)
             {
-                _pinnedView.Hide();
+                _lnParamView.Hide();
                 _showPinned = false;
             }
         }
@@ -233,6 +274,9 @@ namespace Logic.Editor
             graph.name = file;
             path = path.Replace(Application.dataPath, "Assets");
             LGInfoCache graphCache = new LGInfoCache(graph);
+            graphCache.ParamCache = new LGParamCache();
+            graphCache.ParamCache.Pos = new Vector2(0, 20);
+            graphCache.ParamCache.Size = new Vector2(180, 320);
             graphCache.LogicName = file;
             graphCache.AssetPath = path;
             Instance.LGInfoList.Add(graphCache);
@@ -244,6 +288,12 @@ namespace Logic.Editor
         private bool m_onOpenMenuSelectEntry(SearchTreeEntry searchTreeEntry, SearchWindowContext context)
         {
             LGInfoCache graphCache = searchTreeEntry.userData as LGInfoCache;
+            if (graphCache.ParamCache == null)
+            {
+                graphCache.ParamCache = new LGParamCache();
+                graphCache.ParamCache.Pos = new Vector2(0, 20);
+                graphCache.ParamCache.Size = new Vector2(180, 320);
+            }
             _window.SetLogic(graphCache);
             return true;
         }
@@ -428,6 +478,9 @@ namespace Logic.Editor
                         case GroupView groupView:
                             LGInfoCache.Graph.Groups.Remove(groupView.group);
                             break;
+                        case LGParameterFieldView blackboardField:
+                            DelLGParam(blackboardField.param);
+                            break;
                         default:
                             break;
                     }
@@ -440,7 +493,7 @@ namespace Logic.Editor
         {
             if (LGInfoCache != null)
             {
-                LGInfoCache.Position = viewTransform.position;
+                LGInfoCache.Pos = viewTransform.position;
                 LGInfoCache.Scale = viewTransform.scale;
             }
         }
@@ -449,7 +502,7 @@ namespace Logic.Editor
         {
             if (_showPinned)
             {
-                _pinnedView.Show(evt.newRect);
+                _lnParamView.Show(evt.newRect);
             }
         }
         private void m_onKeyDownEvent(KeyDownEvent evt)
@@ -519,9 +572,19 @@ namespace Logic.Editor
             if (_hasData)
             {
                 EditorGUILayout.BeginHorizontal();
+                bool res = GUILayout.Toggle(LGInfoCache.ParamCache.IsShow, "显示逻辑图参数", EditorStyles.toolbarButton);
+                if (res != LGInfoCache.ParamCache.IsShow)
+                {
+                    LGInfoCache.ParamCache.IsShow = res;
+                    if (res)
+                        _lgParamView.Show();
+                    else
+                        _lgParamView.Hide();
+                }
+                EditorGUILayout.Separator();
                 if (GUILayout.Button("居中", EditorStyles.toolbarButton))
                 {
-                    LGInfoCache.Position = Vector3.zero;
+                    LGInfoCache.Pos = Vector3.zero;
                     LGInfoCache.Scale = Vector3.one;
                     UpdateViewTransform(Vector3.zero, Vector3.one);
                 }

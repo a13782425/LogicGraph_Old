@@ -264,6 +264,15 @@ namespace Logic.Editor
             field.RegisterCallback<ChangeEvent<string>>((e) => changed?.Invoke(e.newValue));
             return field;
         }
+        protected Toggle GetInputField(string titleText, bool defaultValue, Action<int> changed = null)
+        {
+            Toggle field = new Toggle();
+            field.label = titleText;
+            SetBaseFieldStyle(field);
+            field.value = defaultValue;
+            field.RegisterCallback<ChangeEvent<int>>((e) => changed?.Invoke(e.newValue));
+            return field;
+        }
         protected IntegerField GetInputField(string titleText, int defaultValue, Action<int> changed = null)
         {
             IntegerField field = new IntegerField();
@@ -615,9 +624,10 @@ namespace Logic.Editor
 
             #endregion
         }
-
-
     }
-
+    public abstract class BaseNodeView<T> : BaseNodeView where T : BaseLogicNode
+    {
+        protected T node => Target as T;
+    }
 
 }
