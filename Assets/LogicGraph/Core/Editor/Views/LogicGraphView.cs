@@ -34,7 +34,7 @@ namespace Logic.Editor
         /// <summary>
         /// 刷新界面数据
         /// </summary>
-        public event Action onUpdateLGParamView;
+        public event Action onUpdateLGParam;
         public LogicGraphView(LGWindow lgWindow)
         {
             _window = lgWindow;
@@ -119,7 +119,7 @@ namespace Logic.Editor
             var param = Activator.CreateInstance(paramType) as BaseParameter;
             param.Name = paramName;
             LGInfoCache.Graph.Params.Add(param);
-            this.onUpdateLGParamView?.Invoke();
+            this.onUpdateLGParam?.Invoke();
             Save();
         }
 
@@ -131,7 +131,7 @@ namespace Logic.Editor
         public void DelLGParam(BaseParameter param)
         {
             LGInfoCache.Graph.Params.Remove(param);
-            this.onUpdateLGParamView?.Invoke();
+            this.onUpdateLGParam?.Invoke();
             Save();
         }
         #region 重写方法
@@ -397,7 +397,7 @@ namespace Logic.Editor
                     return;
                 }
                 var logicFormat = Activator.CreateInstance(formatConfig.GetFormatType()) as ILogicFormat;
-                bool res = logicFormat.ToFormat(LGInfoCache.Graph, filePath);
+                bool res = logicFormat.ToFormat(LGInfoCache, filePath);
                 if (res)
                 {
                     _window.ShowNotification(new GUIContent($"导出: {formatConfig.FormatName} 成功"));

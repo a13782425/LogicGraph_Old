@@ -92,7 +92,7 @@ namespace Logic.Editor
                 graphView.LGInfoCache.ParamCache.Pos = layout.position;
                 e.StopPropagation();
             });
-            graphView.onUpdateLGParamView += m_updateParameterList;
+            graphView.onUpdateLGParam += m_updateParameterList;
         }
         public void Hide()
         {

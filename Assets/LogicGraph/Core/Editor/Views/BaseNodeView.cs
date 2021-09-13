@@ -25,6 +25,11 @@ namespace Logic.Editor
 
         private LogicGraphView _owner;
 
+        /// <summary>
+        /// 所属的逻辑视图
+        /// </summary>
+        protected LogicGraphView owner => _owner;
+
         private LNEditorCache _nodeEditorCache;
 
         /// <summary>
