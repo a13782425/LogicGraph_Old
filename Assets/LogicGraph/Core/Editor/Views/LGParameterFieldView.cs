@@ -27,8 +27,8 @@ namespace Logic.Editor
 
             (this.Q("textField") as TextField).RegisterValueChangedCallback((e) =>
             {
-                param.Name = e.newValue;
                 text = e.newValue;
+                graphView.RenameLGParam(this.param, e.newValue);
             });
         }
 
@@ -46,6 +46,10 @@ namespace Logic.Editor
 #else
         private void BuildContextualMenu(ContextualMenuPopulateEvent evt)
         {
+            while (evt.menu.MenuItems().Count > 0)
+            {
+                evt.menu.RemoveItemAt(0);
+            }
             evt.menu.AppendAction("重命名", (a) => OpenTextEditor(), DropdownMenuAction.AlwaysEnabled);
             evt.menu.AppendAction("删除", (a) =>
             {

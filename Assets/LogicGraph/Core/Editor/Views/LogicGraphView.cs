@@ -35,6 +35,10 @@ namespace Logic.Editor
         /// 刷新界面数据
         /// </summary>
         public event Action onUpdateLGParam;
+        /// <summary>
+        /// 重命名界面数据
+        /// </summary>
+        public event Action onRenameLGParam;
         public LogicGraphView(LGWindow lgWindow)
         {
             _window = lgWindow;
@@ -120,7 +124,6 @@ namespace Logic.Editor
             param.Name = paramName;
             LGInfoCache.Graph.Params.Add(param);
             this.onUpdateLGParam?.Invoke();
-            Save();
         }
 
         /// <summary>
@@ -132,8 +135,19 @@ namespace Logic.Editor
         {
             LGInfoCache.Graph.Params.Remove(param);
             this.onUpdateLGParam?.Invoke();
-            Save();
         }
+        /// <summary>
+        /// 重命名逻辑图参数
+        /// </summary>
+        /// <param name="param"></param>
+        /// <param name="newValue"></param>
+        public void RenameLGParam(BaseParameter param, string newValue)
+        {
+            param.Name = newValue;
+            this.onRenameLGParam?.Invoke();
+        }
+
+
         #region 重写方法
         public override void AddToSelection(ISelectable selectable)
         {
@@ -574,7 +588,8 @@ namespace Logic.Editor
             if (_hasData)
             {
                 EditorGUILayout.BeginHorizontal();
-                bool res = GUILayout.Toggle(LGInfoCache.ParamCache.IsShow, "显示逻辑图参数", EditorStyles.toolbarButton);
+                string str = LGInfoCache.ParamCache.IsShow ? "隐藏逻辑图参数" : "显示逻辑图参数";
+                bool res = GUILayout.Toggle(LGInfoCache.ParamCache.IsShow, str, EditorStyles.toolbarButton);
                 if (res != LGInfoCache.ParamCache.IsShow)
                 {
                     LGInfoCache.ParamCache.IsShow = res;
