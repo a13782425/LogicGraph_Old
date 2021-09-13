@@ -24,6 +24,7 @@ public class DebugNodeView : BaseNodeView
         this.AddUI(text);
         _port = AddPort("条件", UnityEditor.Experimental.GraphView.Direction.Output, true);
         this.AddUI(_port);
+        this.AddUI(GetInputField("aa", 0));
     }
 
     public override void ShowParamUI()

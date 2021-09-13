@@ -21,8 +21,8 @@ MonoBehaviour:
     Pos: {x: 584, y: 219, z: 0}
     Scale: {x: 1, y: 1, z: 1}
     ParamCache:
-      IsShow: 0
-      Pos: {x: 325, y: 243}
+      IsShow: 1
+      Pos: {x: 334, y: 370}
       Size: {x: 180, y: 320}
   _lgEditorList:
   - GraphName: "\u9ED8\u8BA4\u903B\u8F91\u56FE"

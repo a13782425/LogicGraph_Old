@@ -524,12 +524,17 @@ namespace Logic.Editor
                 this.style.width = LogicNodeView.Width;
                 //移除右上角折叠按钮
                 titleButtonContainer.RemoveFromHierarchy();
-                //this.titleContainer.Remove(titleButtonContainer);
                 topContainer.style.height = 24;
                 m_content = topContainer.parent;
                 m_content.style.backgroundColor = new Color(0, 0, 0, 0.5f);
                 m_checkTitle();
             }
+
+            private void abc(TooltipEvent evt)
+            {
+                Debug.LogError(evt.rect);
+            }
+
             public void AddUI(VisualElement ui)
             {
                 m_content.Add(ui);
@@ -554,6 +559,7 @@ namespace Logic.Editor
                     return;
                 }
                 LogicNodeView.OnGenericMenu(evt);
+                evt.StopPropagation();
             }
 
             public void Repaint()

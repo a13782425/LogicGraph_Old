@@ -95,6 +95,34 @@ namespace Logic.Editor
         {
             return window.position.position + localPos;
         }
+        /// <summary>
+        /// 设置输入框的颜色
+        /// </summary>
+        public static void SetInputColor<TValueType>(this TextInputBaseField<TValueType> input, Color color)
+        {
+            input.Q("unity-text-input").style.backgroundColor = color;
+        }
+        /// <summary>
+        /// 设置输入框文字的颜色
+        /// </summary>
+        public static void SetTextColor<TValueType>(this TextInputBaseField<TValueType> input, Color color)
+        {
+            input.Q("unity-text-input").style.color = color;
+        }
+        /// <summary>
+        /// 获取输入框的颜色
+        /// </summary>
+        public static Color GetInputColor<TValueType>(this TextInputBaseField<TValueType> input)
+        {
+            return input.Q("unity-text-input").style.backgroundColor.value;
+        }
+        /// <summary>
+        /// 获取输入框文字的颜色
+        /// </summary>
+        public static Color GetTextColor<TValueType>(this TextInputBaseField<TValueType> input)
+        {
+            return input.Q("unity-text-input").style.color.value;
+        }
         #endregion
 
 
