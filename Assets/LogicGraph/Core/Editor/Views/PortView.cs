@@ -15,6 +15,7 @@ namespace Logic.Editor
         /// 即In和Out端口
         /// </summary>
         public bool IsDefault { get; private set; }
+        public string OnlyId { get; private set; }
         public BaseNodeView Owner { get; private set; }
         private bool _isCube = false;
         public PortView(Orientation portOrientation, Direction portDirection, Capacity portCapacity, Type type) : base(portOrientation, portDirection, portCapacity, type)
@@ -32,8 +33,23 @@ namespace Logic.Editor
 
             return port;
         }
-        public void Initialize(BaseNodeView nodeView)
+        //public void Initialize(BaseNodeView nodeView)
+        //{
+        //    this.Owner = nodeView;
+        //    if (_isCube)
+        //    {
+        //        this.AddToClassList(LogicUtils.PORT_CUBE);
+        //        visualClass = "Port_Cube" + direction;
+        //    }
+        //    else
+        //    {
+        //        visualClass = "Port_" + direction;
+        //    }
+        //}
+
+        public void Initialize(BaseNodeView nodeView, string onlyId)
         {
+            this.OnlyId = onlyId;
             this.Owner = nodeView;
             if (_isCube)
             {

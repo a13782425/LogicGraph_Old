@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEditor;
@@ -31,6 +32,19 @@ namespace Logic.Editor
             }
         }
 
+        private static string _configPath;
+        /// <summary>
+        /// 配置文件路径
+        /// </summary>
+        public static string ConfigPath => _configPath;
+
+        private static List<Assembly> _includeAssemblies = new List<Assembly>();
+
+        /// <summary>
+        /// 需要检索的程序集
+        /// </summary>
+        public static List<Assembly> IncludeAssemblies => _includeAssemblies;
+
         #endregion
 
         [SerializeField]
@@ -49,13 +63,8 @@ namespace Logic.Editor
 
         private static void getCacheData()
         {
-            string[] grids = AssetDatabase.FindAssets(typeof(LGCacheData).Name);
-            if (grids.Length < 1)
-            {
-                throw new System.Exception("没有找到LogicEditorConfig文件所在地");
-            }
-            string path = AssetDatabase.GUIDToAssetPath(grids[0]);
-            string filePath = Path.Combine(Path.GetDirectoryName(path), "LGConfig.asset");
+            checkConfig();
+            string filePath = Path.Combine(ConfigPath, "LGConfig.asset");
             _instance = AssetDatabase.LoadAssetAtPath<LGCacheData>(filePath);
             if (_instance == null)
             {
@@ -63,6 +72,46 @@ namespace Logic.Editor
                 AssetDatabase.CreateAsset(_instance, filePath);
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
+            }
+        }
+
+        private static void checkConfig()
+        {
+            IncludeAssemblies.Add(typeof(BaseLogicNode).Assembly);
+            IncludeAssemblies.Add(typeof(BaseNodeView).Assembly);
+            string[] grids = AssetDatabase.FindAssets(typeof(LGCacheData).Name);
+            if (grids.Length < 1)
+            {
+                throw new System.Exception("没有找到LogicEditorConfig文件所在地");
+            }
+            string path = AssetDatabase.GUIDToAssetPath(grids[0]);
+            _configPath = Path.GetDirectoryName(path);
+
+            var types = TypeCache.GetTypesDerivedFrom<ILogicConfig>();
+            if (types.Count > 0)
+            {
+                Type type = types[0];
+                ILogicConfig config = Activator.CreateInstance(type) as ILogicConfig;
+                try
+                {
+                    string str = config.CONFIG_PATH;
+                    List<Assembly> assemblies = config.INCLUDE_ASSEMBLIES;
+                    if (!string.IsNullOrWhiteSpace(str))
+                    {
+                        _configPath = str;
+                    }
+                    foreach (var assembly in assemblies)
+                    {
+                        if (!IncludeAssemblies.Contains(assembly))
+                        {
+                            IncludeAssemblies.Add(assembly);
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    Debug.LogError("配置文件异常,请检查配置文件");
+                }
             }
         }
 
@@ -212,10 +261,11 @@ namespace Logic.Editor
         {
             if (_curType == null)
             {
-                _curType = typeof(BaseLogicNode).Assembly.GetType(GraphClassName);
-                if (_curType == null)
+                foreach (var assembly in LGCacheData.IncludeAssemblies)
                 {
-                    _curType = typeof(BaseNodeView).Assembly.GetType(GraphClassName);
+                    _curType = assembly.GetType(GraphClassName);
+                    if (_curType != null)
+                        break;
                 }
             }
             return _curType;
@@ -289,10 +339,11 @@ namespace Logic.Editor
         {
             if (_curType == null)
             {
-                _curType = typeof(BaseLogicNode).Assembly.GetType(NodeClassName);
-                if (_curType == null)
+                foreach (var assembly in LGCacheData.IncludeAssemblies)
                 {
-                    _curType = typeof(BaseNodeView).Assembly.GetType(NodeClassName);
+                    _curType = assembly.GetType(NodeClassName);
+                    if (_curType != null)
+                        break;
                 }
             }
             return _curType;
@@ -307,10 +358,11 @@ namespace Logic.Editor
         {
             if (_curViewType == null)
             {
-                _curViewType = typeof(BaseLogicNode).Assembly.GetType(NodeViewClassName);
-                if (_curViewType == null)
+                foreach (var assembly in LGCacheData.IncludeAssemblies)
                 {
-                    _curViewType = typeof(BaseNodeView).Assembly.GetType(NodeViewClassName);
+                    _curViewType = assembly.GetType(NodeViewClassName);
+                    if (_curViewType != null)
+                        break;
                 }
             }
             return _curViewType;

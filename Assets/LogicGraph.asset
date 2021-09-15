@@ -17,10 +17,18 @@ MonoBehaviour:
   _nodes:
   - id: 0
   - id: 1
+  - id: 2
+  - id: 3
+  - id: 4
   _startNodes:
   - id: 0
+  - id: 5
+  - id: 6
+  - id: 7
+  - id: 8
   _params:
-  - id: 2
+  - id: 9
+  - id: 10
   _groups: []
   references:
     version: 1
@@ -28,20 +36,82 @@ MonoBehaviour:
       type: {class: StartNode, ns: , asm: Assembly-CSharp}
       data:
         Title: "\u5F00\u59CB"
-        Pos: {x: 0, y: 0}
+        Pos: {x: -207.32315, y: 26.00001}
         _onlyId: 56b18084-912c-417d-83b9-bdcbd7b773cc
         _childs: []
     00000001:
       type: {class: DebugNode, ns: , asm: Assembly-CSharp}
       data:
         Title: "\u6253\u5370\u65E5\u5FD7"
-        Pos: {x: 264, y: 8.5}
+        Pos: {x: 54.17984, y: -116.89212}
         _onlyId: 3af1a493-70ca-4fb5-9007-95bb61de713d
         _childs: []
         log: 
         Conditions: []
     00000002:
+      type: {class: ParameterNode, ns: Logic, asm: Assembly-CSharp}
+      data:
+        Title: abc
+        Pos: {x: -98.29971, y: -88.890465}
+        _onlyId: 10ab9a6d-0c10-47df-9fff-38317a9050ad
+        _childs: []
+        paramId: 62521ec3-a080-40a4-aa51-ca199b662487
+        accessor: 0
+    00000003:
+      type: {class: ParameterNode, ns: Logic, asm: Assembly-CSharp}
+      data:
+        Title: abc
+        Pos: {x: -226.20981, y: -74.31227}
+        _onlyId: 4eb84a6e-ed9a-4df5-8a24-791b8696e7ef
+        _childs: []
+        paramId: 62521ec3-a080-40a4-aa51-ca199b662487
+        accessor: 0
+    00000004:
+      type: {class: ParameterNode, ns: Logic, asm: Assembly-CSharp}
+      data:
+        Title: New Color
+        Pos: {x: -50, y: 0}
+        _onlyId: e287cea4-c748-4443-b4cf-5090fb87d400
+        _childs: []
+        paramId: 8eec6171-2387-477b-ae15-485a9ad9a6e5
+        accessor: 0
+    00000005:
+      type: {class: StartNode, ns: , asm: Assembly-CSharp}
+      data:
+        Title: "\u5F00\u59CB"
+        Pos: {x: -125.99998, y: 138.54388}
+        _onlyId: bf3c276a-e7b3-4dbe-b057-c89449f26032
+        _childs: []
+    00000006:
+      type: {class: StartNode, ns: , asm: Assembly-CSharp}
+      data:
+        Title: "\u5F00\u59CB"
+        Pos: {x: -194.68558, y: 137.1041}
+        _onlyId: 3a88014c-5ac0-4f3d-aee1-8ff6856bf7eb
+        _childs: []
+    00000007:
+      type: {class: StartNode, ns: , asm: Assembly-CSharp}
+      data:
+        Title: "\u5F00\u59CB"
+        Pos: {x: -84.60491, y: 78.51337}
+        _onlyId: aace04c2-c408-47e9-b507-6531504bec8c
+        _childs: []
+    00000008:
+      type: {class: StartNode, ns: , asm: Assembly-CSharp}
+      data:
+        Title: "\u5F00\u59CB"
+        Pos: {x: -85.95859, y: 192.89922}
+        _onlyId: 4b3068ff-7b4d-4bb9-b9c2-c6c4516eebb4
+        _childs: []
+    00000009:
       type: {class: FloatParameter, ns: Logic, asm: Assembly-CSharp}
       data:
+        _onlyId: 62521ec3-a080-40a4-aa51-ca199b662487
         Name: abc
         val: 0
+    0000000A:
+      type: {class: ColorParameter, ns: Logic, asm: Assembly-CSharp}
+      data:
+        _onlyId: 8eec6171-2387-477b-ae15-485a9ad9a6e5
+        Name: New Color
+        val: {r: 0, g: 0, b: 0, a: 0}

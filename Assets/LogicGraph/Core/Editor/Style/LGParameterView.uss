@@ -1,20 +1,31 @@
-LGParameterPropertyView {
-	padding-left: 13px;
+
+.lgparameter{
+	min-width: 180px;
+    min-height: 320px;
 }
 
-LGParameterView #contentContainer {
+.lgparameter.scrollable {
+    position: absolute;
+}
+
+.lgparameter #contentContainer {
 	padding-bottom: 12px;
-	padding-top: 2px;
+	padding-top: 4px;
 }
 
-LGParameterView #titleLabel {
+.lgparameter #titleLabel {
 	padding-left: 6px;
 }
 
-LGParameterView #header Button {
+.lgparameter >.mainContainer> #content> #header > #addButton {
 	margin-right: 6px;
+	margin-bottom: 2px;
+	font-size: 14px;
 }
 
+LGParameterPropertyView {
+	padding-left: 12px;
+}
 LGParameterFieldView #contentItem > Label {
 	padding-right: 0;
 	margin-right: 0;

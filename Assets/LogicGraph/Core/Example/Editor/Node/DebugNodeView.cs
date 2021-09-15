@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Logic.Editor;
 using UnityEngine.UIElements;
+using Logic;
 
 [LogicNode(typeof(DebugNode), "系统/打印日志")]
 public class DebugNodeView : BaseNodeView
@@ -24,6 +25,7 @@ public class DebugNodeView : BaseNodeView
         this.AddUI(text);
         _port = AddPort("条件", UnityEditor.Experimental.GraphView.Direction.Output, true);
         this.AddUI(_port);
+        this.AddUI(AddPort("参数", UnityEditor.Experimental.GraphView.Direction.Input, true));
         this.AddUI(GetInputField("aa", 0));
     }
 
@@ -40,11 +42,11 @@ public class DebugNodeView : BaseNodeView
         node.log = evt.newData;
     }
 
-    public override void AddChild(BaseNodeView child)
+    public override void AddChild(BaseLogicNode child)
     {
-        if (child.Target is DebugNode)
+        if (child is DebugNode)
         {
-            node.Conditions.Add(child.Target);
+            node.Conditions.Add(child);
         }
         else
             base.AddChild(child);

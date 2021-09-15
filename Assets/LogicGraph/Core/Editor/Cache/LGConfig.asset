@@ -18,11 +18,11 @@ MonoBehaviour:
     GraphClassName: DefaultLogicGraph
     FileName: 
     AssetPath: Assets/LogicGraph.asset
-    Pos: {x: 584, y: 219, z: 0}
+    Pos: {x: 1302, y: 357, z: 0}
     Scale: {x: 1, y: 1, z: 1}
     ParamCache:
       IsShow: 1
-      Pos: {x: 334, y: 370}
+      Pos: {x: 797, y: 198}
       Size: {x: 180, y: 320}
   _lgEditorList:
   - GraphName: "\u9ED8\u8BA4\u903B\u8F91\u56FE"

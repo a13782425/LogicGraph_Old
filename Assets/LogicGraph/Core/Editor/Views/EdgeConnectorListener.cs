@@ -25,7 +25,7 @@ namespace Logic.Editor
             graphView.AddElement(edgeView);
             PortView output = edgeView.output as PortView;
             PortView input = edgeView.input as PortView;
-            output.Owner.AddChild(input.Owner);
+            output.Owner.AddChild(input.Owner.Target);
             input.Connect(edgeView);
             output.Connect(edgeView);
         }

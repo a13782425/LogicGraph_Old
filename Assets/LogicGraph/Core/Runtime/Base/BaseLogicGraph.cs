@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Logic
@@ -22,6 +23,7 @@ namespace Logic
 #endif
         [SerializeReference]
         private List<BaseLogicNode> _nodes = new List<BaseLogicNode>();
+
         /// <summary>
         /// 逻辑图节点
         /// </summary>
@@ -58,11 +60,34 @@ namespace Logic
             _onlyId = Guid.NewGuid().ToString();
         }
 
+        /// <summary>
+        /// 获取一个参数
+        /// </summary>
+        /// <param name="onlyId"></param>
+        /// <returns></returns>
+        public BaseParameter GetParamById(string onlyId) => Params.FirstOrDefault(a => a.OnlyId == onlyId);
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        public virtual void Init() => Nodes.ForEach(n => n.Initialize(this));
+
+
+        /// <summary>
+        /// 更新
+        /// </summary>
+        /// <param name="deltaTime"></param>
+        public virtual void OnUpdate(float deltaTime)
+        {
+
+        }
+
+
 #if UNITY_EDITOR
         public void ResetGuid()
         {
             _onlyId = Guid.NewGuid().ToString();
         }
+
         public void SetTitle(string title)
         {
             _title = title;

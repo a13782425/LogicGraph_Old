@@ -14,12 +14,28 @@ namespace Logic
     [Serializable]
     public abstract class BaseParameter
     {
+
+        [SerializeField]
+        private string _onlyId = "";
+        public string OnlyId => _onlyId;
+
         [SerializeField]
         public string Name;
 
         public virtual object Value { get; set; }
 
+        public BaseParameter()
+        {
+            _onlyId = Guid.NewGuid().ToString();
+        }
+
 #if UNITY_EDITOR
+
+        public virtual Color GetColor()
+        {
+            return new Color32(0, 128, 255, 255);
+        }
+
         public virtual VisualElement GetUI()
         {
             return new Label("BaseParameter");
@@ -35,6 +51,10 @@ namespace Logic
         public override object Value { get => val; set => val = (Color)value; }
 
 #if UNITY_EDITOR
+        public override Color GetColor()
+        {
+            return new Color(1, 0, 1, 1);
+        }
         public override VisualElement GetUI()
         {
             ColorField field = new ColorField();
@@ -52,6 +72,10 @@ namespace Logic
         private float val = default;
         public override object Value { get => val; set => val = (float)value; }
 #if UNITY_EDITOR
+        public override Color GetColor()
+        {
+            return new Color32(32, 128, 255, 255);
+        }
         public override VisualElement GetUI()
         {
             FloatField field = new FloatField();
@@ -69,6 +93,10 @@ namespace Logic
         private int val = default;
         public override object Value { get => val; set => val = (int)value; }
 #if UNITY_EDITOR
+        public override Color GetColor()
+        {
+            return new Color32(50, 93, 255, 255);
+        }
         public override VisualElement GetUI()
         {
             IntegerField field = new IntegerField();
@@ -86,6 +114,10 @@ namespace Logic
         private string val = "";
         public override object Value { get => val; set => val = (string)value; }
 #if UNITY_EDITOR
+        public override Color GetColor()
+        {
+            return new Color32(128, 255, 128, 255);
+        }
         public override VisualElement GetUI()
         {
             TextField field = new TextField();
@@ -137,6 +169,10 @@ namespace Logic
         private bool val = default;
         public override object Value { get => val; set => val = (bool)value; }
 #if UNITY_EDITOR
+        public override Color GetColor()
+        {
+            return new Color32(48, 255, 255, 255);
+        }
         public override VisualElement GetUI()
         {
             Toggle field = new Toggle();

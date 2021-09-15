@@ -22,7 +22,7 @@ namespace Logic.Editor
 #if !UNITY_2020_1_OR_NEWER
             this.AddManipulator(new ContextualMenuManipulator(BuildContextualMenu));
 #endif
-            this.Q("icon").AddToClassList("parameter-" + param.Value.GetType().Name);
+            this.Q("icon").style.backgroundColor = param.GetColor();
             this.Q("icon").visible = true;
 
             (this.Q("textField") as TextField).RegisterValueChangedCallback((e) =>

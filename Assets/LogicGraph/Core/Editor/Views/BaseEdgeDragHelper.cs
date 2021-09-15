@@ -20,7 +20,7 @@ namespace Logic.Editor
         internal const float k_MaxPanSpeed = k_MaxSpeedFactor * k_PanSpeed;
         internal const float kPortDetectionWidth = 30;
 
-        private Dictionary<BaseNodeView, List<PortView>> compatiblePorts = new Dictionary<BaseNodeView, List<PortView>>();
+        private Dictionary<Node, List<PortView>> compatiblePorts = new Dictionary<Node, List<PortView>>();
         private Edge ghostEdge;
         private GraphView graphView;
         private static NodeAdapter nodeAdapter = new NodeAdapter();
@@ -150,9 +150,9 @@ namespace Logic.Editor
 
             foreach (PortView port in graphView.GetCompatiblePorts(draggedPort, nodeAdapter))
             {
-                compatiblePorts.TryGetValue(port.Owner, out var portList);
+                compatiblePorts.TryGetValue(port.Owner.View, out var portList);
                 if (portList == null)
-                    portList = compatiblePorts[port.Owner] = new List<PortView>();
+                    portList = compatiblePorts[port.Owner.View] = new List<PortView>();
                 portList.Add(port);
             }
 
@@ -369,7 +369,7 @@ namespace Logic.Editor
             Reset(didConnect);
         }
 
-        Rect GetPortBounds(BaseNodeView nodeView, int index, List<PortView> portList)
+        Rect GetPortBounds(Node node, int index, List<PortView> portList)
         {
             var port = portList[index];
             var bounds = port.worldBound;
@@ -377,13 +377,13 @@ namespace Logic.Editor
             if (port.orientation == Orientation.Horizontal)
             {
                 // Increase horizontal port bounds
-                bounds.xMin = nodeView.View.worldBound.xMin;
-                bounds.xMax = nodeView.View.worldBound.xMax;
+                bounds.xMin = node.worldBound.xMin;
+                bounds.xMax = node.worldBound.xMax;
 
                 if (index == 0)
-                    bounds.yMin = nodeView.View.worldBound.yMin;
+                    bounds.yMin = node.worldBound.yMin;
                 if (index == portList.Count - 1)
-                    bounds.yMax = nodeView.View.worldBound.yMax;
+                    bounds.yMax = node.worldBound.yMax;
 
                 if (index > 0)
                 {
@@ -423,14 +423,14 @@ namespace Logic.Editor
 
             foreach (var kp in compatiblePorts)
             {
-                var nodeView = kp.Key;
+                var node = kp.Key;
                 var portList = kp.Value;
 
                 // We know that the port in the list is top to bottom in term of layout
                 for (int i = 0; i < portList.Count; i++)
                 {
                     var port = portList[i];
-                    Rect bounds = GetPortBounds(nodeView, i, portList);
+                    Rect bounds = GetPortBounds(node, i, portList);
 
                     float distance = Vector2.Distance(port.worldBound.position, mousePosition);
 

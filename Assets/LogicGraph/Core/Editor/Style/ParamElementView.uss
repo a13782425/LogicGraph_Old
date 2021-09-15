@@ -8,8 +8,8 @@
     flex-direction: column;
     background-color: #2b2b2b;
     border-color: #191919;
-    min-width: 100px;
-    min-height: 100px;
+    min-width: 180px;
+    min-height: 320px;
 }
 
 .pinnedElement.scrollable {

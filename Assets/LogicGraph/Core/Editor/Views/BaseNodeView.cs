@@ -15,22 +15,17 @@ namespace Logic.Editor
     public abstract class BaseNodeView
     {
         public string OnlyId => Target.OnlyId;
-        private LGInfoCache _graphCache;
-        protected LGInfoCache graphCache => _graphCache;
 
-        private NodeView _view;
+        protected LGInfoCache graphCache { get; private set; }
+
+        private Node _view;
 
         public Node View => _view;
-
-
-        private LogicGraphView _owner;
 
         /// <summary>
         /// 所属的逻辑视图
         /// </summary>
-        protected LogicGraphView owner => _owner;
-
-        private LNEditorCache _nodeEditorCache;
+        protected LogicGraphView owner { get; private set; }
 
         /// <summary>
         /// 当前节点视图对应的节点
@@ -40,12 +35,12 @@ namespace Logic.Editor
         /// <summary>
         /// 入端口
         /// </summary>
-        public PortView Input { get; private set; }
+        public PortView Input { get; protected set; }
 
         /// <summary>
         /// 出端口
         /// </summary>
-        public PortView OutPut { get; private set; }
+        public PortView OutPut { get; protected set; }
 
         /// <summary>
         /// 是否显示参数界面
@@ -100,15 +95,51 @@ namespace Logic.Editor
         {
             Target = node;
             this._title = node.Title;
-            this._owner = owner;
-            this._graphCache = owner.LGInfoCache;
-            this._nodeEditorCache = owner.LGEditorCache.GetEditorNode(node.GetType());
-            OnCreate();
-            _view = new NodeView(this);
-            this._owner.AddElement(_view);
-            _view.Initialize();
-            m_initializePorts();
+            this.owner = owner;
+            this.graphCache = owner.LGInfoCache;
+            this._view = GetNode();
+            if (this.View is INodeVisualElement nodeView)
+            {
+                nodeView.onGenericMenu += OnGenericMenu;
+            }
+            else
+            {
+                throw new Exception("界面视图需要实现INodeVisualElement接口");
+            }
 
+            this.owner.AddElement(_view);
+            OnCreate();
+        }
+
+        /// <summary>
+        /// 获取一个Node
+        /// </summary>
+        /// <returns></returns>
+        protected virtual Node GetNode()
+        {
+            NodeVisualElement view = new NodeVisualElement(this, owner);
+            var nodeEditorCache = owner.LGEditorCache.GetEditorNode(Target.GetType());
+            if ((nodeEditorCache.PortType & PortEnum.In) > PortEnum.None)
+            {
+                Input = AddPort("In", Direction.Input);
+                onPortSetDefault.Invoke(Input, true);
+                view.inputContainer.Add(Input);
+            }
+            else
+            {
+                view.inputContainer.RemoveFromHierarchy();
+            }
+            if ((nodeEditorCache.PortType & PortEnum.Out) > PortEnum.None)
+            {
+                OutPut = AddPort("Out", Direction.Output);
+                onPortSetDefault.Invoke(OutPut, true);
+                view.outputContainer.Add(OutPut);
+            }
+            else
+            {
+                view.outputContainer.RemoveFromHierarchy();
+            }
+            return view;
         }
 
         /// <summary>
@@ -131,17 +162,17 @@ namespace Logic.Editor
         /// 添加子节点
         /// </summary>
         /// <param name="owner"></param>
-        public virtual void AddChild(BaseNodeView child)
+        public virtual void AddChild(BaseLogicNode child)
         {
-            this.Target.Childs.Add(child.Target);
+            this.Target.Childs.Add(child);
         }
         /// <summary>
         /// 移除一个节点
         /// </summary>
         /// <param name="child"></param>
-        public virtual void RemoveChild(BaseNodeView child)
+        public virtual void RemoveChild(BaseLogicNode child)
         {
-            this.Target.Childs.Remove(child.Target);
+            this.Target.Childs.Remove(child);
         }
 
         /// <summary>
@@ -162,7 +193,7 @@ namespace Logic.Editor
             nodeList.RemoveAll(a => a == null);
             foreach (BaseLogicNode item in nodeList)
             {
-                BaseNodeView nodeView = _graphCache.GetNodeView(item);
+                BaseNodeView nodeView = graphCache.GetNodeView(item);
                 DrawLink(nodeView);
             }
         }
@@ -176,8 +207,8 @@ namespace Logic.Editor
             edge.output = outPort;
             input.Input.Connect(edge);
             outPort.Connect(edge);
-            this._owner.AddElement(edge);
-            this._owner.schedule.Execute(() =>
+            this.owner.AddElement(edge);
+            this.owner.schedule.Execute(() =>
             {
                 edge.UpdateEdgeControl();
             }).ExecuteLater(1);
@@ -197,7 +228,7 @@ namespace Logic.Editor
             for (int i = 0; i < Target.Childs.Count; i++)
             {
                 BaseLogicNode item = Target.Childs[i];
-                BaseNodeView nodeView = _graphCache.GetNodeView(item);
+                BaseNodeView nodeView = graphCache.GetNodeView(item);
                 evt.menu.AppendAction($"移除连接:{i + 1}.{nodeView.Title}", onRemoveChild, (a) => DropdownMenuAction.Status.Normal, nodeView);
             }
             if (Target.Childs.Count > 0)
@@ -216,8 +247,8 @@ namespace Logic.Editor
         /// <returns></returns>
         protected PortView AddPort(string labelName, Direction direction, bool isCube = false)
         {
-            PortView portView = PortView.CreatePort(labelName, direction, isCube, this._owner.ConnectorListener);
-            portView.Initialize(this);
+            PortView portView = PortView.CreatePort(labelName, direction, isCube, this.owner.ConnectorListener);
+            portView.Initialize(this, this.OnlyId);
             return portView;
         }
         /// <summary>
@@ -234,23 +265,17 @@ namespace Logic.Editor
                     Debug.LogError("Port 节点无法添加到参数面板");
                     return;
                 }
-                _owner.AddParamElement(element);
+                owner.AddParamElement(element);
             }
         }
-        protected void Repaint()
-        {
-            this._view.Repaint();
-            this._owner.RepaintParamPanel();
-            this.ShowUI();
-            this.ShowParamUI();
-        }
+
         /// <summary>
         /// 添加一个UI元素到节点视图中
         /// </summary>
         /// <param name="ui"></param>
         protected void AddUI(VisualElement element)
         {
-            _view.AddUI(element);
+            (_view as INodeVisualElement).AddUI(element);
         }
         protected Label GetLabel(string defaultValue = "")
         {
@@ -440,8 +465,8 @@ namespace Logic.Editor
             if (obj.userData is BaseNodeView nodeView)
             {
                 Edge edge = this.OutPut.connections.FirstOrDefault(a => a.input.node == nodeView.View);
-                this._owner.DeleteElements(new Edge[] { edge });
-                _owner.Save();
+                this.owner.DeleteElements(new Edge[] { edge });
+                owner.Save();
             }
 
         }
@@ -486,58 +511,35 @@ namespace Logic.Editor
         #endregion
 
 
-        #region 私有方法
-        private void m_initializePorts()
+        private class NodeVisualElement : Node, INodeVisualElement
         {
-            if ((_nodeEditorCache.PortType & PortEnum.In) > PortEnum.None)
-            {
-                Input = AddPort("In", Direction.Input);
-                onPortSetDefault.Invoke(Input, true);
-                this._view.inputContainer.Add(Input);
-            }
-            else
-            {
-                this._view.inputContainer.RemoveFromHierarchy();
-            }
-            if ((_nodeEditorCache.PortType & PortEnum.Out) > PortEnum.None)
-            {
-                OutPut = AddPort("Out", Direction.Output);
-                onPortSetDefault.Invoke(OutPut, true);
-                this._view.outputContainer.Add(OutPut);
-            }
-            else
-            {
-                this._view.outputContainer.RemoveFromHierarchy();
-            }
-        }
-        #endregion
+            private BaseNodeView nodeView { get; set; }
 
-
-        private class NodeView : Node
-        {
-            public BaseNodeView LogicNodeView { get; private set; }
+            public event Action<ContextualMenuPopulateEvent> onGenericMenu;
+            /// <summary>
+            /// 逻辑图视图
+            /// </summary>
+            private LogicGraphView _graphView;
 
             /// <summary>
             /// 重新定义的内容容器
             /// </summary>
             private VisualElement m_content { get; set; }
-            public NodeView(BaseNodeView nodeView)
+            public NodeVisualElement(BaseNodeView nodeView, LogicGraphView graphView)
             {
-                LogicNodeView = nodeView;
+                this.nodeView = nodeView;
+                _graphView = graphView;
                 userData = nodeView;
                 styleSheets.Add(LogicUtils.GetNodeStyle());
-                this.style.width = LogicNodeView.Width;
+                this.style.width = this.nodeView.Width;
                 //移除右上角折叠按钮
                 titleButtonContainer.RemoveFromHierarchy();
                 topContainer.style.height = 24;
                 m_content = topContainer.parent;
                 m_content.style.backgroundColor = new Color(0, 0, 0, 0.5f);
                 m_checkTitle();
-            }
-
-            private void abc(TooltipEvent evt)
-            {
-                Debug.LogError(evt.rect);
+                this.title = this.nodeView.Title;
+                this.SetPosition(new Rect(this.nodeView.Target.Pos, Vector2.zero));
             }
 
             public void AddUI(VisualElement ui)
@@ -547,29 +549,24 @@ namespace Logic.Editor
 
             public void Initialize()
             {
-                this.title = LogicNodeView.Title;
-                this.SetPosition(new Rect(LogicNodeView.Target.Pos, Vector2.zero));
+                this.title = nodeView.Title;
+                this.SetPosition(new Rect(nodeView.Target.Pos, Vector2.zero));
             }
 
             public override void SetPosition(Rect newPos)
             {
                 base.SetPosition(newPos);
-                LogicNodeView.Target.Pos = newPos.position;
+                nodeView.Target.Pos = newPos.position;
             }
 
             public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
             {
-                if (!this.selected || this.LogicNodeView._owner.selection.Count > 1)
+                if (!this.selected || this._graphView.selection.Count > 1)
                 {
                     return;
                 }
-                LogicNodeView.OnGenericMenu(evt);
+                onGenericMenu?.Invoke(evt);
                 evt.StopPropagation();
-            }
-
-            public void Repaint()
-            {
-                m_content.Clear();
             }
 
             #region Title
@@ -586,6 +583,7 @@ namespace Logic.Editor
                 _titleItem.style.unityTextAlign = TextAnchor.MiddleCenter;
                 _titleItem.RegisterCallback<MouseDownEvent>(m_onMouseDownEvent);
                 _titleEditor = new TextField();
+                _titleEditor.name = "titleField";
                 _titleItem.parent.Add(_titleEditor);
                 _titleEditor.style.flexGrow = 1;
                 _titleEditor.style.marginRight = 6;
@@ -615,7 +613,7 @@ namespace Logic.Editor
                 _titleEditor.style.display = DisplayStyle.None;
                 if (!_editTitleCancelled)
                 {
-                    this.LogicNodeView.Title = _titleEditor.text;
+                    this.nodeView.Title = _titleEditor.text;
                 }
                 _editTitleCancelled = true;
             }

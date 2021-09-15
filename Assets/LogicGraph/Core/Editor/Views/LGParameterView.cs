@@ -10,83 +10,46 @@ using UnityEngine.UIElements;
 
 namespace Logic.Editor
 {
-    public sealed class LGParameterView : GraphElement
+    public sealed class LGParameterView : Blackboard
     {
-        private LogicGraphView graphView;
+        private LogicGraphView _graphView;
 
-        private VisualElement main;
         private VisualElement root;
         private VisualElement content;
-        private VisualElement header;
 
-
-        private Label titleLabel;
         private ScrollView scrollView;
-
-
-
-        public override string title
-        {
-            get { return titleLabel.text; }
-            set { titleLabel.text = value; }
-        }
 
         public LGParameterView()
         {
-            var tpl = LogicUtils.GetPinnedView();
-            styleSheets.Add(LogicUtils.GetPinnedStyle());
             styleSheets.Add(LogicUtils.GetExposedStyle());
-            main = tpl.CloneTree();
-            main.AddToClassList("mainContainer");
             scrollView = new ScrollView(ScrollViewMode.Vertical);
             scrollView.horizontalScroller.RemoveFromHierarchy();
-            root = main.Q("content");
+            root = this.Q("content");
 
-            header = main.Q("header");
+            content = this.Q<VisualElement>(name: "contentContainer");
 
-            titleLabel = main.Q<Label>(name: "titleLabel");
-            content = main.Q<VisualElement>(name: "contentContainer");
-
-            hierarchy.Add(main);
-            capabilities |= Capabilities.Movable | Capabilities.Resizable;
             style.overflow = Overflow.Hidden;
 
-            ClearClassList();
-            AddToClassList("pinnedElement");
-
+            AddToClassList("lgparameter");
             style.position = Position.Absolute;
             content.RemoveFromHierarchy();
             root.Add(scrollView);
             scrollView.Add(content);
             AddToClassList("scrollable");
-            content.style.paddingTop = 6;
-            content.style.paddingLeft = 6;
-            content.style.paddingRight = 6;
-            content.style.paddingBottom = 6;
 
-            this.style.minWidth = 180;
-            this.style.minHeight = 320;
-            header.Add(new Button(m_onAddClicked)
-            {
-                text = "+"
-            });
+            this.Q<Button>("addButton").clicked += m_onAddClicked;
+            this.Q("subTitleLabel").RemoveFromHierarchy();
             title = "逻辑图参数";
         }
 
         public void InitializeGraphView(LogicGraphView graphView)
         {
-            this.graphView = graphView;
+            this._graphView = graphView;
             SetPosition(new Rect(graphView.LGInfoCache.ParamCache.Pos, graphView.LGInfoCache.ParamCache.Size));
-            this.AddManipulator(new Dragger { clampToParentEdges = true });
             hierarchy.Add(new Resizer(() =>
             {
                 graphView.LGInfoCache.ParamCache.Size = layout.size;
             }));
-            RegisterCallback<DragUpdatedEvent>(e =>
-            {
-                e.StopPropagation();
-            });
-            RegisterCallback<MouseDownEvent>((e) => e.StopPropagation());
             RegisterCallback<MouseUpEvent>((e) =>
             {
                 graphView.LGInfoCache.ParamCache.Pos = layout.position;
@@ -114,7 +77,7 @@ namespace Logic.Editor
                 {
                     string uniqueName = "New " + m_getNiceNameFromType(paramType);
                     uniqueName = m_getUniqueName(uniqueName);
-                    graphView.AddLGParam(uniqueName, paramType);
+                    _graphView.AddLGParam(uniqueName, paramType);
                 });
 
             parameterType.ShowAsContext();
@@ -123,9 +86,9 @@ namespace Logic.Editor
         {
             content.Clear();
 
-            foreach (var param in graphView.LGInfoCache.Graph.Params)
+            foreach (var param in _graphView.LGInfoCache.Graph.Params)
             {
-                var row = new BlackboardRow(new LGParameterFieldView(graphView, param), new LGParameterPropertyView(graphView, param));
+                var row = new BlackboardRow(new LGParameterFieldView(_graphView, param), new LGParameterPropertyView(_graphView, param));
                 row.expanded = false;
 
                 content.Add(row);
@@ -156,7 +119,7 @@ namespace Logic.Editor
             // Generate unique name
             string uniqueName = name;
             int i = 0;
-            while (graphView.LGInfoCache.Graph.Params.Any(e => e.Name == name))
+            while (_graphView.LGInfoCache.Graph.Params.Any(e => e.Name == name))
                 name = uniqueName + " " + i++;
             return name;
         }

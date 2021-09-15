@@ -9,6 +9,7 @@ using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 using static Logic.Editor.LGCacheData;
+
 namespace Logic.Editor
 {
     public sealed class LogicGraphView : GraphView
@@ -61,6 +62,8 @@ namespace Logic.Editor
             this.AddManipulator(new ClickSelector());
             this.RegisterCallback<GeometryChangedEvent>(m_onGeometryChanged);
             this.RegisterCallback<KeyDownEvent>(m_onKeyDownEvent);
+            this.RegisterCallback<DragPerformEvent>(m_onDragPerformEvent);
+            this.RegisterCallback<DragUpdatedEvent>(m_onDragUpdatedEvent);
             graphViewChanged = m_onGraphViewChanged;
             viewTransformChanged = m_onViewTransformChanged;
             viewTransform.position = LGInfoCache.Pos;
@@ -79,6 +82,10 @@ namespace Logic.Editor
                 _lgParamView.Show();
             else
                 _lgParamView.Hide();
+            //BlackboardField field = new BlackboardField();
+            //field.AddManipulator(new Dragger());
+            //field.text = "cccc";
+            //this.Add(field);
             //m_setPinnedPanel(this.layout);
             _hasData = true;
         }
@@ -216,6 +223,7 @@ namespace Logic.Editor
                 //LogicNodeBaseView startNodeView = startPort.node as LogicNodeBaseView;
                 foreach (var port in ports.ToList())
                 {
+
                     if (port.direction == Direction.Output)
                     {
                         continue;
@@ -228,14 +236,28 @@ namespace Logic.Editor
                     {
                         continue;
                     }
-                    if (port is PortView tarPort)
+                    var tarPort = port as PortView;
+                    if (tarPort == null)
                     {
-                        if (tarPort.CanLink(portView))
-                        {
-                            compatiblePorts.Add(port);
-                        }
+                        continue;
                     }
-
+                    switch (portView.Owner)
+                    {
+                        case ParameterNodeView paramView:
+                            if (!tarPort.IsDefault && tarPort.CanLink(portView))
+                            {
+                                compatiblePorts.Add(port);
+                            }
+                            break;
+                        case BaseNodeView nodeView:
+                            if (tarPort.CanLink(portView))
+                            {
+                                compatiblePorts.Add(port);
+                            }
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
             return compatiblePorts;
@@ -362,9 +384,9 @@ namespace Logic.Editor
             {
                 this.LGInfoCache.Graph.StartNodes.Add(logicNode);
             }
-
             logicNode.Pos = pos;
             logicNode.Title = nodeEditor.NodeName;
+            logicNode.Initialize(this.LGInfoCache.Graph);
             this.Save();
             m_showNode(logicNode, record);
         }
@@ -448,12 +470,21 @@ namespace Logic.Editor
         private void m_showNode(BaseLogicNode node, bool record = true)
         {
             string fullName = node.GetType().FullName;
-            LNEditorCache nodeEditor = LGEditorCache.Nodes.FirstOrDefault(a => a.NodeClassName == fullName);
-            BaseNodeView nodeView = Activator.CreateInstance(nodeEditor.GetViewType()) as BaseNodeView;
+            BaseNodeView nodeView = null;
+            LNEditorCache nodeEditor = null;
+            if (node is ParameterNode)
+            {
+                nodeView = new ParameterNodeView();
+            }
+            else
+            {
+                nodeEditor = LGEditorCache.Nodes.FirstOrDefault(a => a.NodeClassName == fullName);
+                nodeView = Activator.CreateInstance(nodeEditor.GetViewType()) as BaseNodeView;
+            }
             LGInfoCache.NodeDic.Add(node.OnlyId, nodeView);
             nodeView.Initialize(this, node);
             nodeView.ShowUI();
-            if (record)
+            if (record && nodeEditor != null)
             {
                 nodeEditor.AddUseCount();
                 LGEditorCache.Nodes.ForEach(a =>
@@ -485,7 +516,7 @@ namespace Logic.Editor
                         case EdgeView edgeView:
                             var input = edgeView.input as PortView;
                             var output = edgeView.output as PortView;
-                            output.Owner.RemoveChild(input.Owner);
+                            output.Owner.RemoveChild(input.Owner.Target);
                             break;
                         case Node node:
                             var baseNode = node.userData as BaseNodeView;
@@ -553,9 +584,53 @@ namespace Logic.Editor
                 }
             }
         }
+        private void m_onDragPerformEvent(DragPerformEvent evt)
+        {
+            var mousePos = (evt.currentTarget as VisualElement).ChangeCoordinatesTo(contentViewContainer, evt.localMousePosition);
+            var dragData = DragAndDrop.GetGenericData("DragSelection") as List<ISelectable>;
+            if (dragData != null)
+            {
+                var exposedParameterFieldViews = dragData.OfType<LGParameterFieldView>();
+                if (exposedParameterFieldViews.Any())
+                {
+                    foreach (var paramFieldView in exposedParameterFieldViews)
+                    {
+                        ParameterNode node = new ParameterNode();
+                        node.paramId = paramFieldView.param.OnlyId;
+                        var nodeView = new ParameterNodeView();
+                        LGInfoCache.Graph.Nodes.Add(node);
+                        node.Pos = mousePos;
+                        node.Title = paramFieldView.param.Name;
+                        node.Initialize(LGInfoCache.Graph);
+                        LGInfoCache.NodeDic.Add(node.OnlyId, nodeView);
+                        nodeView.Initialize(this, node);
+                        nodeView.ShowUI();
+                    }
+                }
+            }
+        }
+        private void m_onDragUpdatedEvent(DragUpdatedEvent evt)
+        {
+            var dragData = DragAndDrop.GetGenericData("DragSelection") as List<ISelectable>;
+            bool dragging = false;
+            if (dragData != null)
+                dragging = dragData.OfType<LGParameterFieldView>().Any();
+            if (dragging)
+                DragAndDrop.visualMode = DragAndDropVisualMode.Generic;
+        }
 
         private void m_duplicateNodeView(BaseNodeView baseNodeView, Vector2 nodePosition)
         {
+            if (baseNodeView is ParameterNodeView)
+            {
+                _window.ShowNotification(new GUIContent($"参数节点不能复制,请在参数界面拖拽"));
+                return;
+            }
+            if (LGEditorCache.DefaultNodes.Exists(a => a.NodeClassName == baseNodeView.Target.GetType().FullName))
+            {
+                _window.ShowNotification(new GUIContent($"默认节点不能复制"));
+                return;
+            }
             string nodeFullName = baseNodeView.Target.GetType().FullName;
             var nodeEditor = LGEditorCache.Nodes.FirstOrDefault(a => a.NodeClassName == nodeFullName);
             m_createNodeView(nodeEditor, nodePosition, false);

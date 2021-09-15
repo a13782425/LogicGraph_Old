@@ -58,9 +58,10 @@ namespace Logic.Editor
                     this._lgInfoCache = info;
                     this._lgEditorCache = LGCacheOp.GetEditorCache(info);
                     BaseLogicGraph graph = LGCacheOp.GetLogicGraph(info);
-                    this._lgInfoCache.Graph = graph;
                     //删除没有的节点
                     graph.Nodes.RemoveAll(n => n == null);
+                    graph.Init();
+                    this._lgInfoCache.Graph = graph;
                     this._view.ShowLogic();
                 }
                 else

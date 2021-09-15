@@ -59,6 +59,10 @@ namespace Logic.Editor
         {
             return AssetDatabase.LoadAssetAtPath<StyleSheet>(Path.Combine(EDITOR_STYLE_PATH, "BaseNodeView.uss"));
         }
+        public static StyleSheet GetParamNodeStyle()
+        {
+            return AssetDatabase.LoadAssetAtPath<StyleSheet>(Path.Combine(EDITOR_STYLE_PATH, "ParamNodeView.uss"));
+        }
         public static StyleSheet GetPortStyle()
         {
             return AssetDatabase.LoadAssetAtPath<StyleSheet>(Path.Combine(EDITOR_STYLE_PATH, "PortView.uss"));
