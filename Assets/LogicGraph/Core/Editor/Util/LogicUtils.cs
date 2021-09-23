@@ -263,4 +263,13 @@ namespace Logic.Editor
             }
         }
     }
+
+    /// <summary>
+    /// 参数存取权限
+    /// </summary>
+    public enum ParamAccessor
+    {
+        Get,
+        Set
+    }
 }

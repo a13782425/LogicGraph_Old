@@ -23,9 +23,10 @@ public class DebugNodeView : BaseNodeView
         var text = GetInputField("日志:", node.log);
         text.RegisterCallback<InputEvent>(onInputEvent);
         this.AddUI(text);
-        _port = AddPort("条件", UnityEditor.Experimental.GraphView.Direction.Output, true);
+        //_port = AddPort("条件", UnityEditor.Experimental.GraphView.Direction.Output, true);
+        //this.AddUI(_port);
+        _port = AddPort("参数", UnityEditor.Experimental.GraphView.Direction.Input, isCube: true);
         this.AddUI(_port);
-        this.AddUI(AddPort("参数", UnityEditor.Experimental.GraphView.Direction.Input, true));
         this.AddUI(GetInputField("aa", 0));
     }
 
@@ -51,17 +52,33 @@ public class DebugNodeView : BaseNodeView
         else
             base.AddChild(child);
     }
-
+    public override void AddParam(ParameterNode paramNode, PortView curPort, ParamAccessor accessor)
+    {
+        if (accessor == ParamAccessor.Get)
+        {
+            node.Parameter = paramNode;
+        }
+    }
+    public override void DelParam(ParameterNode paramNode, PortView curPort, ParamAccessor accessor)
+    {
+        if (accessor == ParamAccessor.Get)
+        {
+            node.Parameter = null;
+        }
+    }
     public override void DrawLink()
     {
         base.DrawLink();
-        this.node.Conditions.RemoveAll(a => a == null);
-        foreach (var item in this.node.Conditions)
+        //this.node.Conditions.RemoveAll(a => a == null);
+        //foreach (var item in this.node.Conditions)
+        //{
+        //    var nodeView = graphCache.GetNodeView(item);
+        //    DrawLink(nodeView, _port);
+        //}
+        if (this.node.Parameter.param != null)
         {
-            var nodeView = graphCache.GetNodeView(item);
-            DrawLink(nodeView, _port);
+            DrawLink(_port, graphCache.GetNodeView(this.node.Parameter).OutPut);
         }
-
     }
     //public override bool CanLink(PortView ownerPort, PortView waitLinkPort)
     //{

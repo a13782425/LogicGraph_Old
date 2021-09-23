@@ -23,12 +23,12 @@ namespace Logic.Editor
             node.titleContainer.Add(node.inputContainer);
             node.titleContainer.Add(titleLabel);
             node.titleContainer.Add(node.outputContainer);
-            Input = AddPort("", Direction.Output);
+            Input = AddPort("", Direction.Input);
             //Input.Q("type").RemoveFromHierarchy();
-            node.outputContainer.Add(Input);
-            OutPut = AddPort("", Direction.Input);
+            node.inputContainer.Add(Input);
+            OutPut = AddPort("", Direction.Output);
             //OutPut.Q("type").RemoveFromHierarchy();
-            node.inputContainer.Add(OutPut);
+            node.outputContainer.Add(OutPut);
             var contents = node.Q("contents");
             contents.RemoveFromHierarchy();
             return node;
@@ -43,6 +43,10 @@ namespace Logic.Editor
 
         }
 
+        public override void DrawLink()
+        {
+            
+        }
         public override bool CanLink(PortView ownerPort, PortView waitLinkPort)
         {
             if (waitLinkPort.IsDefault)
@@ -82,8 +86,8 @@ namespace Logic.Editor
                 m_content = topContainer.parent;
                 m_content.style.backgroundColor = new Color(0, 0, 0, 0.5f);
                 this.title = this.nodeView.Title;
-                this.transform.position = this.nodeView.Target.Pos;
-                //this.SetPosition(new Rect(this.nodeView.Target.Pos, Vector2.zero));
+                //this.transform.position = this.nodeView.Target.Pos;
+                this.SetPosition(new Rect(this.nodeView.Target.Pos, Vector2.zero));
                 this.AddToClassList("paramNode");
             }
 

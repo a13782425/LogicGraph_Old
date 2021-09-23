@@ -8,6 +8,7 @@ using UnityEditor.Experimental.GraphView;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
+using static UnityEditor.Experimental.GraphView.Port;
 using Object = UnityEngine.Object;
 
 namespace Logic.Editor
@@ -176,6 +177,22 @@ namespace Logic.Editor
         }
 
         /// <summary>
+        /// 添加一个参数
+        /// </summary>
+        /// <param name="node">参数节点</param>
+        /// <param name="curPort">进来的端口</param>
+        /// <param name="accessor">参数存取器</param>
+        public virtual void AddParam(ParameterNode paramNode, PortView curPort, ParamAccessor accessor) { Debug.LogError("添加:" + paramNode.param.Name + ":" + accessor); }
+
+        /// <summary>
+        /// 移除一个参数
+        /// </summary>
+        /// <param name="node">参数节点</param>
+        /// <param name="curPort">进来的端口</param>
+        /// <param name="accessor">参数存取器</param>
+        public virtual void DelParam(ParameterNode paramNode, PortView curPort, ParamAccessor accessor) { Debug.LogError("移除:" + paramNode.param.Name + ":" + accessor); }
+
+        /// <summary>
         /// 当前节点是否可以被链接
         /// </summary>
         /// <param name="ownerPort">自己的端口</param>
@@ -213,7 +230,19 @@ namespace Logic.Editor
                 edge.UpdateEdgeControl();
             }).ExecuteLater(1);
         }
-
+        protected void DrawLink(PortView input, PortView outPort)
+        {
+            EdgeView edge = new EdgeView();
+            edge.input = input;
+            edge.output = outPort;
+            input.Connect(edge);
+            outPort.Connect(edge);
+            this.owner.AddElement(edge);
+            this.owner.schedule.Execute(() =>
+            {
+                edge.UpdateEdgeControl();
+            }).ExecuteLater(1);
+        }
         #endregion
 
 
@@ -245,9 +274,9 @@ namespace Logic.Editor
         /// <param name="direction"></param>
         /// <param name="isCube"></param>
         /// <returns></returns>
-        protected PortView AddPort(string labelName, Direction direction, bool isCube = false)
+        protected PortView AddPort(string labelName, Direction direction, Capacity capacity = Capacity.Multi, bool isCube = false)
         {
-            PortView portView = PortView.CreatePort(labelName, direction, isCube, this.owner.ConnectorListener);
+            PortView portView = PortView.CreatePort(labelName, direction, capacity, isCube, this.owner.ConnectorListener);
             portView.Initialize(this, this.OnlyId);
             return portView;
         }

@@ -25,7 +25,17 @@ namespace Logic.Editor
             graphView.AddElement(edgeView);
             PortView output = edgeView.output as PortView;
             PortView input = edgeView.input as PortView;
-            output.Owner.AddChild(input.Owner.Target);
+
+            if (input.Owner is ParameterNodeView inParamView)
+            {
+                output.Owner.AddParam(inParamView.Target as ParameterNode, output, ParamAccessor.Set);
+            }
+            else if (output.Owner is ParameterNodeView outParamView)
+            {
+                input.Owner.AddParam(outParamView.Target as ParameterNode, input, ParamAccessor.Get);
+            }
+            else
+                output.Owner.AddChild(input.Owner.Target);
             input.Connect(edgeView);
             output.Connect(edgeView);
         }

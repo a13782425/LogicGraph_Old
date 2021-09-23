@@ -21,31 +21,17 @@ namespace Logic.Editor
         public PortView(Orientation portOrientation, Direction portDirection, Capacity portCapacity, Type type) : base(portOrientation, portDirection, portCapacity, type)
         {
         }
-        public static PortView CreatePort(string labelName, Direction direction, bool isCube, EdgeConnectorListener edgeConnectorListener)
+        public static PortView CreatePort(string labelName, Direction direction, Capacity capacity, bool isCube, EdgeConnectorListener edgeConnectorListener)
         {
-            var port = new PortView(Orientation.Horizontal, direction, Capacity.Multi, null);
+            var port = new PortView(Orientation.Horizontal, direction, capacity, null);
             port.m_EdgeConnector = new BaseEdgeConnector(edgeConnectorListener);
             port.AddManipulator(port.m_EdgeConnector);
             port.portName = labelName;
             port.styleSheets.Add(LogicUtils.GetPortStyle());
             port._isCube = isCube;
 
-
             return port;
         }
-        //public void Initialize(BaseNodeView nodeView)
-        //{
-        //    this.Owner = nodeView;
-        //    if (_isCube)
-        //    {
-        //        this.AddToClassList(LogicUtils.PORT_CUBE);
-        //        visualClass = "Port_Cube" + direction;
-        //    }
-        //    else
-        //    {
-        //        visualClass = "Port_" + direction;
-        //    }
-        //}
 
         public void Initialize(BaseNodeView nodeView, string onlyId)
         {

@@ -13,16 +13,16 @@ MonoBehaviour:
   m_Name: LGConfig
   m_EditorClassIdentifier: 
   _lgInfoList:
-  - OnlyId: 573e9420-ea07-40d6-bf93-f07bcc6fe04a
+  - OnlyId: 55a9bc70-b571-44d8-893a-b38ed1cb8d29
     LogicName: LogicGraph
     GraphClassName: DefaultLogicGraph
     FileName: 
     AssetPath: Assets/LogicGraph.asset
-    Pos: {x: 1302, y: 357, z: 0}
-    Scale: {x: 1, y: 1, z: 1}
+    Pos: {x: 345, y: 140, z: 0}
+    Scale: {x: 0.7462154, y: 0.7462154, z: 1}
     ParamCache:
       IsShow: 1
-      Pos: {x: 797, y: 198}
+      Pos: {x: 335, y: 216}
       Size: {x: 180, y: 320}
   _lgEditorList:
   - GraphName: "\u9ED8\u8BA4\u903B\u8F91\u56FE"
@@ -50,7 +50,7 @@ MonoBehaviour:
       PortType: 3
       IsRefresh: 1
       IsShow: 1
-      UseCount: -2147483568
+      UseCount: -2147483558
     DefaultNodes:
     - NodeName: "\u5F00\u59CB"
       NodeFullName: "\u7CFB\u7EDF/\u5F00\u59CB"

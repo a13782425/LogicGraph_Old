@@ -16,6 +16,8 @@ namespace Logic.Editor
         public ToolbarView()
         {
             Add(new IMGUIContainer(DrawImGUIToolbar));
+            this.RegisterCallback<MouseDownEvent>((a) => a.StopPropagation());
+            this.RegisterCallback<MouseUpEvent>((a) => a.StopPropagation());
         }
         private void DrawImGUIToolbar()
         {

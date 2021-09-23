@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Logic;
+using System;
 
 public class DebugNode : BaseLogicNode
 {
@@ -12,5 +13,8 @@ public class DebugNode : BaseLogicNode
     /// </summary>
     [SerializeReference]
     public List<BaseLogicNode> Conditions = new List<BaseLogicNode>();
+
+    [SerializeField]
+    public ParameterNode Parameter;
 
 }

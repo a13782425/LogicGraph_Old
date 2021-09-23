@@ -516,7 +516,12 @@ namespace Logic.Editor
                         case EdgeView edgeView:
                             var input = edgeView.input as PortView;
                             var output = edgeView.output as PortView;
-                            output.Owner.RemoveChild(input.Owner.Target);
+                            if (input.Owner is ParameterNodeView inParamView)
+                                output.Owner.DelParam(inParamView.Target as ParameterNode, output, ParamAccessor.Set);
+                            else if (output.Owner is ParameterNodeView outParamView)
+                                input.Owner.DelParam(outParamView.Target as ParameterNode, input, ParamAccessor.Get);
+                            else
+                                output.Owner.RemoveChild(input.Owner.Target);
                             break;
                         case Node node:
                             var baseNode = node.userData as BaseNodeView;

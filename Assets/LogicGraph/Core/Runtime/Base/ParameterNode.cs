@@ -7,6 +7,7 @@ using UnityEngine;
 
 namespace Logic
 {
+    [Serializable]
     public sealed class ParameterNode : BaseLogicNode
     {
         public string paramId = "";
@@ -16,8 +17,6 @@ namespace Logic
         /// </summary>
         public BaseParameter param { get; private set; }
 
-        public ParameterAccessor accessor;
-
         protected override bool OnEnable()
         {
             param = logicGraph.GetParamById(paramId);
@@ -25,10 +24,5 @@ namespace Logic
         }
         public object GetValue() => param.Value;
         public void SetValue(object value) => param.Value = value;
-    }
-    public enum ParameterAccessor
-    {
-        Get,
-        Set
     }
 }
