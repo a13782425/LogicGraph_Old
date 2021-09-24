@@ -15,6 +15,6 @@ public class DebugNode : BaseLogicNode
     public List<BaseLogicNode> Conditions = new List<BaseLogicNode>();
 
     [SerializeField]
-    public ParameterNode Parameter;
+    public VariableNode Parameter;
 
 }

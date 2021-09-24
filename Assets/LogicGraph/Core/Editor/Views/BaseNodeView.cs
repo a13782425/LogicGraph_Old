@@ -65,6 +65,16 @@ namespace Logic.Editor
             }
         }
 
+        public Color TitleBackgroundColor
+        {
+            get => (_view as INodeVisualElement).TitleBackgroundColor;
+            set => (_view as INodeVisualElement).TitleBackgroundColor = value;
+        }
+        public Color ContentBackgroundColor
+        {
+            get => (_view as INodeVisualElement).ContentBackgroundColor;
+            set => (_view as INodeVisualElement).ContentBackgroundColor = value;
+        }
         private string _title = "";
         public string Title
         {
@@ -81,6 +91,7 @@ namespace Logic.Editor
         }
 
         private static Action<PortView, bool> onPortSetDefault;
+
         #region 公共方法
         static BaseNodeView()
         {
@@ -150,6 +161,11 @@ namespace Logic.Editor
         public virtual void OnCreate() { }
 
         /// <summary>
+        /// 当节点被销毁时候销毁
+        /// </summary>
+        public virtual void OnDestroy() { }
+
+        /// <summary>
         /// 显示UI
         /// 子类实现
         /// </summary>
@@ -182,7 +198,7 @@ namespace Logic.Editor
         /// <param name="node">参数节点</param>
         /// <param name="curPort">进来的端口</param>
         /// <param name="accessor">参数存取器</param>
-        public virtual void AddParam(ParameterNode paramNode, PortView curPort, ParamAccessor accessor) { Debug.LogError("添加:" + paramNode.param.Name + ":" + accessor); }
+        public virtual void AddVariable(VariableNode varNode, PortView curPort, ParamAccessor accessor) { Debug.LogError("添加:" + varNode.variable.Name + ":" + accessor); }
 
         /// <summary>
         /// 移除一个参数
@@ -190,7 +206,7 @@ namespace Logic.Editor
         /// <param name="node">参数节点</param>
         /// <param name="curPort">进来的端口</param>
         /// <param name="accessor">参数存取器</param>
-        public virtual void DelParam(ParameterNode paramNode, PortView curPort, ParamAccessor accessor) { Debug.LogError("移除:" + paramNode.param.Name + ":" + accessor); }
+        public virtual void DelVariable(VariableNode varNode, PortView curPort, ParamAccessor accessor) { Debug.LogError("移除:" + varNode.variable.Name + ":" + accessor); }
 
         /// <summary>
         /// 当前节点是否可以被链接
@@ -253,7 +269,6 @@ namespace Logic.Editor
         /// <param name="evt"></param>
         protected virtual void OnGenericMenu(ContextualMenuPopulateEvent evt)
         {
-
             for (int i = 0; i < Target.Childs.Count; i++)
             {
                 BaseLogicNode item = Target.Childs[i];
@@ -266,6 +281,7 @@ namespace Logic.Editor
             }
             evt.menu.AppendAction("查看节点代码", onOpenNodeScript);
             evt.menu.AppendAction("查看界面代码", onOpenNodeViewScript);
+            evt.menu.AppendAction("删除", (a) => owner.DeleteSelection());
         }
         /// <summary>
         /// 添加一个端口
@@ -554,6 +570,9 @@ namespace Logic.Editor
             /// 重新定义的内容容器
             /// </summary>
             private VisualElement m_content { get; set; }
+            public Color TitleBackgroundColor { get => titleContainer.style.backgroundColor.value; set => titleContainer.style.backgroundColor = value; }
+            public Color ContentBackgroundColor { get => m_content.style.backgroundColor.value; set => m_content.style.backgroundColor = value; }
+
             public NodeVisualElement(BaseNodeView nodeView, LogicGraphView graphView)
             {
                 this.nodeView = nodeView;

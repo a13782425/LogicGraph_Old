@@ -10,7 +10,7 @@ using UnityEngine.UIElements;
 
 namespace Logic.Editor
 {
-    public sealed class LGParameterView : Blackboard
+    public sealed class LGVariableView : Blackboard
     {
         private LogicGraphView _graphView;
 
@@ -19,9 +19,9 @@ namespace Logic.Editor
 
         private ScrollView scrollView;
 
-        public LGParameterView()
+        public LGVariableView()
         {
-            styleSheets.Add(LogicUtils.GetExposedStyle());
+            styleSheets.Add(LogicUtils.GetVariableStyle());
             scrollView = new ScrollView(ScrollViewMode.Vertical);
             scrollView.horizontalScroller.RemoveFromHierarchy();
             root = this.Q("content");
@@ -30,7 +30,7 @@ namespace Logic.Editor
 
             style.overflow = Overflow.Hidden;
 
-            AddToClassList("lgparameter");
+            AddToClassList("lgvariable");
             style.position = Position.Absolute;
             content.RemoveFromHierarchy();
             root.Add(scrollView);
@@ -39,23 +39,23 @@ namespace Logic.Editor
 
             this.Q<Button>("addButton").clicked += m_onAddClicked;
             this.Q("subTitleLabel").RemoveFromHierarchy();
-            title = "逻辑图参数";
+            title = "逻辑图变量";
         }
 
         public void InitializeGraphView(LogicGraphView graphView)
         {
             this._graphView = graphView;
-            SetPosition(new Rect(graphView.LGInfoCache.ParamCache.Pos, graphView.LGInfoCache.ParamCache.Size));
+            SetPosition(new Rect(graphView.LGInfoCache.VariableCache.Pos, graphView.LGInfoCache.VariableCache.Size));
             hierarchy.Add(new Resizer(() =>
             {
-                graphView.LGInfoCache.ParamCache.Size = layout.size;
+                graphView.LGInfoCache.VariableCache.Size = layout.size;
             }));
             RegisterCallback<MouseUpEvent>((e) =>
             {
-                graphView.LGInfoCache.ParamCache.Pos = layout.position;
+                graphView.LGInfoCache.VariableCache.Pos = layout.position;
                 e.StopPropagation();
             });
-            graphView.onUpdateLGParam += m_updateParameterList;
+            graphView.onUpdateLGVariable += m_updateVariableList;
         }
         public void Hide()
         {
@@ -66,38 +66,38 @@ namespace Logic.Editor
         public void Show()
         {
             this.visible = true;
-            m_updateParameterList();
+            m_updateVariableList();
         }
         private void m_onAddClicked()
         {
             var parameterType = new GenericMenu();
 
-            foreach (var paramType in m_getParameterTypes())
-                parameterType.AddItem(new GUIContent(m_getNiceNameFromType(paramType)), false, () =>
+            foreach (var varType in m_getVariableTypes())
+                parameterType.AddItem(new GUIContent(m_getNiceNameFromType(varType)), false, () =>
                 {
-                    string uniqueName = "New " + m_getNiceNameFromType(paramType);
+                    string uniqueName = "New" + m_getNiceNameFromType(varType);
                     uniqueName = m_getUniqueName(uniqueName);
-                    _graphView.AddLGParam(uniqueName, paramType);
+                    _graphView.AddLGVariable(uniqueName, varType);
                 });
 
             parameterType.ShowAsContext();
         }
-        private void m_updateParameterList()
+        private void m_updateVariableList()
         {
             content.Clear();
 
-            foreach (var param in _graphView.LGInfoCache.Graph.Params)
+            foreach (var variable in _graphView.LGInfoCache.Graph.Variables)
             {
-                var row = new BlackboardRow(new LGParameterFieldView(_graphView, param), new LGParameterPropertyView(_graphView, param));
+                var row = new BlackboardRow(new LGVariableFieldView(_graphView, variable), new LGVariablePropertyView(_graphView, variable));
                 row.expanded = false;
 
                 content.Add(row);
             }
         }
 
-        private IEnumerable<Type> m_getParameterTypes()
+        private IEnumerable<Type> m_getVariableTypes()
         {
-            foreach (var type in TypeCache.GetTypesDerivedFrom<BaseParameter>())
+            foreach (var type in TypeCache.GetTypesDerivedFrom<BaseVariable>())
             {
                 if (type.IsGenericType)
                     continue;
@@ -110,7 +110,7 @@ namespace Logic.Editor
             string name = type.Name;
 
             // Remove parameter in the name of the type if it exists
-            name = name.Replace("Parameter", "");
+            name = name.Replace("Variable", "");
 
             return ObjectNames.NicifyVariableName(name);
         }
@@ -119,8 +119,8 @@ namespace Logic.Editor
             // Generate unique name
             string uniqueName = name;
             int i = 0;
-            while (_graphView.LGInfoCache.Graph.Params.Any(e => e.Name == name))
-                name = uniqueName + " " + i++;
+            while (_graphView.LGInfoCache.Graph.Variables.Any(e => e.Name == name))
+                name = uniqueName + (i++);
             return name;
         }
 

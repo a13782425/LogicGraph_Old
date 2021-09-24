@@ -1,37 +1,37 @@
 
-.lgparameter{
+.lgvariable{
 	min-width: 180px;
     min-height: 320px;
 }
 
-.lgparameter.scrollable {
+.lgvariable.scrollable {
     position: absolute;
 }
 
-.lgparameter #contentContainer {
+.lgvariable #contentContainer {
 	padding-bottom: 12px;
 	padding-top: 4px;
 }
 
-.lgparameter #titleLabel {
+.lgvariable #titleLabel {
 	padding-left: 6px;
 }
 
-.lgparameter >.mainContainer> #content> #header > #addButton {
+.lgvariable >.mainContainer> #content> #header > #addButton {
 	margin-right: 6px;
 	margin-bottom: 2px;
 	font-size: 14px;
 }
 
-LGParameterPropertyView {
+LGVariablePropertyView {
 	padding-left: 12px;
 }
-LGParameterFieldView #contentItem > Label {
+LGVariableFieldView #contentItem > Label {
 	padding-right: 0;
 	margin-right: 0;
 }
 
-LGParameterFieldView .pill #contents > #top > #icon {
+LGVariableFieldView .pill #contents > #top > #icon {
 	width: 4px;
 	height: 4px;
 	border-radius: 2px;
@@ -39,7 +39,7 @@ LGParameterFieldView .pill #contents > #top > #icon {
 	margin-left: 2px;
 }
 
-LGParameterFieldView Image {
+LGVariableFieldView Image {
 	background-color: #ffffff;
 }
 

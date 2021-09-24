@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 //using System.Collections.Generic;
 //using System.Linq;
 //using System.Text;
@@ -12,6 +13,10 @@ namespace Logic.Editor
 
     public interface INodeVisualElement
     {
+
+        Color TitleBackgroundColor { get; set; }
+        Color ContentBackgroundColor { get; set; }
+
         /// <summary>
         /// 添加一个UI
         /// </summary>

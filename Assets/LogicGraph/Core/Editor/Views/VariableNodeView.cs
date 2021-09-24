@@ -10,12 +10,12 @@ using UnityEngine.UIElements;
 
 namespace Logic.Editor
 {
-    public sealed class ParameterNodeView : BaseNodeView<ParameterNode>
+    public sealed class VariableNodeView : BaseNodeView<VariableNode>
     {
 
         protected override Node GetNode()
         {
-            var node = new ParameterNodeVisualElement(this, this.owner);
+            var node = new VariableNodeVisualElement(this, this.owner);
             node.inputContainer.RemoveFromHierarchy();
             node.outputContainer.RemoveFromHierarchy();
             var titleLabel = node.titleContainer.Q("title-label");
@@ -35,33 +35,47 @@ namespace Logic.Editor
         }
         public override void OnCreate()
         {
-            Input.portColor = node.param.GetColor();
-            OutPut.portColor = node.param.GetColor();
+            Input.portColor = node.variable.GetColor();
+            OutPut.portColor = node.variable.GetColor();
+            if (node.variable != null)
+            {
+                node.variable.onModifyParam += m_onModifyParam;
+            }
         }
-        protected override void OnGenericMenu(ContextualMenuPopulateEvent evt)
-        {
 
+        private void m_onModifyParam()
+        {
+            this.Title = node.variable.Name;
         }
 
-        public override void DrawLink()
+        public override void OnDestroy()
         {
-            
+            if (node.variable != null)
+            {
+                node.variable.onModifyParam -= m_onModifyParam;
+            }
         }
+
+        protected override void OnGenericMenu(ContextualMenuPopulateEvent evt) { evt.menu.AppendAction("删除", (a) => owner.DeleteSelection()); }
+        public override void DrawLink() { }
         public override bool CanLink(PortView ownerPort, PortView waitLinkPort)
         {
             if (waitLinkPort.IsDefault)
             {
                 return false;
             }
-            if (waitLinkPort.Owner is ParameterNodeView)
+            if (waitLinkPort.Owner is VariableNodeView)
             {
                 return false;
             }
             return true;
         }
 
-        private class ParameterNodeVisualElement : Node, INodeVisualElement
+        private class VariableNodeVisualElement : Node, INodeVisualElement
         {
+
+            public Color TitleBackgroundColor { get => titleContainer.style.backgroundColor.value; set => titleContainer.style.backgroundColor = value; }
+            public Color ContentBackgroundColor { get => throw new Exception("变量节点不支持"); set => throw new Exception("变量节点不支持"); }
             private BaseNodeView nodeView { get; set; }
 
             public event Action<ContextualMenuPopulateEvent> onGenericMenu;
@@ -74,7 +88,8 @@ namespace Logic.Editor
             /// 重新定义的内容容器
             /// </summary>
             private VisualElement m_content { get; set; }
-            public ParameterNodeVisualElement(BaseNodeView nodeView, LogicGraphView graphView)
+
+            public VariableNodeVisualElement(BaseNodeView nodeView, LogicGraphView graphView)
             {
                 this.nodeView = nodeView;
                 _graphView = graphView;
@@ -86,7 +101,6 @@ namespace Logic.Editor
                 m_content = topContainer.parent;
                 m_content.style.backgroundColor = new Color(0, 0, 0, 0.5f);
                 this.title = this.nodeView.Title;
-                //this.transform.position = this.nodeView.Target.Pos;
                 this.SetPosition(new Rect(this.nodeView.Target.Pos, Vector2.zero));
                 this.AddToClassList("paramNode");
             }

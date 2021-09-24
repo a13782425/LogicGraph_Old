@@ -83,9 +83,9 @@ namespace Logic.Editor
         {
             return AssetDatabase.LoadAssetAtPath<StyleSheet>(Path.Combine(EDITOR_STYLE_PATH, "ParamElementView.uss"));
         }
-        public static StyleSheet GetExposedStyle()
+        public static StyleSheet GetVariableStyle()
         {
-            return AssetDatabase.LoadAssetAtPath<StyleSheet>(Path.Combine(EDITOR_STYLE_PATH, "LGParameterView.uss"));
+            return AssetDatabase.LoadAssetAtPath<StyleSheet>(Path.Combine(EDITOR_STYLE_PATH, "LGVariableView.uss"));
         }
         #endregion
 
@@ -165,8 +165,8 @@ namespace Logic.Editor
                     infoCache.LogicName = logicGraph.Title;
                     infoCache.GraphClassName = logicGraph.GetType().FullName;
                     infoCache.OnlyId = logicGraph.OnlyId;
-                    infoCache.ParamCache.Pos = new Vector2(0, 20);
-                    infoCache.ParamCache.Size = new Vector2(180, 320);
+                    infoCache.VariableCache.Pos = new Vector2(0, 20);
+                    infoCache.VariableCache.Size = new Vector2(180, 320);
                     LGCacheData.Instance.LGInfoList.Add(infoCache);
                 }
             }

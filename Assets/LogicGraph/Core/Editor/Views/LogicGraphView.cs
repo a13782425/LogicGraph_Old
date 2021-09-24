@@ -17,29 +17,30 @@ namespace Logic.Editor
         private bool _hasData = false;
         private bool _showPinned = false;
         private LGWindow _window;
+        public LGWindow Window => _window;
         public LGInfoCache LGInfoCache => _window.LGInfoCache;
         public LGEditorCache LGEditorCache => _window.LGEditorCache;
 
         private LNParameterView _lnParamView;
 
-        private LGParameterView _lgParamView;
+        private LGVariableView _lgVariableView;
 
         private ToolbarView _toolbarView;
 
+
+        private CreateLNSearchWindow _createLNSearch = null;
+
         private EdgeConnectorListener _connectorListener;
         /// <summary>
-        /// Connector listener that will create the edges between ports
+        /// 端口连接监听器
         /// </summary>
         public EdgeConnectorListener ConnectorListener => _connectorListener;
 
         /// <summary>
         /// 刷新界面数据
         /// </summary>
-        public event Action onUpdateLGParam;
-        /// <summary>
-        /// 重命名界面数据
-        /// </summary>
-        public event Action onRenameLGParam;
+        public event Action onUpdateLGVariable;
+
         public LogicGraphView(LGWindow lgWindow)
         {
             _window = lgWindow;
@@ -69,24 +70,20 @@ namespace Logic.Editor
             viewTransform.position = LGInfoCache.Pos;
             viewTransform.scale = LGInfoCache.Scale;
             m_showLogic();
+            //节点参数
             _lnParamView = new LNParameterView();
             _lnParamView.InitializeGraphView(this);
             this.Add(_lnParamView);
             _lnParamView.Hide();
-
-
-            _lgParamView = new LGParameterView();
-            _lgParamView.InitializeGraphView(this);
-            this.Add(_lgParamView);
-            if (LGInfoCache.ParamCache.IsShow)
-                _lgParamView.Show();
+            //逻辑图变量
+            _lgVariableView = new LGVariableView();
+            _lgVariableView.InitializeGraphView(this);
+            this.Add(_lgVariableView);
+            if (LGInfoCache.VariableCache.IsShow)
+                _lgVariableView.Show();
             else
-                _lgParamView.Hide();
-            //BlackboardField field = new BlackboardField();
-            //field.AddManipulator(new Dragger());
-            //field.text = "cccc";
-            //this.Add(field);
-            //m_setPinnedPanel(this.layout);
+                _lgVariableView.Hide();
+
             _hasData = true;
         }
 
@@ -99,13 +96,6 @@ namespace Logic.Editor
             if (_showPinned)
             {
                 _lnParamView.AddUI(element);
-            }
-        }
-        public void RepaintParamPanel()
-        {
-            if (_showPinned)
-            {
-                _lnParamView.Repaint();
             }
         }
         /// <summary>
@@ -123,14 +113,14 @@ namespace Logic.Editor
         /// <summary>
         /// 添加一个逻辑图参数
         /// </summary>
-        /// <param name="paramName"></param>
-        /// <param name="paramType"></param>
-        public void AddLGParam(string paramName, Type paramType)
+        /// <param name="varName"></param>
+        /// <param name="varType"></param>
+        public void AddLGVariable(string varName, Type varType)
         {
-            var param = Activator.CreateInstance(paramType) as BaseParameter;
-            param.Name = paramName;
-            LGInfoCache.Graph.Params.Add(param);
-            this.onUpdateLGParam?.Invoke();
+            var variable = Activator.CreateInstance(varType) as BaseVariable;
+            variable.Name = varName;
+            LGInfoCache.Graph.Variables.Add(variable);
+            this.onUpdateLGVariable?.Invoke();
         }
 
         /// <summary>
@@ -138,22 +128,11 @@ namespace Logic.Editor
         /// </summary>
         /// <param name="paramName"></param>
         /// <param name="paramType"></param>
-        public void DelLGParam(BaseParameter param)
+        public void DelLGVariable(BaseVariable variable)
         {
-            LGInfoCache.Graph.Params.Remove(param);
-            this.onUpdateLGParam?.Invoke();
+            LGInfoCache.Graph.Variables.Remove(variable);
+            this.onUpdateLGVariable?.Invoke();
         }
-        /// <summary>
-        /// 重命名逻辑图参数
-        /// </summary>
-        /// <param name="param"></param>
-        /// <param name="newValue"></param>
-        public void RenameLGParam(BaseParameter param, string newValue)
-        {
-            param.Name = newValue;
-            this.onRenameLGParam?.Invoke();
-        }
-
 
         #region 重写方法
         public override void AddToSelection(ISelectable selectable)
@@ -197,7 +176,7 @@ namespace Logic.Editor
             }
             else
             {
-                evt.menu.AppendAction("创建节点", m_onCreateNode, DropdownMenuAction.AlwaysEnabled);
+                evt.menu.AppendAction("创建节点", m_onCreateNodeWindow, DropdownMenuAction.AlwaysEnabled);
                 evt.menu.AppendAction("创建分组", m_onCreateGroup, DropdownMenuAction.AlwaysEnabled);
                 evt.menu.AppendAction("创建默认节点", m_onCreateDefaultNode, DropdownMenuAction.AlwaysEnabled);
                 evt.menu.AppendSeparator();
@@ -207,7 +186,6 @@ namespace Logic.Editor
                 {
                     evt.menu.AppendAction("导出: " + item.FormatName, m_onFormatCallback, DropdownMenuAction.AlwaysEnabled, item);
                 }
-                //evt.menu.AppendAction("导出", null);
             }
         }
 
@@ -243,14 +221,19 @@ namespace Logic.Editor
                     }
                     switch (portView.Owner)
                     {
-                        case ParameterNodeView paramView:
+                        case VariableNodeView paramView:
                             if (!tarPort.IsDefault && tarPort.CanLink(portView))
                             {
                                 compatiblePorts.Add(port);
                             }
                             break;
                         case BaseNodeView nodeView:
-                            if (tarPort.CanLink(portView))
+                            if (tarPort.Owner is VariableNodeView paramNode)
+                            {
+                                if (portView.CanLink(tarPort))
+                                    compatiblePorts.Add(port);
+                            }
+                            else if (tarPort.CanLink(portView))
                             {
                                 compatiblePorts.Add(port);
                             }
@@ -310,9 +293,9 @@ namespace Logic.Editor
             graph.name = file;
             path = path.Replace(Application.dataPath, "Assets");
             LGInfoCache graphCache = new LGInfoCache(graph);
-            graphCache.ParamCache = new LGParamCache();
-            graphCache.ParamCache.Pos = new Vector2(0, 20);
-            graphCache.ParamCache.Size = new Vector2(180, 320);
+            graphCache.VariableCache = new LGVariableCache();
+            graphCache.VariableCache.Pos = new Vector2(0, 20);
+            graphCache.VariableCache.Size = new Vector2(180, 320);
             graphCache.LogicName = file;
             graphCache.AssetPath = path;
             Instance.LGInfoList.Add(graphCache);
@@ -324,14 +307,14 @@ namespace Logic.Editor
         private bool m_onOpenMenuSelectEntry(SearchTreeEntry searchTreeEntry, SearchWindowContext context)
         {
             LGInfoCache graphCache = searchTreeEntry.userData as LGInfoCache;
-            if (graphCache.ParamCache == null)
+            if (graphCache.VariableCache == null)
             {
-                graphCache.ParamCache = new LGParamCache();
-                graphCache.ParamCache.Pos = new Vector2(0, 20);
-                graphCache.ParamCache.Size = new Vector2(180, 320);
+                graphCache.VariableCache = new LGVariableCache();
+                graphCache.VariableCache.Pos = new Vector2(0, 20);
+                graphCache.VariableCache.Size = new Vector2(180, 320);
             }
-            else if (graphCache.ParamCache.Size.magnitude < 350)
-                graphCache.ParamCache.Size = new Vector2(180, 320);
+            else if (graphCache.VariableCache.Size.magnitude < 350)
+                graphCache.VariableCache.Size = new Vector2(180, 320);
             _window.SetLogic(graphCache);
             return true;
         }
@@ -340,14 +323,17 @@ namespace Logic.Editor
         /// 创建节点面板
         /// </summary>
         /// <param name="obj"></param>
-        private void m_onCreateNode(DropdownMenuAction obj)
+        private void m_onCreateNodeWindow(DropdownMenuAction obj)
         {
-            var menuWindowProvider = ScriptableObject.CreateInstance<CreateLNSearchWindow>();
-            menuWindowProvider.Init(LGEditorCache);
-            menuWindowProvider.onSelectHandler += m_onCreateNodeSelectEntry;
+            if (_createLNSearch == null)
+            {
+                _createLNSearch = ScriptableObject.CreateInstance<CreateLNSearchWindow>();
+                _createLNSearch.Init(LGEditorCache);
+                _createLNSearch.onSelectHandler += m_onCreateNodeSelectEntry;
+            }
 
             Vector2 screenPos = _window.GetScreenPosition(obj.eventInfo.mousePosition);
-            SearchWindow.Open(new SearchWindowContext(screenPos), menuWindowProvider);
+            SearchWindow.Open(new SearchWindowContext(screenPos), _createLNSearch);
         }
 
         private bool m_onCreateNodeSelectEntry(SearchTreeEntry searchTreeEntry, SearchWindowContext context)
@@ -357,7 +343,7 @@ namespace Logic.Editor
             var nodePosition = this.contentViewContainer.WorldToLocal(windowMousePosition);
             if (searchTreeEntry.userData is LNEditorCache nodeEditor)
             {
-                m_createNodeView(nodeEditor, nodePosition);
+                m_showNode(m_createNode(nodeEditor.GetNodeType(), nodePosition));
             }
 
             return true;
@@ -376,19 +362,30 @@ namespace Logic.Editor
 
         }
 
-        private void m_createNodeView(LNEditorCache nodeEditor, Vector2 pos, bool record = true)
+        /// <summary>
+        /// 创建一个节点并添加到逻辑图相应的地方
+        /// </summary>
+        /// <param name="nodeType"></param>
+        /// <param name="pos"></param>
+        /// <param name="record"></param>
+        /// <returns></returns>
+        private BaseLogicNode m_createNode(Type nodeType, Vector2 pos)
         {
-            BaseLogicNode logicNode = Activator.CreateInstance(nodeEditor.GetNodeType()) as BaseLogicNode;
+            BaseLogicNode logicNode = Activator.CreateInstance(nodeType) as BaseLogicNode;
+            LNEditorCache nodeEditor = LGEditorCache.Nodes.FirstOrDefault(a => a.NodeClassName == nodeType.FullName);
             this.LGInfoCache.Graph.Nodes.Add(logicNode);
-            if (this.LGEditorCache.DefaultNodes.Contains(nodeEditor))
+            if (nodeEditor != null)
             {
-                this.LGInfoCache.Graph.StartNodes.Add(logicNode);
+                if (this.LGEditorCache.DefaultNodes.Contains(nodeEditor))
+                {
+                    this.LGInfoCache.Graph.StartNodes.Add(logicNode);
+                }
+                logicNode.Title = nodeEditor.NodeName;
             }
             logicNode.Pos = pos;
-            logicNode.Title = nodeEditor.NodeName;
             logicNode.Initialize(this.LGInfoCache.Graph);
             this.Save();
-            m_showNode(logicNode, record);
+            return logicNode;
         }
 
         private void m_onCreateDefaultNode(DropdownMenuAction obj)
@@ -409,7 +406,7 @@ namespace Logic.Editor
                 {
                     continue;
                 }
-                m_createNodeView(item, nodePosition, false);
+                m_showNode(m_createNode(item.GetNodeType(), nodePosition), false);
                 createNum++;
             }
             if (createNum == 0)
@@ -472,9 +469,9 @@ namespace Logic.Editor
             string fullName = node.GetType().FullName;
             BaseNodeView nodeView = null;
             LNEditorCache nodeEditor = null;
-            if (node is ParameterNode)
+            if (node is VariableNode)
             {
-                nodeView = new ParameterNodeView();
+                nodeView = new VariableNodeView();
             }
             else
             {
@@ -516,22 +513,23 @@ namespace Logic.Editor
                         case EdgeView edgeView:
                             var input = edgeView.input as PortView;
                             var output = edgeView.output as PortView;
-                            if (input.Owner is ParameterNodeView inParamView)
-                                output.Owner.DelParam(inParamView.Target as ParameterNode, output, ParamAccessor.Set);
-                            else if (output.Owner is ParameterNodeView outParamView)
-                                input.Owner.DelParam(outParamView.Target as ParameterNode, input, ParamAccessor.Get);
+                            if (input.Owner is VariableNodeView inParamView)
+                                output.Owner.DelVariable(inParamView.Target as VariableNode, output, ParamAccessor.Set);
+                            else if (output.Owner is VariableNodeView outParamView)
+                                input.Owner.DelVariable(outParamView.Target as VariableNode, input, ParamAccessor.Get);
                             else
                                 output.Owner.RemoveChild(input.Owner.Target);
                             break;
                         case Node node:
                             var baseNode = node.userData as BaseNodeView;
                             LGInfoCache.Graph.Nodes.Remove(baseNode.Target);
+                            baseNode.OnDestroy();
                             break;
                         case GroupView groupView:
                             LGInfoCache.Graph.Groups.Remove(groupView.group);
                             break;
-                        case LGParameterFieldView blackboardField:
-                            DelLGParam(blackboardField.param);
+                        case LGVariableFieldView blackboardField:
+                            DelLGVariable(blackboardField.param);
                             break;
                         default:
                             break;
@@ -595,21 +593,16 @@ namespace Logic.Editor
             var dragData = DragAndDrop.GetGenericData("DragSelection") as List<ISelectable>;
             if (dragData != null)
             {
-                var exposedParameterFieldViews = dragData.OfType<LGParameterFieldView>();
+                var exposedParameterFieldViews = dragData.OfType<LGVariableFieldView>();
                 if (exposedParameterFieldViews.Any())
                 {
                     foreach (var paramFieldView in exposedParameterFieldViews)
                     {
-                        ParameterNode node = new ParameterNode();
-                        node.paramId = paramFieldView.param.OnlyId;
-                        var nodeView = new ParameterNodeView();
-                        LGInfoCache.Graph.Nodes.Add(node);
-                        node.Pos = mousePos;
+                        VariableNode node = m_createNode(typeof(VariableNode), mousePos) as VariableNode;
+                        node.varId = paramFieldView.param.OnlyId;
                         node.Title = paramFieldView.param.Name;
                         node.Initialize(LGInfoCache.Graph);
-                        LGInfoCache.NodeDic.Add(node.OnlyId, nodeView);
-                        nodeView.Initialize(this, node);
-                        nodeView.ShowUI();
+                        m_showNode(node, false);
                     }
                 }
             }
@@ -619,14 +612,14 @@ namespace Logic.Editor
             var dragData = DragAndDrop.GetGenericData("DragSelection") as List<ISelectable>;
             bool dragging = false;
             if (dragData != null)
-                dragging = dragData.OfType<LGParameterFieldView>().Any();
+                dragging = dragData.OfType<LGVariableFieldView>().Any();
             if (dragging)
                 DragAndDrop.visualMode = DragAndDropVisualMode.Generic;
         }
 
         private void m_duplicateNodeView(BaseNodeView baseNodeView, Vector2 nodePosition)
         {
-            if (baseNodeView is ParameterNodeView)
+            if (baseNodeView is VariableNodeView)
             {
                 _window.ShowNotification(new GUIContent($"参数节点不能复制,请在参数界面拖拽"));
                 return;
@@ -637,8 +630,7 @@ namespace Logic.Editor
                 return;
             }
             string nodeFullName = baseNodeView.Target.GetType().FullName;
-            var nodeEditor = LGEditorCache.Nodes.FirstOrDefault(a => a.NodeClassName == nodeFullName);
-            m_createNodeView(nodeEditor, nodePosition, false);
+            m_showNode(m_createNode(baseNodeView.Target.GetType(), nodePosition));
         }
 
         /// <summary>
@@ -668,15 +660,15 @@ namespace Logic.Editor
             if (_hasData)
             {
                 EditorGUILayout.BeginHorizontal();
-                string str = LGInfoCache.ParamCache.IsShow ? "隐藏逻辑图参数" : "显示逻辑图参数";
-                bool res = GUILayout.Toggle(LGInfoCache.ParamCache.IsShow, str, EditorStyles.toolbarButton);
-                if (res != LGInfoCache.ParamCache.IsShow)
+                string str = LGInfoCache.VariableCache.IsShow ? "隐藏逻辑图变量" : "显示逻辑图变量";
+                bool res = GUILayout.Toggle(LGInfoCache.VariableCache.IsShow, str, EditorStyles.toolbarButton);
+                if (res != LGInfoCache.VariableCache.IsShow)
                 {
-                    LGInfoCache.ParamCache.IsShow = res;
+                    LGInfoCache.VariableCache.IsShow = res;
                     if (res)
-                        _lgParamView.Show();
+                        _lgVariableView.Show();
                     else
-                        _lgParamView.Hide();
+                        _lgVariableView.Hide();
                 }
                 EditorGUILayout.Separator();
                 if (GUILayout.Button("居中", EditorStyles.toolbarButton))

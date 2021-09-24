@@ -26,13 +26,13 @@ namespace Logic.Editor
             PortView output = edgeView.output as PortView;
             PortView input = edgeView.input as PortView;
 
-            if (input.Owner is ParameterNodeView inParamView)
+            if (input.Owner is VariableNodeView inParamView)
             {
-                output.Owner.AddParam(inParamView.Target as ParameterNode, output, ParamAccessor.Set);
+                output.Owner.AddVariable(inParamView.Target as VariableNode, output, ParamAccessor.Set);
             }
-            else if (output.Owner is ParameterNodeView outParamView)
+            else if (output.Owner is VariableNodeView outParamView)
             {
-                input.Owner.AddParam(outParamView.Target as ParameterNode, input, ParamAccessor.Get);
+                input.Owner.AddVariable(outParamView.Target as VariableNode, input, ParamAccessor.Get);
             }
             else
                 output.Owner.AddChild(input.Owner.Target);

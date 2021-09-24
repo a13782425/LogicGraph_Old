@@ -161,7 +161,7 @@ namespace Logic.Editor
         public Vector3 Scale = Vector3.one;
 
         [SerializeField]
-        public LGParamCache ParamCache;
+        public LGVariableCache VariableCache;
 
         /// <summary>
         /// 方便查找缓存
@@ -194,10 +194,10 @@ namespace Logic.Editor
     }
 
     /// <summary>
-    /// 逻辑图参数面板
+    /// 逻辑图变量面板
     /// </summary>
     [Serializable]
-    public class LGParamCache
+    public class LGVariableCache
     {
         /// <summary>
         /// 是否显示

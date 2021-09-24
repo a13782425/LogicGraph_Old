@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c1acb026ab750c41b1f2b8b8164e9c0, type: 3}
   m_Name: LogicGraph
   m_EditorClassIdentifier: 
-  _onlyId: 55a9bc70-b571-44d8-893a-b38ed1cb8d29
+  _onlyId: a14bf2df-4c53-4ff3-bc05-903cf2a84a57
   _title: 
   _nodes:
   - id: 0
@@ -20,8 +20,9 @@ MonoBehaviour:
   - id: 2
   _startNodes:
   - id: 0
-  _params:
+  _variables:
   - id: 3
+  - id: 4
   _groups: []
   references:
     version: 1
@@ -29,35 +30,41 @@ MonoBehaviour:
       type: {class: StartNode, ns: , asm: Assembly-CSharp}
       data:
         Title: "\u5F00\u59CB"
-        Pos: {x: 357.4609, y: 160.77191}
-        _onlyId: ce533e04-9979-4d0b-bee6-b7fbdd15b384
+        Pos: {x: 598, y: 242}
+        _onlyId: 1aa46229-8167-43c8-8bb8-ec467f39f23d
         _childs: []
     00000001:
       type: {class: DebugNode, ns: , asm: Assembly-CSharp}
       data:
         Title: "\u6253\u5370\u65E5\u5FD7"
-        Pos: {x: 713.9188, y: 203.88307}
-        _onlyId: 86e6b153-6a2b-450b-b974-700ae80c94c2
+        Pos: {x: 789, y: 262}
+        _onlyId: ca9ee41b-afe8-4492-8ea1-37ec738e605f
         _childs: []
         log: 
         Conditions: []
         Parameter:
-          Title: ParameterNode
+          Title: VariableNode
           Pos: {x: 0, y: 0}
-          _onlyId: 7de7c6ff-673b-459c-bf99-f210bbddfd56
+          _onlyId: 562ec55b-e262-4311-a1ef-44687e28b15f
           _childs: []
-          paramId: 
+          varId: 
     00000002:
-      type: {class: ParameterNode, ns: Logic, asm: Assembly-CSharp}
+      type: {class: VariableNode, ns: Logic, asm: Assembly-CSharp}
       data:
-        Title: New Color
-        Pos: {x: 516.4415, y: 32.264908}
-        _onlyId: d5073468-b5b4-440c-8706-b8897a3e85aa
+        Title: NewFloat
+        Pos: {x: 758, y: 163}
+        _onlyId: 7dcd22eb-126d-4ecd-b3b8-4130830085e6
         _childs: []
-        paramId: e69cf3c3-9ca6-400d-9772-16347669949b
+        varId: 0b412e6f-1b4a-4a57-af60-555313f7ea80
     00000003:
-      type: {class: ColorParameter, ns: Logic, asm: Assembly-CSharp}
+      type: {class: ColorVariable, ns: Logic, asm: Assembly-CSharp}
       data:
-        _onlyId: e69cf3c3-9ca6-400d-9772-16347669949b
-        Name: New Color
+        _onlyId: e70e446a-ff2b-453a-b93a-742defa8ddd7
+        _name: New_Color
         val: {r: 0, g: 0, b: 0, a: 0}
+    00000004:
+      type: {class: FloatVariable, ns: Logic, asm: Assembly-CSharp}
+      data:
+        _onlyId: 0b412e6f-1b4a-4a57-af60-555313f7ea80
+        _name: NewFloat
+        val: 0

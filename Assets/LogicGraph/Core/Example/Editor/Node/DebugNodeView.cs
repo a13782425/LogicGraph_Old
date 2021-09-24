@@ -17,6 +17,8 @@ public class DebugNodeView : BaseNodeView
     {
         Width = 200;
         node = Target as DebugNode;
+        TitleBackgroundColor = Color.red;
+        ContentBackgroundColor = Color.green;
     }
     public override void ShowUI()
     {
@@ -27,6 +29,7 @@ public class DebugNodeView : BaseNodeView
         //this.AddUI(_port);
         _port = AddPort("参数", UnityEditor.Experimental.GraphView.Direction.Input, isCube: true);
         this.AddUI(_port);
+        this.AddUI(AddPort("测试", UnityEditor.Experimental.GraphView.Direction.Output, isCube: true));
         this.AddUI(GetInputField("aa", 0));
     }
 
@@ -52,14 +55,14 @@ public class DebugNodeView : BaseNodeView
         else
             base.AddChild(child);
     }
-    public override void AddParam(ParameterNode paramNode, PortView curPort, ParamAccessor accessor)
+    public override void AddVariable(VariableNode paramNode, PortView curPort, ParamAccessor accessor)
     {
         if (accessor == ParamAccessor.Get)
         {
             node.Parameter = paramNode;
         }
     }
-    public override void DelParam(ParameterNode paramNode, PortView curPort, ParamAccessor accessor)
+    public override void DelVariable(VariableNode paramNode, PortView curPort, ParamAccessor accessor)
     {
         if (accessor == ParamAccessor.Get)
         {
@@ -75,10 +78,30 @@ public class DebugNodeView : BaseNodeView
         //    var nodeView = graphCache.GetNodeView(item);
         //    DrawLink(nodeView, _port);
         //}
-        if (this.node.Parameter.param != null)
+        if (this.node.Parameter.variable != null)
         {
             DrawLink(_port, graphCache.GetNodeView(this.node.Parameter).OutPut);
         }
+    }
+
+    public override bool CanLink(PortView ownerPort, PortView waitLinkPort)
+    {
+        if (!ownerPort.IsDefault)
+        {
+            if (waitLinkPort.Owner is VariableNodeView parameter)
+            {
+                if (ownerPort.direction == UnityEditor.Experimental.GraphView.Direction.Input)
+                {
+                    return (parameter.Target as VariableNode).variable.Value is float;
+                }
+                if (ownerPort.direction == UnityEditor.Experimental.GraphView.Direction.Output)
+                {
+                    return (parameter.Target as VariableNode).variable.Value is Color;
+                }
+                return false;
+            }
+        }
+        return base.CanLink(ownerPort, waitLinkPort);
     }
     //public override bool CanLink(PortView ownerPort, PortView waitLinkPort)
     //{

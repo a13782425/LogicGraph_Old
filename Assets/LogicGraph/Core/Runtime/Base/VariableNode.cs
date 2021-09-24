@@ -8,21 +8,21 @@ using UnityEngine;
 namespace Logic
 {
     [Serializable]
-    public sealed class ParameterNode : BaseLogicNode
+    public sealed class VariableNode : BaseLogicNode
     {
-        public string paramId = "";
+        public string varId = "";
 
         /// <summary>
         /// 数据
         /// </summary>
-        public BaseParameter param { get; private set; }
+        public BaseVariable variable { get; private set; }
 
         protected override bool OnEnable()
         {
-            param = logicGraph.GetParamById(paramId);
+            variable = logicGraph.GetVariableById(varId);
             return base.OnEnable();
         }
-        public object GetValue() => param.Value;
-        public void SetValue(object value) => param.Value = value;
+        public object GetValue() => variable.Value;
+        public void SetValue(object value) => variable.Value = value;
     }
 }

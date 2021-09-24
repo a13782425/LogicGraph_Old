@@ -12,7 +12,7 @@ using UnityEditor.UIElements;
 namespace Logic
 {
     [Serializable]
-    public abstract class BaseParameter
+    public abstract class BaseVariable
     {
 
         [SerializeField]
@@ -20,17 +20,31 @@ namespace Logic
         public string OnlyId => _onlyId;
 
         [SerializeField]
-        public string Name;
+        private string _name;
+
+        public string Name
+        {
+            get => _name; set
+            {
+                _name = value;
+#if UNITY_EDITOR
+                onModifyParam?.Invoke();
+#endif
+            }
+        }
 
         public virtual object Value { get; set; }
 
-        public BaseParameter()
+        public BaseVariable()
         {
             _onlyId = Guid.NewGuid().ToString();
         }
 
 #if UNITY_EDITOR
-
+        /// <summary>
+        /// 节点信息发生修改
+        /// </summary>
+        public event Action onModifyParam;
         public virtual Color GetColor()
         {
             return new Color32(0, 128, 255, 255);
@@ -43,8 +57,8 @@ namespace Logic
 #endif
 
     }
-    [System.Serializable]
-    public partial class ColorParameter : BaseParameter
+    [Serializable]
+    public class ColorVariable : BaseVariable
     {
         [SerializeField]
         private Color val = default;
@@ -65,8 +79,8 @@ namespace Logic
 #endif
     }
 
-    [System.Serializable]
-    public partial class FloatParameter : BaseParameter
+    [Serializable]
+    public class FloatVariable : BaseVariable
     {
         [SerializeField]
         private float val = default;
@@ -86,8 +100,8 @@ namespace Logic
 #endif
     }
 
-    [System.Serializable]
-    public partial class IntParameter : BaseParameter
+    [Serializable]
+    public class IntVariable : BaseVariable
     {
         [SerializeField]
         private int val = default;
@@ -107,8 +121,8 @@ namespace Logic
 #endif
     }
 
-    [System.Serializable]
-    public partial class StringParameter : BaseParameter
+    [Serializable]
+    public class StringVariable : BaseVariable
     {
         [SerializeField]
         private string val = "";
@@ -129,8 +143,8 @@ namespace Logic
 #endif
     }
 
-    [System.Serializable]
-    public partial class Vector2Parameter : BaseParameter
+    [Serializable]
+    public class Vector2Variable : BaseVariable
     {
         [SerializeField]
         private Vector2 val = default;
@@ -146,8 +160,8 @@ namespace Logic
 #endif
     }
 
-    [System.Serializable]
-    public partial class Vector3Parameter : BaseParameter
+    [Serializable]
+    public class Vector3Variable : BaseVariable
     {
         [SerializeField]
         private Vector3 val = default;
@@ -162,8 +176,8 @@ namespace Logic
         }
 #endif
     }
-    [System.Serializable]
-    public partial class BoolParameter : BaseParameter
+    [Serializable]
+    public class BoolVariable : BaseVariable
     {
         [SerializeField]
         private bool val = default;

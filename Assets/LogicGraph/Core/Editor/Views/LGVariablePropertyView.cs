@@ -7,13 +7,13 @@ using UnityEngine.UIElements;
 
 namespace Logic.Editor
 {
-    public sealed class LGParameterPropertyView : VisualElement
+    public sealed class LGVariablePropertyView : VisualElement
     {
         private LogicGraphView graphView;
 
-        public BaseParameter param { get; private set; }
+        public BaseVariable param { get; private set; }
 
-        public LGParameterPropertyView(LogicGraphView graphView, BaseParameter param)
+        public LGVariablePropertyView(LogicGraphView graphView, BaseVariable param)
         {
             this.graphView = graphView;
             this.param = param;

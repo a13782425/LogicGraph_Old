@@ -39,12 +39,12 @@ namespace Logic
         public List<BaseLogicNode> StartNodes => _startNodes;
 
         [SerializeReference]
-        private List<BaseParameter> _params = new List<BaseParameter>();
+        private List<BaseVariable> _variables = new List<BaseVariable>();
 
         /// <summary>
-        /// 单一逻辑图内部参数,所有节点均可访问
+        /// 单一逻辑图内部变量,所有节点均可访问
         /// </summary>       
-        public List<BaseParameter> Params => _params;
+        public List<BaseVariable> Variables => _variables;
 
 #if UNITY_EDITOR
         [SerializeField]
@@ -65,7 +65,7 @@ namespace Logic
         /// </summary>
         /// <param name="onlyId"></param>
         /// <returns></returns>
-        public BaseParameter GetParamById(string onlyId) => Params.FirstOrDefault(a => a.OnlyId == onlyId);
+        public BaseVariable GetVariableById(string onlyId) => Variables.FirstOrDefault(a => a.OnlyId == onlyId);
         /// <summary>
         /// 初始化
         /// </summary>
