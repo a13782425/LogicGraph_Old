@@ -109,7 +109,7 @@ namespace Logic.Editor
             evt.menu.AppendAction("重命名", (a) => OpenTextEditor(), DropdownMenuAction.AlwaysEnabled);
             evt.menu.AppendAction("删除", (a) =>
             {
-                graphView.DelLGParam(param);
+                graphView.DelLGVariable(param);
             }, DropdownMenuAction.AlwaysEnabled);
 
             evt.StopPropagation();
