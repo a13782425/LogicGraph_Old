@@ -61,9 +61,13 @@ namespace Logic.Editor
         /// </summary>
         public List<LGEditorCache> LGEditorList => _lgEditorList;
 
+        private ILogicConfig _logicConfig = null;
+
+        public ILogicConfig LogicConfig => _logicConfig;
+
         private static void getCacheData()
         {
-            checkConfig();
+            ILogicConfig logicConfig = checkConfig();
             string filePath = Path.Combine(ConfigPath, "LGConfig.asset");
             _instance = AssetDatabase.LoadAssetAtPath<LGCacheData>(filePath);
             if (_instance == null)
@@ -73,9 +77,10 @@ namespace Logic.Editor
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
             }
+            _instance._logicConfig = logicConfig;
         }
 
-        private static void checkConfig()
+        private static ILogicConfig checkConfig()
         {
             IncludeAssemblies.Add(typeof(BaseLogicNode).Assembly);
             IncludeAssemblies.Add(typeof(BaseNodeView).Assembly);
@@ -110,12 +115,14 @@ namespace Logic.Editor
                             }
                         }
                     }
+                    return config;
                 }
                 catch (Exception)
                 {
                     Debug.LogError("配置文件异常,请检查配置文件");
                 }
             }
+            return null;
         }
 
         public void Save()

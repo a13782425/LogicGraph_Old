@@ -27,5 +27,15 @@ namespace Logic.Editor
         /// </summary>
         List<Assembly> INCLUDE_ASSEMBLIES { get; }
 
+        /// <summary>
+        /// 打开窗口调用
+        /// </summary>
+        void OpenWindow();
+
+        /// <summary>
+        /// 打开逻辑图调用
+        /// </summary>
+        void OpenLogicGraph(BaseLogicGraph logicGraph);
+
     }
 }

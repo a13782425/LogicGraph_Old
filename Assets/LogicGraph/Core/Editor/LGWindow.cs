@@ -36,6 +36,7 @@ namespace Logic.Editor
             {
                 panel = CreateWindow<LGWindow>();
                 panel.minSize = LogicUtils.MIN_SIZE;
+                LGCacheData.Instance.LogicConfig?.OpenWindow();
                 panel.SetLogic(info);
             }
             panel.Show();
@@ -62,6 +63,7 @@ namespace Logic.Editor
                     graph.Nodes.RemoveAll(n => n == null);
                     graph.Init();
                     this._lgInfoCache.Graph = graph;
+                    LGCacheData.Instance.LogicConfig?.OpenLogicGraph(graph);
                     this._view.ShowLogic();
                 }
                 else
