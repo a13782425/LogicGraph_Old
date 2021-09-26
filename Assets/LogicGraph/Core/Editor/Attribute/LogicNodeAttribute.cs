@@ -43,7 +43,7 @@ namespace Logic.Editor
         {
             NodeType = nodeType;
             MenuText = menuText;
-            if (logicGraphs == null)
+            if (logicGraphs != null)
             {
                 _logicGraphs = logicGraphs.ToList();
             }

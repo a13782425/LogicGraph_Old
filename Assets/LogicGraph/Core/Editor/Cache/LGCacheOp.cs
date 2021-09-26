@@ -121,7 +121,6 @@ namespace Logic.Editor
             m_refreshLogicNode(types);
             m_refreshFormat(types);
             Instance.LGEditorList.RemoveAll(a => !a.IsRefresh);
-            //m_refreshStartNode();
 
             foreach (var item in Instance.LGEditorList)
             {
@@ -146,32 +145,6 @@ namespace Logic.Editor
 
             }
         }
-
-        ///// <summary>
-        ///// 刷新开始节点
-        ///// </summary>
-        //private static void m_refreshStartNode()
-        //{
-        //    string fullname = typeof(StartNodeView).FullName;
-        //    foreach (var item in Instance.LGEditorList)
-        //    {
-        //        var nodeCache = item.Nodes.FirstOrDefault(a => a.NodeClassName == fullname);
-        //        if (nodeCache == null)
-        //        {
-        //            nodeCache = new LNEditorCache();
-        //            nodeCache.NodeClassName = typeof(StartNode).FullName;
-        //            nodeCache.NodeViewClassName = fullname;
-        //            nodeCache.UseCount = int.MinValue;
-        //            nodeCache.NodeLayers = new string[] { "系统", "开始" };
-        //            nodeCache.NodeName = "开始";
-        //            nodeCache.NodeFullName = "系统/开始";
-        //            item.Nodes.Add(nodeCache);
-        //        }
-        //        nodeCache.PortType = PortEnum.Out;
-        //        nodeCache.IsRefresh = true;
-        //        nodeCache.IsShow = false;
-        //    }
-        //}
 
         /// <summary>
         /// 刷新逻辑图

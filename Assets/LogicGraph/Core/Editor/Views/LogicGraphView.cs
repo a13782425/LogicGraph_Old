@@ -291,6 +291,7 @@ namespace Logic.Editor
             string file = Path.GetFileNameWithoutExtension(path);
             BaseLogicGraph graph = ScriptableObject.CreateInstance(configData.GraphClassName) as BaseLogicGraph;
             graph.name = file;
+            graph.SetTitle(file);
             path = path.Replace(Application.dataPath, "Assets");
             LGInfoCache graphCache = new LGInfoCache(graph);
             graphCache.VariableCache = new LGVariableCache();
@@ -523,6 +524,7 @@ namespace Logic.Editor
                         case Node node:
                             var baseNode = node.userData as BaseNodeView;
                             LGInfoCache.Graph.Nodes.Remove(baseNode.Target);
+                            LGInfoCache.Graph.StartNodes.Remove(baseNode.Target);
                             baseNode.OnDestroy();
                             break;
                         case GroupView groupView:
@@ -585,6 +587,8 @@ namespace Logic.Editor
                             break;
                     }
                 }
+                evt.StopImmediatePropagation();
+                return;
             }
         }
         private void m_onDragPerformEvent(DragPerformEvent evt)

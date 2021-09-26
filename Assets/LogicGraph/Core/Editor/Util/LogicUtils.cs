@@ -165,12 +165,14 @@ namespace Logic.Editor
                     infoCache.LogicName = logicGraph.Title;
                     infoCache.GraphClassName = logicGraph.GetType().FullName;
                     infoCache.OnlyId = logicGraph.OnlyId;
+                    infoCache.VariableCache = new LGVariableCache();
                     infoCache.VariableCache.Pos = new Vector2(0, 20);
                     infoCache.VariableCache.Size = new Vector2(180, 320);
                     LGCacheData.Instance.LGInfoList.Add(infoCache);
                 }
             }
             LGCacheOp.Save();
+            EditorUtility.DisplayDialog("Successful", "逻辑图扫描完成", "确定");
         }
 
         /// <summary>

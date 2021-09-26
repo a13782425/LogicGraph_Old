@@ -100,11 +100,14 @@ namespace Logic.Editor
                     {
                         _configPath = str;
                     }
-                    foreach (var assembly in assemblies)
+                    if (assemblies != null)
                     {
-                        if (!IncludeAssemblies.Contains(assembly))
+                        foreach (var assembly in assemblies)
                         {
-                            IncludeAssemblies.Add(assembly);
+                            if (!IncludeAssemblies.Contains(assembly))
+                            {
+                                IncludeAssemblies.Add(assembly);
+                            }
                         }
                     }
                 }
