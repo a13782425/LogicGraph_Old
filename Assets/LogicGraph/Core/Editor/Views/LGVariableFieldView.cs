@@ -17,7 +17,7 @@ namespace Logic.Editor
 
         private string _newName = "";
 
-        public LGVariableFieldView(LogicGraphView graphView, BaseVariable param) : base(null, param.Name, param.Value.GetType().Name)
+        public LGVariableFieldView(LogicGraphView graphView, BaseVariable param) : base(null, param.Name, param.GetValueType().Name)
         {
             this.graphView = graphView;
             this.param = param;

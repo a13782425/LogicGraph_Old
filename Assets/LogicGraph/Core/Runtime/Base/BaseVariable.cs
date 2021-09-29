@@ -34,7 +34,11 @@ namespace Logic
         }
 
         public virtual object Value { get; set; }
-
+        /// <summary>
+        /// 获取值的类型
+        /// </summary>
+        /// <returns></returns>
+        public virtual Type GetValueType() => Value?.GetType();
         public BaseVariable()
         {
             _onlyId = Guid.NewGuid().ToString();
