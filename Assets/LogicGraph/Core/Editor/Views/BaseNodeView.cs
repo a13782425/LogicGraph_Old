@@ -617,6 +617,14 @@ namespace Logic.Editor
                 evt.StopPropagation();
             }
 
+            public override void CollectElements(HashSet<GraphElement> collectedElementSet, Func<GraphElement, bool> conditionFunc)
+            {
+                base.CollectElements(collectedElementSet, conditionFunc);
+                collectedElementSet.UnionWith((from d in m_content.Children().OfType<Port>().SelectMany((Port c) => c.connections)
+                                   where (d.capabilities & Capabilities.Deletable) != 0
+                                   select d).Cast<GraphElement>());
+            }
+
             #region Title
 
             private TextField _titleEditor;

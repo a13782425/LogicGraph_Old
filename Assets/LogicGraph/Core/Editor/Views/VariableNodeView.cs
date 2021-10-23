@@ -107,7 +107,7 @@ namespace Logic.Editor
 
             public void AddUI(VisualElement ui)
             {
-                m_content.Add(ui);
+                throw new Exception("变量节点无法添加UI");
             }
 
             public override void SetPosition(Rect newPos)
@@ -124,6 +124,14 @@ namespace Logic.Editor
                 }
                 onGenericMenu?.Invoke(evt);
                 evt.StopPropagation();
+            }
+
+            public override void CollectElements(HashSet<GraphElement> collectedElementSet, Func<GraphElement, bool> conditionFunc)
+            {
+                base.CollectElements(collectedElementSet, conditionFunc);
+                collectedElementSet.UnionWith((from d in m_content.Children().OfType<Port>().SelectMany((Port c) => c.connections)
+                                               where (d.capabilities & Capabilities.Deletable) != 0
+                                               select d).Cast<GraphElement>());
             }
         }
 
