@@ -27,9 +27,9 @@ public class DebugNodeView : BaseNodeView
         this.AddUI(text);
         //_port = AddPort("条件", UnityEditor.Experimental.GraphView.Direction.Output, true);
         //this.AddUI(_port);
-        _port = AddPort("参数", UnityEditor.Experimental.GraphView.Direction.Input, isCube: true);
+        _port = AddPort("参数", UnityEditor.Experimental.GraphView.Direction.Input, UnityEditor.Experimental.GraphView.Port.Capacity.Single, isCube: true);
         this.AddUI(_port);
-        this.AddUI(AddPort("测试", UnityEditor.Experimental.GraphView.Direction.Output, isCube: true));
+        this.AddUI(AddPort("测试", UnityEditor.Experimental.GraphView.Direction.Output, UnityEditor.Experimental.GraphView.Port.Capacity.Single, isCube: true));
         this.AddUI(GetInputField("aa", 0));
     }
 

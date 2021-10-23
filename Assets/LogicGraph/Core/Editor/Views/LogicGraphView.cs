@@ -196,6 +196,13 @@ namespace Logic.Editor
             {
                 return compatiblePorts;
             }
+            if (startPort.capacity == Port.Capacity.Single)
+            {
+                if (startPort.connections.Count() > 0)
+                {
+                    return compatiblePorts;
+                }
+            }
             if (startPort is PortView portView)
             {
                 //LogicNodeBaseView startNodeView = startPort.node as LogicNodeBaseView;
@@ -219,6 +226,13 @@ namespace Logic.Editor
                     {
                         continue;
                     }
+                    if (tarPort.capacity == Port.Capacity.Single)
+                    {
+                        if (tarPort.connections.Count() > 0)
+                        {
+                            continue;
+                        }
+                    }
                     switch (portView.Owner)
                     {
                         case VariableNodeView paramView:
@@ -228,10 +242,12 @@ namespace Logic.Editor
                             }
                             break;
                         case BaseNodeView nodeView:
-                            if (tarPort.Owner is VariableNodeView paramNode)
+                            if (tarPort.Owner is VariableNodeView)
                             {
-                                if (portView.CanLink(tarPort))
+                                if (!portView.IsDefault && portView.CanLink(tarPort))
+                                {
                                     compatiblePorts.Add(port);
+                                }
                             }
                             else if (tarPort.CanLink(portView))
                             {

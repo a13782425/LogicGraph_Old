@@ -67,6 +67,7 @@ namespace Logic
         [SerializeField]
         private Color val = default;
         public override object Value { get => val; set => val = (Color)value; }
+        public override Type GetValueType() => typeof(Color);
 
 #if UNITY_EDITOR
         public override Color GetColor()
@@ -89,6 +90,8 @@ namespace Logic
         [SerializeField]
         private float val = default;
         public override object Value { get => val; set => val = (float)value; }
+        public override Type GetValueType() => typeof(float);
+
 #if UNITY_EDITOR
         public override Color GetColor()
         {
@@ -110,6 +113,8 @@ namespace Logic
         [SerializeField]
         private int val = default;
         public override object Value { get => val; set => val = (int)value; }
+        public override Type GetValueType() => typeof(int);
+
 #if UNITY_EDITOR
         public override Color GetColor()
         {
@@ -131,6 +136,8 @@ namespace Logic
         [SerializeField]
         private string val = "";
         public override object Value { get => val; set => val = (string)value; }
+        public override Type GetValueType() => typeof(string);
+
 #if UNITY_EDITOR
         public override Color GetColor()
         {
@@ -153,6 +160,8 @@ namespace Logic
         [SerializeField]
         private Vector2 val = default;
         public override object Value { get => val; set => val = (Vector2)value; }
+        public override Type GetValueType() => typeof(Vector2);
+
 #if UNITY_EDITOR
         public override VisualElement GetUI()
         {
@@ -170,6 +179,8 @@ namespace Logic
         [SerializeField]
         private Vector3 val = default;
         public override object Value { get => val; set => val = (Vector3)value; }
+        public override Type GetValueType() => typeof(Vector3);
+
 #if UNITY_EDITOR
         public override VisualElement GetUI()
         {
@@ -186,6 +197,8 @@ namespace Logic
         [SerializeField]
         private bool val = default;
         public override object Value { get => val; set => val = (bool)value; }
+        public override Type GetValueType() => typeof(bool);
+
 #if UNITY_EDITOR
         public override Color GetColor()
         {
