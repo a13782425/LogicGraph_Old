@@ -523,13 +523,18 @@ namespace Logic.Editor
         {
             if (graphViewChange.elementsToRemove != null)
             {
-                foreach (var item in graphViewChange.elementsToRemove)
+                List<GraphElement> removeList = graphViewChange.elementsToRemove.ToList();
+#if UNITY_2019
+                graphViewChange.elementsToRemove.Clear();
+                List<GraphElement> removeList2 = removeList.ToList();
+#endif
+                foreach (GraphElement item in removeList)
                 {
                     switch (item)
                     {
                         case EdgeView edgeView:
-                            var input = edgeView.input as PortView;
-                            var output = edgeView.output as PortView;
+                            PortView input = edgeView.input as PortView;
+                            PortView output = edgeView.output as PortView;
                             if (input.Owner is VariableNodeView inParamView)
                                 output.Owner.DelVariable(inParamView.Target as VariableNode, output, ParamAccessor.Set);
                             else if (output.Owner is VariableNodeView outParamView)
@@ -538,10 +543,18 @@ namespace Logic.Editor
                                 output.Owner.RemoveChild(input.Owner.Target);
                             break;
                         case Node node:
-                            var baseNode = node.userData as BaseNodeView;
+                            BaseNodeView baseNode = node.userData as BaseNodeView;
                             LGInfoCache.Graph.Nodes.Remove(baseNode.Target);
                             LGInfoCache.Graph.StartNodes.Remove(baseNode.Target);
                             baseNode.OnDestroy();
+#if UNITY_2019
+                            if (node is INodeVisualElement nodeVisual)
+                            {
+                                removeList2 = removeList2.Union((from d in nodeVisual.ContentContainer.Children().OfType<Port>().SelectMany((Port c) => c.connections)
+                                                                 where (d.capabilities & Capabilities.Deletable) != 0
+                                                                 select d).Cast<GraphElement>()).ToList();
+                            }
+#endif
                             break;
                         case GroupView groupView:
                             LGInfoCache.Graph.Groups.Remove(groupView.group);
@@ -553,6 +566,9 @@ namespace Logic.Editor
                             break;
                     }
                 }
+#if UNITY_2019
+                graphViewChange.elementsToRemove.AddRange(removeList2);
+#endif
             }
             return graphViewChange;
         }

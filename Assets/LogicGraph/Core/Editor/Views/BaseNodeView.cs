@@ -571,8 +571,9 @@ namespace Logic.Editor
             /// </summary>
             private VisualElement m_content { get; set; }
             public Color TitleBackgroundColor { get => titleContainer.style.backgroundColor.value; set => titleContainer.style.backgroundColor = value; }
-            public Color ContentBackgroundColor { get => m_content.style.backgroundColor.value; set => m_content.style.backgroundColor = value; }
+            public Color ContentBackgroundColor { get => ContentContainer.style.backgroundColor.value; set => ContentContainer.style.backgroundColor = value; }
 
+            public VisualElement ContentContainer { get; private set; }
             public NodeVisualElement(BaseNodeView nodeView, LogicGraphView graphView)
             {
                 this.nodeView = nodeView;
@@ -583,8 +584,10 @@ namespace Logic.Editor
                 //移除右上角折叠按钮
                 titleButtonContainer.RemoveFromHierarchy();
                 topContainer.style.height = 24;
-                m_content = topContainer.parent;
-                m_content.style.backgroundColor = new Color(0, 0, 0, 0.5f);
+                ContentContainer = new VisualElement();
+                this.topContainer.parent.Add(ContentContainer);
+                ContentContainer.name = "center";
+                ContentContainer.style.backgroundColor = new Color(0, 0, 0, 0.5f);
                 m_checkTitle();
                 this.title = this.nodeView.Title;
                 this.SetPosition(new Rect(this.nodeView.Target.Pos, Vector2.zero));
@@ -592,7 +595,7 @@ namespace Logic.Editor
 
             public void AddUI(VisualElement ui)
             {
-                m_content.Add(ui);
+                ContentContainer.Add(ui);
             }
 
             public void Initialize()
@@ -617,13 +620,15 @@ namespace Logic.Editor
                 evt.StopPropagation();
             }
 
+#if UNITY_2020_1_OR_NEWER
             public override void CollectElements(HashSet<GraphElement> collectedElementSet, Func<GraphElement, bool> conditionFunc)
             {
                 base.CollectElements(collectedElementSet, conditionFunc);
-                collectedElementSet.UnionWith((from d in m_content.Children().OfType<Port>().SelectMany((Port c) => c.connections)
+                collectedElementSet.UnionWith((from d in ContentContainer.Children().OfType<Port>().SelectMany((Port c) => c.connections)
                                    where (d.capabilities & Capabilities.Deletable) != 0
                                    select d).Cast<GraphElement>());
             }
+#endif
 
             #region Title
 

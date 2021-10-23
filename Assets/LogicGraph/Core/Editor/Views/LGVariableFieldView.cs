@@ -15,13 +15,11 @@ namespace Logic.Editor
 
         public BaseVariable param { get; private set; }
 
-        private string _newName = "";
-
         public LGVariableFieldView(LogicGraphView graphView, BaseVariable param) : base(null, param.Name, param.GetValueType().Name)
         {
             this.graphView = graphView;
             this.param = param;
-#if !UNITY_2020_1_OR_NEWER
+#if UNITY_2019
             this.AddManipulator(new ContextualMenuManipulator(BuildContextualMenu));
 #endif
             this.Q("icon").style.backgroundColor = param.GetColor();
@@ -99,7 +97,7 @@ namespace Logic.Editor
 
             evt.StopPropagation();
         }
-#else
+#elif UNITY_2019
         private void BuildContextualMenu(ContextualMenuPopulateEvent evt)
         {
             while (evt.menu.MenuItems().Count > 0)

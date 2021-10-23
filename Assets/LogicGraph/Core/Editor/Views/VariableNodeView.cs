@@ -76,6 +76,7 @@ namespace Logic.Editor
 
             public Color TitleBackgroundColor { get => titleContainer.style.backgroundColor.value; set => titleContainer.style.backgroundColor = value; }
             public Color ContentBackgroundColor { get => throw new Exception("变量节点不支持"); set => throw new Exception("变量节点不支持"); }
+            public VisualElement ContentContainer { get; private set; }
             private BaseNodeView nodeView { get; set; }
 
             public event Action<ContextualMenuPopulateEvent> onGenericMenu;
@@ -84,10 +85,6 @@ namespace Logic.Editor
             /// </summary>
             private LogicGraphView _graphView;
 
-            /// <summary>
-            /// 重新定义的内容容器
-            /// </summary>
-            private VisualElement m_content { get; set; }
 
             public VariableNodeVisualElement(BaseNodeView nodeView, LogicGraphView graphView)
             {
@@ -98,8 +95,6 @@ namespace Logic.Editor
                 //移除右上角折叠按钮
                 titleButtonContainer.RemoveFromHierarchy();
                 topContainer.style.height = 24;
-                m_content = topContainer.parent;
-                m_content.style.backgroundColor = new Color(0, 0, 0, 0.5f);
                 this.title = this.nodeView.Title;
                 this.SetPosition(new Rect(this.nodeView.Target.Pos, Vector2.zero));
                 this.AddToClassList("paramNode");
@@ -124,14 +119,6 @@ namespace Logic.Editor
                 }
                 onGenericMenu?.Invoke(evt);
                 evt.StopPropagation();
-            }
-
-            public override void CollectElements(HashSet<GraphElement> collectedElementSet, Func<GraphElement, bool> conditionFunc)
-            {
-                base.CollectElements(collectedElementSet, conditionFunc);
-                collectedElementSet.UnionWith((from d in m_content.Children().OfType<Port>().SelectMany((Port c) => c.connections)
-                                               where (d.capabilities & Capabilities.Deletable) != 0
-                                               select d).Cast<GraphElement>());
             }
         }
 

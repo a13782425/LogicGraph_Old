@@ -18,6 +18,12 @@ namespace Logic.Editor
         Color ContentBackgroundColor { get; set; }
 
         /// <summary>
+        /// 内容容器
+        /// </summary>
+        VisualElement ContentContainer { get; }
+
+
+        /// <summary>
         /// 添加一个UI
         /// </summary>
         /// <param name="ui"></param>
