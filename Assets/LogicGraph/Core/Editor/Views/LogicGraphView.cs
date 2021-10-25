@@ -307,7 +307,7 @@ namespace Logic.Editor
             string file = Path.GetFileNameWithoutExtension(path);
             BaseLogicGraph graph = ScriptableObject.CreateInstance(configData.GraphClassName) as BaseLogicGraph;
             graph.name = file;
-            graph.SetTitle(file);
+
             path = path.Replace(Application.dataPath, "Assets");
             LGInfoCache graphCache = new LGInfoCache(graph);
             graphCache.VariableCache = new LGVariableCache();
@@ -315,6 +315,7 @@ namespace Logic.Editor
             graphCache.VariableCache.Size = new Vector2(180, 320);
             graphCache.LogicName = file;
             graphCache.AssetPath = path;
+            graph.Title = file;
             Instance.LGInfoList.Add(graphCache);
             AssetDatabase.CreateAsset(graph, path);
             LGCacheOp.Save();
@@ -548,7 +549,7 @@ namespace Logic.Editor
                             LGInfoCache.Graph.StartNodes.Remove(baseNode.Target);
                             baseNode.OnDestroy();
 #if UNITY_2019
-                            if (node is INodeVisualElement nodeVisual)
+                            if (node is INodeVisualElement nodeVisual && nodeVisual.ContentContainer != null)
                             {
                                 removeList2 = removeList2.Union((from d in nodeVisual.ContentContainer.Children().OfType<Port>().SelectMany((Port c) => c.connections)
                                                                  where (d.capabilities & Capabilities.Deletable) != 0
@@ -681,7 +682,7 @@ namespace Logic.Editor
                 if (logicName != LGInfoCache.LogicName)
                 {
                     LGInfoCache.LogicName = logicName;
-                    LGInfoCache.Graph.SetTitle(logicName);
+                    LGInfoCache.Graph.Title = logicName;
                 }
                 EditorGUILayout.Separator();
             }

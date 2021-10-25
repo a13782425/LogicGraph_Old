@@ -220,16 +220,23 @@ namespace Logic.Editor
 
         public virtual void DrawLink()
         {
+            if (OutPut == null)
+            {
+                Target.Childs.Clear();
+            }
             DrawLink(Target.Childs);
         }
 
         protected void DrawLink(List<BaseLogicNode> nodeList)
         {
             nodeList.RemoveAll(a => a == null);
-            foreach (BaseLogicNode item in nodeList)
+            if (nodeList.Count > 0)
             {
-                BaseNodeView nodeView = graphCache.GetNodeView(item);
-                DrawLink(nodeView);
+                for (int i = nodeList.Count - 1; i <= 0; i--)
+                {
+                    BaseNodeView nodeView = graphCache.GetNodeView(nodeList[i]);
+                    DrawLink(nodeView);
+                }
             }
         }
 
@@ -237,6 +244,12 @@ namespace Logic.Editor
 
         protected void DrawLink(BaseNodeView input, PortView outPort)
         {
+            if (input.Input == null)
+            {
+                //当子节点入口被删除时候,要删除自己的子节点
+                this.RemoveChild(outPort, input.Target);
+                return;
+            }
             EdgeView edge = new EdgeView();
             edge.input = input.Input;
             edge.output = outPort;
@@ -250,6 +263,18 @@ namespace Logic.Editor
         }
         protected void DrawLink(PortView input, PortView outPort)
         {
+            if (input == null)
+            {
+                owner.Window.ShowNotification(new GUIContent("入端口为空,请检查代码"));
+                Debug.LogError("入端口为空,请检查代码");
+                return;
+            }
+            if (outPort == null)
+            {
+                owner.Window.ShowNotification(new GUIContent("出端口为空,请检查代码"));
+                Debug.LogError("出端口为空,请检查代码");
+                return;
+            }
             EdgeView edge = new EdgeView();
             edge.input = input;
             edge.output = outPort;
