@@ -130,7 +130,24 @@ namespace Logic.Editor
         /// <param name="paramType"></param>
         public void DelLGVariable(BaseVariable variable)
         {
+            List<VariableNodeView> nodeViews = new List<VariableNodeView>();
+            foreach (var item in LGInfoCache.NodeDic)
+            {
+                if (item.Value is VariableNodeView nodeView)
+                {
+                    if (nodeView.Target is VariableNode node)
+                    {
+                        if (node.varId == variable.OnlyId)
+                        {
+                            nodeViews.Add(nodeView);
+                        }
+                    }
+                }
+            }
             LGInfoCache.Graph.Variables.Remove(variable);
+            selection.Clear();
+            selection.AddRange(nodeViews.Select<VariableNodeView, Node>((a) => a.View));
+            this.DeleteSelection();
             this.onUpdateLGVariable?.Invoke();
         }
 
