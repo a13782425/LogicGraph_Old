@@ -59,13 +59,24 @@ namespace Logic
         {
             _onlyId = Guid.NewGuid().ToString();
         }
-
         /// <summary>
-        /// 获取一个参数
+        /// 获取一个节点
+        /// </summary>
+        /// <param name="onlyId"></param>
+        /// <returns></returns>
+        public BaseLogicNode GetNodeById(string onlyId) => Nodes.FirstOrDefault(a => a.OnlyId == onlyId);
+        /// <summary>
+        /// 获取一个变量
         /// </summary>
         /// <param name="onlyId"></param>
         /// <returns></returns>
         public BaseVariable GetVariableById(string onlyId) => Variables.FirstOrDefault(a => a.OnlyId == onlyId);
+        /// <summary>
+        /// 获取一个变量
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public BaseVariable GetVariableByName(string name) => Variables.FirstOrDefault(a => a.Name == name);
         /// <summary>
         /// 初始化
         /// </summary>

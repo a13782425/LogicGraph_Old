@@ -178,16 +178,18 @@ namespace Logic.Editor
         /// <summary>
         /// 添加子节点
         /// </summary>
-        /// <param name="owner"></param>
-        public virtual void AddChild(BaseLogicNode child)
+        /// <param name="port">从哪个端口添加</param>
+        /// <param name="child"></param>
+        public virtual void AddChild(PortView port, BaseLogicNode child)
         {
             this.Target.Childs.Add(child);
         }
         /// <summary>
         /// 移除一个节点
         /// </summary>
+        /// <param name="port">从哪个端口添加</param>
         /// <param name="child"></param>
-        public virtual void RemoveChild(BaseLogicNode child)
+        public virtual void RemoveChild(PortView port, BaseLogicNode child)
         {
             this.Target.Childs.Remove(child);
         }
@@ -497,6 +499,7 @@ namespace Logic.Editor
             element.style.marginRight = 2;
             element.style.marginLeft = 2;
             element.style.marginBottom = 2;
+            element.style.unityTextAlign = TextAnchor.MiddleLeft;
             element.labelElement.style.minWidth = 50;
             element.labelElement.style.fontSize = 12;
         }
@@ -625,8 +628,8 @@ namespace Logic.Editor
             {
                 base.CollectElements(collectedElementSet, conditionFunc);
                 collectedElementSet.UnionWith((from d in ContentContainer.Children().OfType<Port>().SelectMany((Port c) => c.connections)
-                                   where (d.capabilities & Capabilities.Deletable) != 0
-                                   select d).Cast<GraphElement>());
+                                               where (d.capabilities & Capabilities.Deletable) != 0
+                                               select d).Cast<GraphElement>());
             }
 #endif
 

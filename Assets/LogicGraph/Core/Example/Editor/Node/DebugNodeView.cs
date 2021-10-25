@@ -17,8 +17,8 @@ public class DebugNodeView : BaseNodeView
     {
         Width = 200;
         node = Target as DebugNode;
-        TitleBackgroundColor = Color.red;
-        ContentBackgroundColor = Color.green;
+        //TitleBackgroundColor = Color.red;
+        //ContentBackgroundColor = Color.green;
     }
     public override void ShowUI()
     {
@@ -46,14 +46,14 @@ public class DebugNodeView : BaseNodeView
         node.log = evt.newData;
     }
 
-    public override void AddChild(BaseLogicNode child)
+    public override void AddChild(PortView port, BaseLogicNode child)
     {
         if (child is DebugNode)
         {
             node.Conditions.Add(child);
         }
         else
-            base.AddChild(child);
+            base.AddChild(port, child);
     }
     public override void AddVariable(VariableNode paramNode, PortView curPort, ParamAccessor accessor)
     {

@@ -35,7 +35,7 @@ namespace Logic.Editor
                 input.Owner.AddVariable(outParamView.Target as VariableNode, input, ParamAccessor.Get);
             }
             else
-                output.Owner.AddChild(input.Owner.Target);
+                output.Owner.AddChild(output, input.Owner.Target);
             input.Connect(edgeView);
             output.Connect(edgeView);
         }

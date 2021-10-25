@@ -540,7 +540,7 @@ namespace Logic.Editor
                             else if (output.Owner is VariableNodeView outParamView)
                                 input.Owner.DelVariable(outParamView.Target as VariableNode, input, ParamAccessor.Get);
                             else
-                                output.Owner.RemoveChild(input.Owner.Target);
+                                output.Owner.RemoveChild(output, input.Owner.Target);
                             break;
                         case Node node:
                             BaseNodeView baseNode = node.userData as BaseNodeView;
