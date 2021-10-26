@@ -96,7 +96,7 @@ namespace Logic.Editor
                 logicGraph.ResetGuid();
             }
             graphCache.GraphClassName = logicTypeName;
-            graphCache.LogicName = fileName;
+            graphCache.LogicName = logicGraph.Title;
             graphCache.AssetPath = graphPath;
             graphCache.OnlyId = logicGraph.OnlyId;
             Instance.LGInfoList.Add(graphCache);

@@ -18,11 +18,22 @@ MonoBehaviour:
     GraphClassName: DefaultLogicGraph
     FileName: LogicGraph
     AssetPath: Assets/LogicGraph.asset
-    Pos: {x: 0, y: 0, z: 0}
+    Pos: {x: 0, y: 48, z: 0}
     Scale: {x: 1, y: 1, z: 1}
     VariableCache:
-      IsShow: 0
-      Pos: {x: 0, y: 20}
+      IsShow: 1
+      Pos: {x: 178, y: 81}
+      Size: {x: 180, y: 320}
+  - OnlyId: 1dfc079a-7fe5-4c94-9eac-509d9091ecf6
+    LogicName: LogicGr2aph
+    GraphClassName: DefaultLogicGraph
+    FileName: 
+    AssetPath: Assets/LogicGr2aph.asset
+    Pos: {x: 0, y: 101, z: 0}
+    Scale: {x: 1, y: 1, z: 1}
+    VariableCache:
+      IsShow: 1
+      Pos: {x: 114, y: 129}
       Size: {x: 180, y: 320}
   _lgEditorList:
   - GraphName: "\u9ED8\u8BA4\u903B\u8F91\u56FE"
@@ -50,7 +61,7 @@ MonoBehaviour:
       PortType: 3
       IsRefresh: 1
       IsShow: 1
-      UseCount: -2147483648
+      UseCount: -2147483478
     DefaultNodes:
     - NodeName: "\u5F00\u59CB"
       NodeFullName: "\u7CFB\u7EDF/\u5F00\u59CB"

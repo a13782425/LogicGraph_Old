@@ -286,6 +286,18 @@ namespace Logic.Editor
                 edge.UpdateEdgeControl();
             }).ExecuteLater(1);
         }
+
+        /// <summary>
+        /// 断开连接
+        /// </summary>
+        /// <param name="port"></param>
+        protected void Disconnect(PortView port)
+        {
+            var connects = port.connections.ToList();
+            this.owner.selection.Clear();
+            this.owner.selection.AddRange(connects.OfType<GraphElement>());
+            this.owner.DeleteSelection();
+        }
         #endregion
 
 

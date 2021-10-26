@@ -19,7 +19,7 @@ namespace Logic
 #if UNITY_EDITOR
         [SerializeField]
         private string _title = "";
-        public string Title => _title;
+        public string Title { get => _title; set => _title = value; }
 #endif
         [SerializeReference]
         private List<BaseLogicNode> _nodes = new List<BaseLogicNode>();
@@ -99,10 +99,6 @@ namespace Logic
             _onlyId = Guid.NewGuid().ToString();
         }
 
-        public void SetTitle(string title)
-        {
-            _title = title;
-        }
 #endif
     }
 }

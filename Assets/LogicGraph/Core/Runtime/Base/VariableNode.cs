@@ -12,14 +12,25 @@ namespace Logic
     {
         public string varId = "";
 
+        private BaseVariable _variable = null;
         /// <summary>
         /// 数据
         /// </summary>
-        public BaseVariable variable { get; private set; }
+        public BaseVariable variable
+        {
+            get
+            {
+                if (_variable == null)
+                {
+                    _variable = logicGraph.GetVariableById(varId);
+                }
+                return _variable;
+            }
+        }
 
         protected override bool OnEnable()
         {
-            variable = logicGraph.GetVariableById(varId);
+            _variable = logicGraph.GetVariableById(varId);
             return base.OnEnable();
         }
         public object GetValue() => variable.Value;
