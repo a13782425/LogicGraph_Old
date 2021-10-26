@@ -232,7 +232,7 @@ namespace Logic.Editor
             nodeList.RemoveAll(a => a == null);
             if (nodeList.Count > 0)
             {
-                for (int i = nodeList.Count - 1; i <= 0; i--)
+                for (int i = nodeList.Count - 1; i >= 0; i--)
                 {
                     BaseNodeView nodeView = graphCache.GetNodeView(nodeList[i]);
                     DrawLink(nodeView);
