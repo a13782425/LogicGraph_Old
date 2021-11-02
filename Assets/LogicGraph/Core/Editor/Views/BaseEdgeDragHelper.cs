@@ -118,10 +118,6 @@ namespace Logic.Editor
             {
                 return false;
             }
-            if (draggedPort.direction == Direction.Input)
-            {
-                return false;
-            }
 
             if (edgeCandidate.parent == null)
             {

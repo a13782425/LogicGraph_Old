@@ -235,6 +235,11 @@ namespace Logic.Editor
                 for (int i = nodeList.Count - 1; i >= 0; i--)
                 {
                     BaseNodeView nodeView = graphCache.GetNodeView(nodeList[i]);
+                    if (nodeView == null)
+                    {
+                        this.RemoveChild(this.OutPut, nodeList[i]);
+                        continue;
+                    }
                     DrawLink(nodeView);
                 }
             }
