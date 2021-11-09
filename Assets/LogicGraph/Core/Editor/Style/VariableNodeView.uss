@@ -1,19 +1,19 @@
 
-.paramNode{
+.varNode{
     width: auto;
 }
 
-.paramNode #node-border{
+.varNode #node-border{
     border-radius: 16px;
 }
-.paramNode #selection-border{
+.varNode #selection-border{
     border-radius: 18px;
 }
-.paramNode #title{
+.varNode #title{
     -unity-text-align: middle-center;
     align-items: center;
 }
-.paramNode #title > Label{
+.varNode #title > Label{
     -unity-text-align: middle-center;
     margin-left: 0px;
     flex-grow: 1;

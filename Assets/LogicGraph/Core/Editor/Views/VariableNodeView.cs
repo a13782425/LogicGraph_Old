@@ -91,13 +91,13 @@ namespace Logic.Editor
                 this.nodeView = nodeView;
                 _graphView = graphView;
                 userData = nodeView;
-                styleSheets.Add(LogicUtils.GetParamNodeStyle());
+                styleSheets.Add(LogicUtils.GetVariableNodeStyle());
                 //移除右上角折叠按钮
                 titleButtonContainer.RemoveFromHierarchy();
                 topContainer.style.height = 24;
                 this.title = this.nodeView.Title;
                 this.SetPosition(new Rect(this.nodeView.Target.Pos, Vector2.zero));
-                this.AddToClassList("paramNode");
+                this.AddToClassList("varNode");
             }
 
             public void AddUI(VisualElement ui)

@@ -99,6 +99,18 @@ namespace Logic
             _onlyId = Guid.NewGuid().ToString();
         }
 
+        //public void OnBeforeSerialize()
+        //{
+        //    Debug.LogError("OnBeforeSerialize");
+        //    Debug.LogError(this.GetType());
+        //}
+
+        //public void OnAfterDeserialize()
+        //{
+        //    Debug.LogError("OnAfterDeserialize");
+        //    Debug.LogError(this.OnlyId);
+        //}
+
 #endif
     }
 }

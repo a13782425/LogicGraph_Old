@@ -25,7 +25,13 @@ namespace Logic.Editor
             styleSheets.Add(LogicUtils.GetGridStyle());
         }
 
-        private static void BuildContextualMenu(ContextualMenuPopulateEvent evt) { }
+        private static void BuildContextualMenu(ContextualMenuPopulateEvent evt)
+        {
+            evt.menu.AppendAction("删除模板", null);
+            evt.menu.AppendAction("保存模板", null);
+            evt.menu.AppendAction("删除", null);
+            evt.StopPropagation();
+        }
 
         public void Initialize(LogicGraphView graphView, BaseLogicGroup group)
         {

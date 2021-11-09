@@ -6,24 +6,6 @@
     background-color: rgba(63, 63, 63, 0.8);
 }
 
-#settings-button {
-    border-width: 0px;
-    width: 28px;
-    height: 28px;
-    background-color: rgba(63, 63, 63, 0);
-    border-radius: 0px;
-}
-
-#settings-button > #icon {
-    -unity-background-scale-mode: scale-to-fit;
-    background-image: resource("Icons/SettingsIcons");
-    flex-grow: 1;
-}
-
-#settings-button:hover {
-    background-color: rgba(127, 127, 127 0.2);
-}
-
 #contents .cube #connector, #contents .cube #connector #cap,
 #contents #top .cube #connector, #contents #top .cube #connector #cap,
 #contents #top .true #connector, #contents #top .true #connector #cap,
@@ -37,11 +19,11 @@
     background-color: rgba(0, 63, 63, 0.8);
 }
 
-#RightTitleContainer {
+/*#RightTitleContainer {
     justify-content: flex-end;
     flex-grow: 1;
     flex-direction: row;
-}
+}*/
 
 #input-container {
     position: absolute;
@@ -198,4 +180,57 @@
 .DrawerField_2020_3 > * > Label
 {
     display: none;
+}
+
+#title
+{
+    align-items: center;
+}
+
+#title-label
+{
+    flex-grow: 1;
+    -unity-text-align: middle-center;
+    margin-left: 24px;
+    margin-right: 24px;
+    padding: 0px;
+}
+
+#title-field
+{
+    flex-grow: 1;
+    -unity-text-align: middle-center;
+    margin-left: 24px;
+    margin-right: 24px;
+    padding: 0px;
+}
+
+#run-status
+{
+    background-color: red;
+    width: 12px;
+    height: 12px;
+    border-radius: 6px;
+    margin-left: 6px;
+    position: absolute;
+}
+
+#lock-icon
+{
+    -unity-background-scale-mode: scale-to-fit;
+    
+    right: 4px;
+    width: 24px;
+    height: 24px;
+    position: absolute;
+}
+
+#title > .lock
+{
+    background-image: resource("lock");
+}
+
+#title > .unlock
+{
+    background-image: resource("unlock");
 }

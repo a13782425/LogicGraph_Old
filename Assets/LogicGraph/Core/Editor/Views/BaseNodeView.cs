@@ -43,11 +43,6 @@ namespace Logic.Editor
         /// </summary>
         public PortView OutPut { get; protected set; }
 
-        /// <summary>
-        /// 是否显示参数界面
-        /// </summary>
-        public virtual bool ShowParamPanel => false;
-
         private float _width = 100;
         /// <summary>
         /// 当前节点视图的宽度
@@ -340,23 +335,6 @@ namespace Logic.Editor
             portView.Initialize(this, this.OnlyId);
             return portView;
         }
-        /// <summary>
-        /// 添加一个UI元素到参数面板
-        /// ShowParamPanel 必须为True 此方法才有效
-        /// </summary>
-        /// <param name="ui"></param>
-        protected void AddUIToParamPanel(VisualElement element)
-        {
-            if (ShowParamPanel)
-            {
-                if (element is Port)
-                {
-                    Debug.LogError("Port 节点无法添加到参数面板");
-                    return;
-                }
-                owner.AddParamElement(element);
-            }
-        }
 
         /// <summary>
         /// 添加一个UI元素到节点视图中
@@ -383,13 +361,13 @@ namespace Logic.Editor
             field.RegisterCallback<ChangeEvent<string>>((e) => changed?.Invoke(e.newValue));
             return field;
         }
-        protected Toggle GetInputField(string titleText, bool defaultValue, Action<int> changed = null)
+        protected Toggle GetInputField(string titleText, bool defaultValue, Action<bool> changed = null)
         {
             Toggle field = new Toggle();
             field.label = titleText;
             SetBaseFieldStyle(field);
             field.value = defaultValue;
-            field.RegisterCallback<ChangeEvent<int>>((e) => changed?.Invoke(e.newValue));
+            field.RegisterCallback<ChangeEvent<bool>>((e) => changed?.Invoke(e.newValue));
             return field;
         }
         protected IntegerField GetInputField(string titleText, int defaultValue, Action<int> changed = null)
@@ -603,7 +581,7 @@ namespace Logic.Editor
 
         private class NodeVisualElement : Node, INodeVisualElement
         {
-            private BaseNodeView nodeView { get; set; }
+            private BaseNodeView nodeView;
 
             public event Action<ContextualMenuPopulateEvent> onGenericMenu;
             /// <summary>
@@ -677,28 +655,55 @@ namespace Logic.Editor
 
             #region Title
 
+            /// <summary>
+            /// 运行状态
+            /// </summary>
+            private VisualElement _runStatus;
+            private VisualElement _lock;
             private TextField _titleEditor;
             private Label _titleItem;
             private bool _editTitleCancelled = false;
             private void m_checkTitle()
             {
+                _runStatus = new VisualElement();
+                _runStatus.name = "run-status";
+                _runStatus.tooltip = "运行状态";
+                titleContainer.Insert(0, _runStatus);
                 //找到Title对应的元素
                 _titleItem = this.Q<Label>("title-label");
-                _titleItem.style.flexGrow = 1;
-                _titleItem.style.marginRight = 6;
-                _titleItem.style.unityTextAlign = TextAnchor.MiddleCenter;
                 _titleItem.RegisterCallback<MouseDownEvent>(m_onMouseDownEvent);
                 _titleEditor = new TextField();
-                _titleEditor.name = "titleField";
-                _titleItem.parent.Add(_titleEditor);
-                _titleEditor.style.flexGrow = 1;
-                _titleEditor.style.marginRight = 6;
-                _titleEditor.style.unityTextAlign = TextAnchor.MiddleCenter;
+                _titleEditor.name = "title-field";
+                titleContainer.Add(_titleEditor);
+
+                _lock = new Button();
+                _lock.name = "lock-icon";
+                _lock.ClearClassList();
+                _lock.AddToClassList("unlock");
+
+                _lock.RegisterCallback<ClickEvent>(m_lockClick);
+
+                titleContainer.Add(_lock);
+
                 _titleEditor.style.display = DisplayStyle.None;
                 VisualElement visualElement2 = _titleEditor.Q(TextInputBaseField<string>.textInputUssName);
                 visualElement2.RegisterCallback<FocusOutEvent>(m_onEditTitleFinished);
                 visualElement2.RegisterCallback<KeyDownEvent>(m_onTitleEditorOnKeyDown);
             }
+
+            private void m_lockClick(ClickEvent evt)
+            {
+                nodeView.Target.IsLock = !nodeView.Target.IsLock;
+                _lock.ClearClassList();
+                if (nodeView.Target.IsLock)
+                {
+                    _lock.AddToClassList("lock");
+                }
+                else
+                    _lock.AddToClassList("unlock");
+
+            }
+
             private void m_onTitleEditorOnKeyDown(KeyDownEvent evt)
             {
                 switch (evt.keyCode)

@@ -10,8 +10,6 @@ public class DebugNodeView : BaseNodeView
 {
     private DebugNode node;
 
-    public override bool ShowParamPanel => true;
-
     private PortView _port;
     public override void OnCreate()
     {
@@ -33,13 +31,13 @@ public class DebugNodeView : BaseNodeView
         this.AddUI(GetInputField("aa", 0));
     }
 
-    public override void ShowParamUI()
-    {
-        var text = GetInputField("日志:", node.log);
-        text.RegisterCallback<InputEvent>(onInputEvent);
-        this.AddUIToParamPanel(text);
+    //public override void ShowParamUI()
+    //{
+    //    var text = GetInputField("日志:", node.log);
+    //    text.RegisterCallback<InputEvent>(onInputEvent);
+    //    this.AddUIToParamPanel(text);
 
-    }
+    //}
 
     private void onInputEvent(InputEvent evt)
     {
@@ -67,6 +65,7 @@ public class DebugNodeView : BaseNodeView
         if (accessor == ParamAccessor.Get)
         {
             node.Parameter = null;
+
         }
     }
     public override void DrawLink()
@@ -78,7 +77,7 @@ public class DebugNodeView : BaseNodeView
         //    var nodeView = graphCache.GetNodeView(item);
         //    DrawLink(nodeView, _port);
         //}
-        if (this.node.Parameter.variable != null)
+        if (this.node.Parameter != null && this.node.Parameter.variable != null)
         {
             DrawLink(_port, graphCache.GetNodeView(this.node.Parameter).OutPut);
         }

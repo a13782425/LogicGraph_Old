@@ -15,19 +15,25 @@ namespace Logic.Editor
     public sealed class LogicGraphView : GraphView
     {
         private bool _hasData = false;
-        private bool _showPinned = false;
+
         private LGWindow _window;
         public LGWindow Window => _window;
         public LGInfoCache LGInfoCache => _window.LGInfoCache;
         public LGEditorCache LGEditorCache => _window.LGEditorCache;
 
-        private LNParameterView _lnParamView;
-
+        /// <summary>
+        /// 逻辑图变量面板
+        /// </summary>
         private LGVariableView _lgVariableView;
 
+        /// <summary>
+        /// 工具栏面板
+        /// </summary>
         private ToolbarView _toolbarView;
 
-
+        /// <summary>
+        /// 创建文档面板
+        /// </summary>
         private CreateLNSearchWindow _createLNSearch = null;
 
         private EdgeConnectorListener _connectorListener;
@@ -54,6 +60,7 @@ namespace Logic.Editor
 
         public void ShowLogic()
         {
+            Input.imeCompositionMode = IMECompositionMode.On;
             this.LGInfoCache.View = this;
             this.LGInfoCache.NodeDic.Clear();
             m_addGridBackGround();
@@ -70,11 +77,6 @@ namespace Logic.Editor
             viewTransform.position = LGInfoCache.Pos;
             viewTransform.scale = LGInfoCache.Scale;
             m_showLogic();
-            //节点参数
-            _lnParamView = new LNParameterView();
-            _lnParamView.InitializeGraphView(this);
-            this.Add(_lnParamView);
-            _lnParamView.Hide();
             //逻辑图变量
             _lgVariableView = new LGVariableView();
             _lgVariableView.InitializeGraphView(this);
@@ -87,17 +89,6 @@ namespace Logic.Editor
             _hasData = true;
         }
 
-        /// <summary>
-        /// 添加元素到参数界面
-        /// </summary>
-        /// <param name="ui"></param>
-        public void AddParamElement(VisualElement element)
-        {
-            if (_showPinned)
-            {
-                _lnParamView.AddUI(element);
-            }
-        }
         /// <summary>
         /// 保存
         /// </summary>
@@ -152,37 +143,6 @@ namespace Logic.Editor
         }
 
         #region 重写方法
-        public override void AddToSelection(ISelectable selectable)
-        {
-            base.AddToSelection(selectable);
-            if (selection.Count == 1)
-            {
-                if (selectable is Node node)
-                {
-                    BaseNodeView nodeView = node.userData as BaseNodeView;
-                    if (nodeView.ShowParamPanel)
-                    {
-                        _lnParamView.Show(this.layout);
-                        _showPinned = true;
-                        nodeView.ShowParamUI();
-                    }
-                }
-            }
-            if (selection.Count > 1 && _showPinned)
-            {
-                _lnParamView.Hide();
-                _showPinned = false;
-            }
-        }
-        public override void ClearSelection()
-        {
-            base.ClearSelection();
-            if (_showPinned)
-            {
-                _lnParamView.Hide();
-                _showPinned = false;
-            }
-        }
 
         public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
         {
@@ -600,12 +560,12 @@ namespace Logic.Editor
             }
         }
 
+        /// <summary>
+        /// 大小发生改变调用
+        /// </summary>
+        /// <param name="evt"></param>
         private void m_onGeometryChanged(GeometryChangedEvent evt)
         {
-            if (_showPinned)
-            {
-                _lnParamView.Show(evt.newRect);
-            }
         }
         private void m_onKeyDownEvent(KeyDownEvent evt)
         {

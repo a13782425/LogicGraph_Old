@@ -31,37 +31,37 @@ namespace Logic.Editor
 
         public LNParameterView()
         {
-            var tpl = LogicUtils.GetPinnedView();
-            styleSheets.Add(LogicUtils.GetPinnedStyle());
+            //var tpl = LogicUtils.GetPinnedView();
+            //styleSheets.Add(LogicUtils.GetPinnedStyle());
 
-            main = tpl.CloneTree();
-            main.AddToClassList("mainContainer");
-            scrollView = new ScrollView(ScrollViewMode.Vertical);
-            scrollView.horizontalScroller.RemoveFromHierarchy();
-            root = main.Q("content");
+            //main = tpl.CloneTree();
+            //main.AddToClassList("mainContainer");
+            //scrollView = new ScrollView(ScrollViewMode.Vertical);
+            //scrollView.horizontalScroller.RemoveFromHierarchy();
+            //root = main.Q("content");
 
-            header = main.Q("header");
+            //header = main.Q("header");
 
-            titleLabel = main.Q<Label>(name: "titleLabel");
-            content = main.Q<VisualElement>(name: "contentContainer");
+            //titleLabel = main.Q<Label>(name: "titleLabel");
+            //content = main.Q<VisualElement>(name: "contentContainer");
 
-            hierarchy.Add(main);
+            //hierarchy.Add(main);
 
-            style.overflow = Overflow.Hidden;
+            //style.overflow = Overflow.Hidden;
 
-            ClearClassList();
-            AddToClassList("pinnedElement");
+            //ClearClassList();
+            //AddToClassList("pinnedElement");
 
-            style.position = Position.Absolute;
-            content.RemoveFromHierarchy();
-            root.Add(scrollView);
-            scrollView.Add(content);
-            AddToClassList("scrollable");
-            content.style.paddingTop = 6;
-            content.style.paddingLeft = 6;
-            content.style.paddingRight = 6;
-            content.style.paddingBottom = 6;
-            title = "节点参数";
+            //style.position = Position.Absolute;
+            //content.RemoveFromHierarchy();
+            //root.Add(scrollView);
+            //scrollView.Add(content);
+            //AddToClassList("scrollable");
+            //content.style.paddingTop = 6;
+            //content.style.paddingLeft = 6;
+            //content.style.paddingRight = 6;
+            //content.style.paddingBottom = 6;
+            //title = "节点参数";
         }
 
         public void Repaint()

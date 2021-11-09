@@ -59,10 +59,6 @@ namespace Logic.Editor
         {
             return AssetDatabase.LoadAssetAtPath<StyleSheet>(Path.Combine(EDITOR_STYLE_PATH, "BaseNodeView.uss"));
         }
-        public static StyleSheet GetParamNodeStyle()
-        {
-            return AssetDatabase.LoadAssetAtPath<StyleSheet>(Path.Combine(EDITOR_STYLE_PATH, "ParamNodeView.uss"));
-        }
         public static StyleSheet GetPortStyle()
         {
             return AssetDatabase.LoadAssetAtPath<StyleSheet>(Path.Combine(EDITOR_STYLE_PATH, "PortView.uss"));
@@ -75,17 +71,13 @@ namespace Logic.Editor
         {
             return AssetDatabase.LoadAssetAtPath<StyleSheet>(Path.Combine(EDITOR_STYLE_PATH, "GroupView.uss"));
         }
-        public static VisualTreeAsset GetPinnedView()
-        {
-            return AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(Path.Combine(EDITOR_STYLE_PATH, "ParamElement.uxml"));
-        }
-        public static StyleSheet GetPinnedStyle()
-        {
-            return AssetDatabase.LoadAssetAtPath<StyleSheet>(Path.Combine(EDITOR_STYLE_PATH, "ParamElementView.uss"));
-        }
         public static StyleSheet GetVariableStyle()
         {
             return AssetDatabase.LoadAssetAtPath<StyleSheet>(Path.Combine(EDITOR_STYLE_PATH, "LGVariableView.uss"));
+        }
+        public static StyleSheet GetVariableNodeStyle()
+        {
+            return AssetDatabase.LoadAssetAtPath<StyleSheet>(Path.Combine(EDITOR_STYLE_PATH, "VariableNodeView.uss"));
         }
         #endregion
 

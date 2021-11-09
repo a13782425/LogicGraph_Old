@@ -16,6 +16,12 @@ namespace Logic
         public string Title;
         [SerializeField]
         public Vector2 Pos = Vector2.zero;
+        /// <summary>
+        /// 是否上锁
+        /// </summary>
+        [SerializeField]
+        public bool IsLock = false;
+
 #endif
         [SerializeField]
         private string _onlyId = "";
