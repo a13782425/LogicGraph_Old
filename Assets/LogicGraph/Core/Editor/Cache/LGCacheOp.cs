@@ -43,10 +43,7 @@ namespace Logic.Editor
 
         public static void Refresh()
         {
-            List<Type> types = new List<Type>();
-            types.AddRange(typeof(BaseNodeView).Assembly.GetTypes());
-            types.AddRange(typeof(BaseLogicNode).Assembly.GetTypes());
-            m_checkTypes(types);
+            m_checkTypes();
             EditorUtility.SetDirty(Instance);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
@@ -105,9 +102,7 @@ namespace Logic.Editor
             logicGraph = null;
         }
 
-
-
-        private static void m_checkTypes(List<Type> types)
+        private static void m_checkTypes()
         {
             foreach (var item in Instance.LGEditorList)
             {
@@ -117,10 +112,14 @@ namespace Logic.Editor
                     node.IsRefresh = false;
                 }
             }
-            m_refreshLogicGraph(types);
-            m_refreshLogicNode(types);
-            m_refreshFormat(types);
+            m_refreshLogicGraph();
             Instance.LGEditorList.RemoveAll(a => !a.IsRefresh);
+            List<Type> nodeViewTypes = TypeCache.GetTypesDerivedFrom<BaseNodeView>().ToList();
+            foreach (var item in Instance.LGEditorList)
+            {
+                m_refreshLogicNode(nodeViewTypes, item);
+            }
+            m_refreshFormat();
 
             foreach (var item in Instance.LGEditorList)
             {
@@ -149,130 +148,104 @@ namespace Logic.Editor
         /// <summary>
         /// 刷新逻辑图
         /// </summary>
-        /// <param name="types"></param>
-        private static void m_refreshLogicGraph(List<Type> types)
+        private static void m_refreshLogicGraph()
         {
-            //逻辑图类型
-            Type _logicGraphType = typeof(BaseLogicGraph);
-            Type _logicGraphAttr = typeof(LogicGraphAttribute);
+            var types = TypeCache.GetTypesDerivedFrom<BaseLogicGraph>();
+            Type logicGraphAttr = typeof(LogicGraphAttribute);
             //循环查询逻辑图
             foreach (var item in types)
             {
-                if (!item.IsAbstract && !item.IsInterface)
+                //如果当前类型是逻辑图
+                var graphAttr = item.GetCustomAttribute<LogicGraphAttribute>();
+                if (graphAttr != null)
                 {
-                    if (_logicGraphType.IsAssignableFrom(item))
+                    LGEditorCache graphData = Instance.LGEditorList.FirstOrDefault(a => a.GraphClassName == item.FullName);
+                    if (graphData == null)
                     {
-                        //如果当前类型是逻辑图
-                        object[] graphAttrs = item.GetCustomAttributes(_logicGraphAttr, false);
-                        if (graphAttrs != null && graphAttrs.Length > 0)
-                        {
-                            LogicGraphAttribute logicGraph = graphAttrs[0] as LogicGraphAttribute;
-                            LGEditorCache graphData = Instance.LGEditorList.FirstOrDefault(a => a.GraphClassName == item.FullName);
-                            if (graphData == null)
-                            {
-                                graphData = new LGEditorCache();
-                                graphData.GraphClassName = item.FullName;
-                                Instance.LGEditorList.Add(graphData);
-                            }
-                            graphData.DefaultClasses.Clear();
-                            graphData.DefaultNodes.Clear();
-                            foreach (var nodeType in logicGraph.DefaultNodes)
-                            {
-                                graphData.DefaultClasses.Add(nodeType.FullName);
-                            }
-                            graphData.GraphName = logicGraph.LogicName;
-                            graphData.IsRefresh = true;
-                        }
+                        graphData = new LGEditorCache();
+                        graphData.GraphClassName = item.FullName;
+
+                        Instance.LGEditorList.Add(graphData);
                     }
-                }
-            }
-        }
-        /// <summary>
-        /// 刷新逻辑图节点
-        /// </summary>
-        /// <param name="types"></param>
-        private static void m_refreshLogicNode(List<Type> types)
-        {
-            //逻辑图节点类型
-            Type _logicNodeViewType = typeof(BaseNodeView);
-            Type _logicNodeAttr = typeof(LogicNodeAttribute);
-            //循环查询逻辑图节点视图
-            foreach (var item in types)
-            {
-                if (!item.IsAbstract && !item.IsInterface)
-                {
-                    if (_logicNodeViewType.IsAssignableFrom(item))
+                    if (graphData.Groups.FirstOrDefault(a => a.Name == "默认分组") == null)
                     {
-                        //如果当前类型是逻辑图节点
-                        object[] nodeAttrs = item.GetCustomAttributes(_logicNodeAttr, false);
-                        if (nodeAttrs != null && nodeAttrs.Length > 0)
-                        {
-                            LogicNodeAttribute logicNode = nodeAttrs[0] as LogicNodeAttribute;
-                            Type nodeType = logicNode.NodeType;
-                            foreach (var graphData in Instance.LGEditorList)
-                            {
-                                if (logicNode.HasType(graphData.GetGraphType()))
-                                {
-                                    LNEditorCache nodeData = graphData.Nodes.FirstOrDefault(a => a.NodeClassName == nodeType.FullName);
-                                    if (nodeData == null)
-                                    {
-                                        nodeData = new LNEditorCache();
-                                        nodeData.UseCount = int.MinValue;
-                                        graphData.Nodes.Add(nodeData);
-                                    }
-                                    string[] strs = logicNode.MenuText.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
-                                    nodeData.NodeClassName = nodeType.FullName;
-                                    nodeData.NodeViewClassName = item.FullName;
-                                    nodeData.NodeLayers = strs;
-                                    nodeData.NodeName = strs[strs.Length - 1];
-                                    nodeData.NodeFullName = logicNode.MenuText;
-                                    nodeData.PortType = logicNode.PortType;
-                                    nodeData.IsRefresh = true;
-                                    if (graphData.DefaultClasses.Contains(nodeType.FullName))
-                                    {
-                                        graphData.DefaultNodes.Add(nodeData);
-                                    }
-                                }
-                            }
-                        }
+                        LGroupEditorCache groupCache = new LGroupEditorCache();
+                        groupCache.Name = "默认分组";
+                        groupCache.CanDel = false;
+                        groupCache.CanEditor = false;
+                        graphData.Groups.Add(groupCache);
                     }
+                    graphData.DefaultNodes.Clear();
+                    graphData.GraphName = graphAttr.LogicName;
+                    graphData.IsRefresh = true;
                 }
             }
         }
 
         /// <summary>
+        /// 刷新逻辑图节点
+        /// </summary>
+        private static void m_refreshLogicNode(List<Type> nodeViewTypes, LGEditorCache lGEditorCache)
+        {
+            Type graphType = lGEditorCache.GetGraphType();
+            //如果当前类型是逻辑图
+            LogicGraphAttribute graphAttr = graphType.GetCustomAttribute<LogicGraphAttribute>();
+            List<string> defaultClasses = graphAttr.DefaultNodes.Select(a => a.FullName).ToList();
+            foreach (var viewType in nodeViewTypes)
+            {
+                var nodeAttr = viewType.GetCustomAttribute<LogicNodeAttribute>();
+                if (nodeAttr != null)
+                {
+                    if (nodeAttr.HasType(graphType))
+                    {
+                        var nodeType = nodeAttr.NodeType;
+                        LNEditorCache nodeData = lGEditorCache.Nodes.FirstOrDefault(a => a.NodeClassName == nodeType.FullName);
+                        if (nodeData == null)
+                        {
+                            nodeData = new LNEditorCache();
+                            nodeData.UseCount = int.MinValue;
+                            lGEditorCache.Nodes.Add(nodeData);
+                        }
+                        string[] strs = nodeAttr.MenuText.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+                        nodeData.NodeClassName = nodeType.FullName;
+                        nodeData.NodeViewClassName = viewType.FullName;
+                        nodeData.NodeLayers = strs;
+                        nodeData.NodeName = strs[strs.Length - 1];
+                        nodeData.NodeFullName = nodeAttr.MenuText;
+                        nodeData.PortType = nodeAttr.PortType;
+                        nodeData.IsRefresh = true;
+                        if (defaultClasses.Contains(nodeType.FullName))
+                        {
+                            lGEditorCache.DefaultNodes.Add(nodeData);
+                        }
+                    }
+                }
+            }
+        }
+        /// <summary>
         /// 刷新格式化信息
         /// </summary>
         /// <param name="types"></param>
-        private static void m_refreshFormat(List<Type> types)
+        private static void m_refreshFormat()
         {
-            //逻辑图格式化类型
-            Type _logicFormatType = typeof(ILogicFormat);
-            Type _logicFormatAttr = typeof(LogicFormatAttribute);
+            List<Type> types = TypeCache.GetTypesDerivedFrom<ILogicFormat>().ToList();
             foreach (var item in types)
             {
-                if (!item.IsAbstract && !item.IsInterface)
+                //如果当前类型是逻辑图节点
+                var formatAttr = item.GetCustomAttribute<LogicFormatAttribute>();
+                if (formatAttr != null)
                 {
-                    if (_logicFormatType.IsAssignableFrom(item))
+                    Type graphType = formatAttr.LogicGraphType;
+                    var graphEditor = Instance.LGEditorList.FirstOrDefault(a => a.GraphClassName == graphType.FullName);
+                    var formatConfig = graphEditor.Formats.FirstOrDefault(a => a.FormatName == formatAttr.Name);
+                    if (formatConfig == null)
                     {
-                        //如果当前类型是逻辑图节点
-                        object[] formatAttrs = item.GetCustomAttributes(_logicFormatAttr, false);
-                        if (formatAttrs != null && formatAttrs.Length > 0)
-                        {
-                            LogicFormatAttribute logicFormat = formatAttrs[0] as LogicFormatAttribute;
-                            Type graphType = logicFormat.LogicGraphType;
-                            var graphEditor = Instance.LGEditorList.FirstOrDefault(a => a.GraphClassName == graphType.FullName);
-                            var formatConfig = graphEditor.Formats.FirstOrDefault(a => a.FormatName == logicFormat.Name);
-                            if (formatConfig == null)
-                            {
-                                formatConfig = new LFEditorCache();
-                                graphEditor.Formats.Add(formatConfig);
-                            }
-                            formatConfig.FormatName = logicFormat.Name;
-                            formatConfig.FormatClassName = item.FullName;
-                            formatConfig.Extension = logicFormat.Extension;
-                        }
+                        formatConfig = new LFEditorCache();
+                        graphEditor.Formats.Add(formatConfig);
                     }
+                    formatConfig.FormatName = formatAttr.Name;
+                    formatConfig.FormatClassName = item.FullName;
+                    formatConfig.Extension = formatAttr.Extension;
                 }
             }
         }

@@ -22,6 +22,16 @@ namespace Logic
         [SerializeField]
         public bool IsLock = false;
 
+        /// <summary>
+        /// 节点描述
+        /// </summary>
+        [SerializeField]
+        private string _describe = "";
+        /// <summary>
+        /// 节点描述
+        /// </summary>
+        public virtual string Describe { get => _describe; set => _describe = value; }
+
 #endif
         [SerializeField]
         private string _onlyId = "";

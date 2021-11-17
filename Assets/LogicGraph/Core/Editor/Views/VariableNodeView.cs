@@ -24,10 +24,8 @@ namespace Logic.Editor
             node.titleContainer.Add(titleLabel);
             node.titleContainer.Add(node.outputContainer);
             Input = AddPort("", Direction.Input);
-            //Input.Q("type").RemoveFromHierarchy();
             node.inputContainer.Add(Input);
             OutPut = AddPort("", Direction.Output);
-            //OutPut.Q("type").RemoveFromHierarchy();
             node.outputContainer.Add(OutPut);
             var contents = node.Q("contents");
             contents.RemoveFromHierarchy();
@@ -39,6 +37,7 @@ namespace Logic.Editor
             OutPut.portColor = node.variable.GetColor();
             if (node.variable != null)
             {
+                this.View.tooltip = node.variable.Describe;
                 node.variable.onModifyParam += m_onModifyParam;
             }
         }
@@ -46,6 +45,7 @@ namespace Logic.Editor
         private void m_onModifyParam()
         {
             this.Title = node.variable.Name;
+            this.View.tooltip = node.variable.Describe;
         }
 
         public override void OnDestroy()
@@ -56,7 +56,12 @@ namespace Logic.Editor
             }
         }
 
-        protected override void OnGenericMenu(ContextualMenuPopulateEvent evt) { evt.menu.AppendAction("删除", (a) => owner.DeleteSelection()); }
+        protected override void OnGenericMenu(ContextualMenuPopulateEvent evt)
+        {
+            evt.menu.AppendAction("编辑描述", onOpenNodeDescribe);
+            evt.menu.AppendSeparator();
+            evt.menu.AppendAction("删除", (a) => owner.DeleteSelection());
+        }
         public override void DrawLink() { }
         public override bool CanLink(PortView ownerPort, PortView waitLinkPort)
         {

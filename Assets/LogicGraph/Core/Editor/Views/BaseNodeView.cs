@@ -17,8 +17,6 @@ namespace Logic.Editor
     {
         public string OnlyId => Target.OnlyId;
 
-        protected LGInfoCache graphCache { get; private set; }
-
         private Node _view;
 
         public Node View => _view;
@@ -43,7 +41,21 @@ namespace Logic.Editor
         /// </summary>
         public PortView OutPut { get; protected set; }
 
-        private float _width = 100;
+        /// <summary>
+        /// 显示锁
+        /// </summary>
+        public virtual bool ShowLock => true;
+        /// <summary>
+        /// 显示状态
+        /// </summary>
+        public virtual bool ShowState => true;
+
+        /// <summary>
+        /// 状态图标
+        /// </summary>
+        public virtual LogicIconEnum StateIcon => LogicIconEnum.Shape;
+
+        private float _width = 180;
         /// <summary>
         /// 当前节点视图的宽度
         /// </summary>
@@ -70,6 +82,16 @@ namespace Logic.Editor
             get => (_view as INodeVisualElement).ContentBackgroundColor;
             set => (_view as INodeVisualElement).ContentBackgroundColor = value;
         }
+        public string Tooltip
+        {
+            get => this.Target.Describe;
+            set
+            {
+                this.Target.Describe = value;
+                this._view.tooltip = value;
+            }
+        }
+
         private string _title = "";
         public string Title
         {
@@ -103,17 +125,17 @@ namespace Logic.Editor
             Target = node;
             this._title = node.Title;
             this.owner = owner;
-            this.graphCache = owner.LGInfoCache;
+            //this.graphCache = owner.LGInfoCache;
             this._view = GetNode();
             if (this.View is INodeVisualElement nodeView)
             {
                 nodeView.onGenericMenu += OnGenericMenu;
+                this._view.tooltip = node.Describe;
             }
             else
             {
                 throw new Exception("界面视图需要实现INodeVisualElement接口");
             }
-
             this.owner.AddElement(_view);
             OnCreate();
         }
@@ -229,7 +251,7 @@ namespace Logic.Editor
             {
                 for (int i = nodeList.Count - 1; i >= 0; i--)
                 {
-                    BaseNodeView nodeView = graphCache.GetNodeView(nodeList[i]);
+                    BaseNodeView nodeView = owner.LGInfoCache.GetNodeView(nodeList[i]);
                     if (nodeView == null)
                     {
                         this.RemoveChild(this.OutPut, nodeList[i]);
@@ -311,7 +333,7 @@ namespace Logic.Editor
             for (int i = 0; i < Target.Childs.Count; i++)
             {
                 BaseLogicNode item = Target.Childs[i];
-                BaseNodeView nodeView = graphCache.GetNodeView(item);
+                BaseNodeView nodeView = owner.LGInfoCache.GetNodeView(item);
                 evt.menu.AppendAction($"移除连接:{i + 1}.{nodeView.Title}", onRemoveChild, (a) => DropdownMenuAction.Status.Normal, nodeView);
             }
             if (Target.Childs.Count > 0)
@@ -320,8 +342,11 @@ namespace Logic.Editor
             }
             evt.menu.AppendAction("查看节点代码", onOpenNodeScript);
             evt.menu.AppendAction("查看界面代码", onOpenNodeViewScript);
+            evt.menu.AppendAction("编辑描述", onOpenNodeDescribe);
+            evt.menu.AppendSeparator();
             evt.menu.AppendAction("删除", (a) => owner.DeleteSelection());
         }
+
         /// <summary>
         /// 添加一个端口
         /// </summary>
@@ -550,7 +575,7 @@ namespace Logic.Editor
             {
                 string path = AssetDatabase.GUIDToAssetPath(item);
                 MonoScript monoScript = AssetDatabase.LoadAssetAtPath<MonoScript>(path);
-                if (monoScript.GetClass() == this.Target.GetType())
+                if (monoScript != null && monoScript.GetClass() == this.Target.GetType())
                 {
                     AssetDatabase.OpenAsset(AssetDatabase.LoadAssetAtPath(path, typeof(UnityEngine.Object)), -1);
                     break;
@@ -568,7 +593,7 @@ namespace Logic.Editor
             {
                 string path = AssetDatabase.GUIDToAssetPath(item);
                 MonoScript monoScript = AssetDatabase.LoadAssetAtPath<MonoScript>(path);
-                if (monoScript.GetClass() == this.GetType())
+                if (monoScript != null && monoScript.GetClass() == this.GetType())
                 {
                     AssetDatabase.OpenAsset(AssetDatabase.LoadAssetAtPath(path, typeof(UnityEngine.Object)), -1);
                     break;
@@ -576,6 +601,14 @@ namespace Logic.Editor
             }
         }
 
+        /// <summary>
+        /// 打开描述
+        /// </summary>
+        /// <param name="obj"></param>
+        protected void onOpenNodeDescribe(DropdownMenuAction obj)
+        {
+            owner.ShowNodeDescribe(this);
+        }
         #endregion
 
 
@@ -595,7 +628,6 @@ namespace Logic.Editor
             private VisualElement m_content { get; set; }
             public Color TitleBackgroundColor { get => titleContainer.style.backgroundColor.value; set => titleContainer.style.backgroundColor = value; }
             public Color ContentBackgroundColor { get => ContentContainer.style.backgroundColor.value; set => ContentContainer.style.backgroundColor = value; }
-
             public VisualElement ContentContainer { get; private set; }
             public NodeVisualElement(BaseNodeView nodeView, LogicGraphView graphView)
             {
@@ -613,7 +645,7 @@ namespace Logic.Editor
                 ContentContainer.style.backgroundColor = new Color(0, 0, 0, 0.5f);
                 m_checkTitle();
                 this.title = this.nodeView.Title;
-                this.SetPosition(new Rect(this.nodeView.Target.Pos, Vector2.zero));
+                base.SetPosition(new Rect(this.nodeView.Target.Pos, Vector2.zero));
             }
 
             public void AddUI(VisualElement ui)
@@ -621,14 +653,12 @@ namespace Logic.Editor
                 ContentContainer.Add(ui);
             }
 
-            public void Initialize()
-            {
-                this.title = nodeView.Title;
-                this.SetPosition(new Rect(nodeView.Target.Pos, Vector2.zero));
-            }
-
             public override void SetPosition(Rect newPos)
             {
+                if (nodeView.Target.IsLock)
+                {
+                    return;
+                }
                 base.SetPosition(newPos);
                 nodeView.Target.Pos = newPos.position;
             }
@@ -658,37 +688,47 @@ namespace Logic.Editor
             /// <summary>
             /// 运行状态
             /// </summary>
-            private VisualElement _runStatus;
+            private VisualElement _runState;
             private VisualElement _lock;
             private TextField _titleEditor;
             private Label _titleItem;
             private bool _editTitleCancelled = false;
             private void m_checkTitle()
             {
-                _runStatus = new VisualElement();
-                _runStatus.name = "run-status";
-                _runStatus.tooltip = "运行状态";
-                titleContainer.Insert(0, _runStatus);
+                m_initState();
                 //找到Title对应的元素
                 _titleItem = this.Q<Label>("title-label");
                 _titleItem.RegisterCallback<MouseDownEvent>(m_onMouseDownEvent);
                 _titleEditor = new TextField();
                 _titleEditor.name = "title-field";
                 titleContainer.Add(_titleEditor);
-
-                _lock = new Button();
-                _lock.name = "lock-icon";
-                _lock.ClearClassList();
-                _lock.AddToClassList("unlock");
-
-                _lock.RegisterCallback<ClickEvent>(m_lockClick);
-
-                titleContainer.Add(_lock);
-
+                m_initLock();
                 _titleEditor.style.display = DisplayStyle.None;
                 VisualElement visualElement2 = _titleEditor.Q(TextInputBaseField<string>.textInputUssName);
                 visualElement2.RegisterCallback<FocusOutEvent>(m_onEditTitleFinished);
                 visualElement2.RegisterCallback<KeyDownEvent>(m_onTitleEditorOnKeyDown);
+            }
+
+            private void m_initState()
+            {
+                _runState = new VisualElement();
+                _runState.name = "run-state";
+                _runState.tooltip = "运行状态";
+                titleContainer.Insert(0, _runState);
+                string str = $"run-state-{nodeView.StateIcon.ToString().ToLower()}";
+                _runState.AddToClassList(str);
+                _runState.style.display = nodeView.ShowState ? DisplayStyle.Flex : DisplayStyle.None;
+            }
+
+            private void m_initLock()
+            {
+                _lock = new Button();
+                _lock.name = "lock-icon";
+                _lock.ClearClassList();
+                _lock.AddToClassList(nodeView.Target.IsLock ? "lock" : "unlock");
+                _lock.style.display = nodeView.ShowLock ? DisplayStyle.Flex : DisplayStyle.None;
+                _lock.RegisterCallback<ClickEvent>(m_lockClick);
+                titleContainer.Add(_lock);
             }
 
             private void m_lockClick(ClickEvent evt)

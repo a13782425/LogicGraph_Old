@@ -11,13 +11,13 @@ namespace Logic.Editor
 {
     public sealed class LGVariableFieldView : BlackboardField
     {
-        private LogicGraphView graphView;
+        private LogicGraphView owner;
 
         public BaseVariable param { get; private set; }
 
         public LGVariableFieldView(LogicGraphView graphView, BaseVariable param) : base(null, param.Name, param.GetValueType().Name)
         {
-            this.graphView = graphView;
+            this.owner = graphView;
             this.param = param;
 #if UNITY_2019
             this.AddManipulator(new ContextualMenuManipulator(BuildContextualMenu));
@@ -45,7 +45,7 @@ namespace Logic.Editor
                 else
                 {
                     text = this.param.Name;
-                    graphView.Window.ShowNotification(new GUIContent("变量名不合法或过长"));
+
                 }
             });
         }
@@ -55,11 +55,13 @@ namespace Logic.Editor
             varName = varName.Trim();
             if (string.IsNullOrWhiteSpace(varName))
             {
+                owner.Window.ShowNotification(new GUIContent("变量名不能为空"));
                 return false;
             }
             char[] strs = varName.ToArray();
-            if (strs.Length > 9)
+            if (strs.Length > 20)
             {
+                owner.Window.ShowNotification(new GUIContent("变量名不能超过20个字符"));
                 return false;
             }
             bool result = true;
@@ -83,7 +85,11 @@ namespace Logic.Editor
                 }
                 length++;
             }
-        End: return result;
+        End: if (result)
+            {
+                owner.Window.ShowNotification(new GUIContent("变量名不合法"));
+            }
+            return result;
         }
 
 #if UNITY_2020_1_OR_NEWER
@@ -92,7 +98,7 @@ namespace Logic.Editor
             evt.menu.AppendAction("重命名", (a) => OpenTextEditor(), DropdownMenuAction.AlwaysEnabled);
             evt.menu.AppendAction("删除", (a) =>
             {
-                graphView.DelLGVariable(param);
+                owner.DelLGVariable(param);
             }, DropdownMenuAction.AlwaysEnabled);
 
             evt.StopPropagation();
@@ -107,7 +113,7 @@ namespace Logic.Editor
             evt.menu.AppendAction("重命名", (a) => OpenTextEditor(), DropdownMenuAction.AlwaysEnabled);
             evt.menu.AppendAction("删除", (a) =>
             {
-                graphView.DelLGVariable(param);
+                owner.DelLGVariable(param);
             }, DropdownMenuAction.AlwaysEnabled);
 
             evt.StopPropagation();

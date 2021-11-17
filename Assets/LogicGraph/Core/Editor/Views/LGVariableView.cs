@@ -112,7 +112,7 @@ namespace Logic.Editor
             // Remove parameter in the name of the type if it exists
             name = name.Replace("Variable", "");
 
-            return ObjectNames.NicifyVariableName(name);
+            return name;
         }
         private string m_getUniqueName(string name)
         {

@@ -114,7 +114,7 @@ namespace Logic.Editor
         }
         private void OnDestroy()
         {
-            _view.Save();
+            _view.OnDestroy();
         }
         #endregion
     }

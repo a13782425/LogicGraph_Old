@@ -20,6 +20,17 @@ namespace Logic
         [SerializeField]
         private string _title = "";
         public string Title { get => _title; set => _title = value; }
+
+        /// <summary>
+        /// 当前图坐标
+        /// </summary>
+        [SerializeField]
+        public Vector3 Pos = Vector3.zero;
+        /// <summary>
+        /// 当前图的缩放
+        /// </summary>
+        [SerializeField]
+        public Vector3 Scale = Vector3.one;
 #endif
         [SerializeReference]
         private List<BaseLogicNode> _nodes = new List<BaseLogicNode>();

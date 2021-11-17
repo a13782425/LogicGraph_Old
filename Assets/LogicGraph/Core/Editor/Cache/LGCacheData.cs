@@ -38,12 +38,12 @@ namespace Logic.Editor
         /// </summary>
         public static string ConfigPath => _configPath;
 
-        private static List<Assembly> _includeAssemblies = new List<Assembly>();
+        //private static List<Assembly> _includeAssemblies = new List<Assembly>();
 
-        /// <summary>
-        /// 需要检索的程序集
-        /// </summary>
-        public static List<Assembly> IncludeAssemblies => _includeAssemblies;
+        ///// <summary>
+        ///// 需要检索的程序集
+        ///// </summary>
+        //public static List<Assembly> IncludeAssemblies => _includeAssemblies;
 
         #endregion
 
@@ -69,6 +69,10 @@ namespace Logic.Editor
         {
             ILogicConfig logicConfig = checkConfig();
             string filePath = Path.Combine(ConfigPath, "LGConfig.asset");
+            if (!Directory.Exists(ConfigPath))
+            {
+                Directory.CreateDirectory(ConfigPath);
+            }
             _instance = AssetDatabase.LoadAssetAtPath<LGCacheData>(filePath);
             if (_instance == null)
             {
@@ -82,8 +86,8 @@ namespace Logic.Editor
 
         private static ILogicConfig checkConfig()
         {
-            IncludeAssemblies.Add(typeof(BaseLogicNode).Assembly);
-            IncludeAssemblies.Add(typeof(BaseNodeView).Assembly);
+            //IncludeAssemblies.Add(typeof(BaseLogicNode).Assembly);
+            //IncludeAssemblies.Add(typeof(BaseNodeView).Assembly);
             string[] grids = AssetDatabase.FindAssets(typeof(LGCacheData).Name);
             if (grids.Length < 1)
             {
@@ -100,21 +104,21 @@ namespace Logic.Editor
                 try
                 {
                     string str = config.CONFIG_PATH;
-                    List<Assembly> assemblies = config.INCLUDE_ASSEMBLIES;
+                    //List<Assembly> assemblies = config.INCLUDE_ASSEMBLIES;
                     if (!string.IsNullOrWhiteSpace(str))
                     {
                         _configPath = str;
                     }
-                    if (assemblies != null)
-                    {
-                        foreach (var assembly in assemblies)
-                        {
-                            if (!IncludeAssemblies.Contains(assembly))
-                            {
-                                IncludeAssemblies.Add(assembly);
-                            }
-                        }
-                    }
+                    //if (assemblies != null)
+                    //{
+                    //    foreach (var assembly in assemblies)
+                    //    {
+                    //        if (!IncludeAssemblies.Contains(assembly))
+                    //        {
+                    //            IncludeAssemblies.Add(assembly);
+                    //        }
+                    //    }
+                    //}
                     return config;
                 }
                 catch (Exception)
@@ -161,20 +165,52 @@ namespace Logic.Editor
         /// 资源路径
         /// </summary>
         public string AssetPath;
-        /// <summary>
-        /// 当前图坐标
-        /// </summary>
-        public Vector3 Pos = Vector3.zero;
-        /// <summary>
-        /// 当前图的缩放
-        /// </summary>
-        public Vector3 Scale = Vector3.one;
 
+        /// <summary>
+        /// 最后一次Format位置
+        /// </summary>
+        public string LastFormatPath;
+        /// <summary>
+        /// 变量面板信息
+        /// </summary>
         [SerializeField]
-        public LGVariableCache VariableCache;
+        private LGPanelCache _variableCache;
 
+        public LGPanelCache VariableCache
+        {
+            get
+            {
+                if (_variableCache == null)
+                {
+                    _variableCache = new LGPanelCache();
+                    _variableCache.Pos = new Vector2(0, 20);
+                    _variableCache.Size = new Vector2(180, 320);
+                }
+                return _variableCache;
+            }
+        }
+        /// <summary>
+        /// 组列表面板信息
+        /// </summary>
+        [SerializeField]
+        private LGPanelCache _groupListCache;
+
+        public LGPanelCache GroupListCache
+        {
+            get
+            {
+                if (_groupListCache == null)
+                {
+                    _groupListCache = new LGPanelCache();
+                    _groupListCache.Pos = new Vector2(0, 20);
+                    _groupListCache.Size = new Vector2(480, 120);
+                }
+                return _groupListCache;
+            }
+        }
         /// <summary>
         /// 方便查找缓存
+        /// Key:OnlyId
         /// </summary>
         [NonSerialized]
         public Dictionary<string, BaseNodeView> NodeDic = new Dictionary<string, BaseNodeView>();
@@ -190,24 +226,36 @@ namespace Logic.Editor
         [NonSerialized]
         public LogicGraphView View;
 
-        public LGInfoCache() { }
-
         public BaseNodeView GetNodeView(BaseLogicNode item) => NodeDic.ContainsKey(item.OnlyId) ? NodeDic[item.OnlyId] : null;
-
+        public BaseNodeView GetNodeView(string onlyId) => NodeDic.ContainsKey(onlyId) ? NodeDic[onlyId] : null;
+        public LGInfoCache()
+        {
+        }
 
         public LGInfoCache(BaseLogicGraph graph)
         {
             Graph = graph;
             OnlyId = graph.OnlyId;
             GraphClassName = graph.GetType().FullName;
+            ResetPanelCache();
+        }
+
+        public void ResetPanelCache()
+        {
+            _variableCache = new LGPanelCache();
+            _variableCache.Pos = new Vector2(0, 20);
+            _variableCache.Size = new Vector2(180, 320);
+            _groupListCache = new LGPanelCache();
+            _groupListCache.Pos = new Vector2(0, 20);
+            _groupListCache.Size = new Vector2(480, 120);
         }
     }
 
     /// <summary>
-    /// 逻辑图变量面板
+    /// 逻辑图面板信息缓存
     /// </summary>
     [Serializable]
-    public class LGVariableCache
+    public class LGPanelCache
     {
         /// <summary>
         /// 是否显示
@@ -222,6 +270,7 @@ namespace Logic.Editor
         /// </summary>
         public Vector2 Size = Vector2.one;
     }
+
 
     /// <summary>
     /// 逻辑图编辑器信息缓存
@@ -248,6 +297,11 @@ namespace Logic.Editor
         public List<LNEditorCache> Nodes = new List<LNEditorCache>();
 
         /// <summary>
+        /// 逻辑图对应的组
+        /// </summary>
+        public List<LGroupEditorCache> Groups = new List<LGroupEditorCache>();
+
+        /// <summary>
         /// 当前逻辑图对应的默认节点
         /// </summary>
         public List<LNEditorCache> DefaultNodes = new List<LNEditorCache>();
@@ -256,11 +310,6 @@ namespace Logic.Editor
         /// 当前逻辑图适用的格式化
         /// </summary>
         public List<LFEditorCache> Formats = new List<LFEditorCache>();
-        /// <summary>
-        /// 默认节点的全成类名
-        /// </summary>
-        [NonSerialized]
-        public List<string> DefaultClasses = new List<string>();
 
         private Type _curType = null;
         /// <summary>
@@ -271,12 +320,7 @@ namespace Logic.Editor
         {
             if (_curType == null)
             {
-                foreach (var assembly in LGCacheData.IncludeAssemblies)
-                {
-                    _curType = assembly.GetType(GraphClassName);
-                    if (_curType != null)
-                        break;
-                }
+                _curType = TypeCache.GetTypesDerivedFrom<BaseLogicGraph>().FirstOrDefault(a => a.FullName == GraphClassName);
             }
             return _curType;
         }
@@ -286,7 +330,25 @@ namespace Logic.Editor
         /// </summary>
         /// <param name="nodeType"></param>
         /// <returns></returns>
-        internal LNEditorCache GetEditorNode(Type nodeType) => Nodes.FirstOrDefault(a => a.GetNodeType() == nodeType);
+        public LNEditorCache GetEditorNode(Type nodeType) => Nodes.FirstOrDefault(a => a.GetNodeType() == nodeType);
+        /// <summary>
+        /// 根据节点类型获取对应的编辑缓存
+        /// </summary>
+        /// <param name="nodeFullName"></param>
+        /// <returns></returns>
+        public LNEditorCache GetEditorNode(string nodeFullName) => Nodes.FirstOrDefault(a => a.NodeClassName == nodeFullName);
+
+        public void AddGroupTemplate(LGroupEditorCache groupEditorCache)
+        {
+            Groups.Add(groupEditorCache);
+            onGroupChanged?.Invoke();
+        }
+        public void DelGroupTemplate(LGroupEditorCache groupEditorCache)
+        {
+            Groups.Remove(groupEditorCache);
+            onGroupChanged?.Invoke();
+        }
+        public event Action onGroupChanged;
 
     }
 
@@ -349,12 +411,7 @@ namespace Logic.Editor
         {
             if (_curType == null)
             {
-                foreach (var assembly in LGCacheData.IncludeAssemblies)
-                {
-                    _curType = assembly.GetType(NodeClassName);
-                    if (_curType != null)
-                        break;
-                }
+                _curType = TypeCache.GetTypesDerivedFrom<BaseLogicNode>().FirstOrDefault(a => a.FullName == NodeClassName);
             }
             return _curType;
         }
@@ -368,12 +425,7 @@ namespace Logic.Editor
         {
             if (_curViewType == null)
             {
-                foreach (var assembly in LGCacheData.IncludeAssemblies)
-                {
-                    _curViewType = assembly.GetType(NodeViewClassName);
-                    if (_curViewType != null)
-                        break;
-                }
+                _curViewType = TypeCache.GetTypesDerivedFrom<BaseNodeView>().FirstOrDefault(a => a.FullName == NodeViewClassName);
             }
             return _curViewType;
         }
@@ -397,6 +449,50 @@ namespace Logic.Editor
             UseCount -= 1;
         }
     }
+
+    /// <summary>
+    /// 逻辑图分组缓存
+    /// </summary>
+    [Serializable]
+    public sealed class LGroupEditorCache
+    {
+
+        /// <summary>
+        /// 分组名称
+        /// </summary>
+        public string Name = "";
+
+        /// <summary>
+        /// 分组节点缓存
+        /// </summary>
+        public List<LGroupNEditorCache> Nodes = new List<LGroupNEditorCache>();
+
+        /// <summary>
+        /// 可以修改
+        /// </summary>
+        public bool CanEditor = true;
+        /// <summary>
+        /// 可以删除
+        /// </summary>
+        public bool CanDel = true;
+    }
+
+    /// <summary>
+    /// 分组节点缓存
+    /// </summary>
+    [Serializable]
+    public sealed class LGroupNEditorCache
+    {
+        public int Id;
+        public string NodeClassFullName;
+        public Vector2 Pos;
+        public List<int> Childs = new List<int>();
+        [NonSerialized]
+        public string OnlyId;
+        [NonSerialized]
+        public BaseLogicNode Node;
+    }
+
     /// <summary>
     /// 逻辑图格式化
     /// </summary>

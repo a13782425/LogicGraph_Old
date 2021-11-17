@@ -9,5 +9,11 @@ namespace Logic.Editor
     [LogicNode(typeof(StartNode), "系统/开始", typeof(DefaultLogicGraph), PortType = PortEnum.Out)]
     public sealed class StartNodeView : BaseNodeView
     {
+        public override bool ShowLock => false;
+
+        public override void OnCreate()
+        {
+            Width = 100;
+        }
     }
 }

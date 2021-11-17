@@ -11,9 +11,9 @@ public class DebugNodeView : BaseNodeView
     private DebugNode node;
 
     private PortView _port;
+    public override LogicIconEnum StateIcon => LogicIconEnum.Triangle;
     public override void OnCreate()
     {
-        Width = 200;
         node = Target as DebugNode;
         //TitleBackgroundColor = Color.red;
         //ContentBackgroundColor = Color.green;
@@ -44,15 +44,15 @@ public class DebugNodeView : BaseNodeView
         node.log = evt.newData;
     }
 
-    public override void AddChild(PortView port, BaseLogicNode child)
-    {
-        if (child is DebugNode)
-        {
-            node.Conditions.Add(child);
-        }
-        else
-            base.AddChild(port, child);
-    }
+    //public override void AddChild(PortView port, BaseLogicNode child)
+    //{
+    //    if (child is DebugNode)
+    //    {
+    //        node.Conditions.Add(child);
+    //    }
+    //    else
+    //        base.AddChild(port, child);
+    //}
     public override void AddVariable(VariableNode paramNode, PortView curPort, ParamAccessor accessor)
     {
         if (accessor == ParamAccessor.Get)
@@ -79,7 +79,7 @@ public class DebugNodeView : BaseNodeView
         //}
         if (this.node.Parameter != null && this.node.Parameter.variable != null)
         {
-            DrawLink(_port, graphCache.GetNodeView(this.node.Parameter).OutPut);
+            DrawLink(_port, owner.LGInfoCache.GetNodeView(this.node.Parameter).OutPut);
         }
     }
 

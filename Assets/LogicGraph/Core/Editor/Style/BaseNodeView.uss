@@ -205,23 +205,21 @@
     padding: 0px;
 }
 
-#run-status
+#run-state
 {
-    background-color: red;
     width: 12px;
     height: 12px;
-    border-radius: 6px;
-    margin-left: 6px;
+    margin-left: 8px;
     position: absolute;
+    -unity-background-scale-mode: scale-to-fit;
 }
 
 #lock-icon
 {
     -unity-background-scale-mode: scale-to-fit;
-    
-    right: 4px;
-    width: 24px;
-    height: 24px;
+    right: 8px;
+    width: 18px;
+    height: 18px;
     position: absolute;
 }
 
@@ -233,4 +231,43 @@
 #title > .unlock
 {
     background-image: resource("unlock");
+}
+
+
+.run-state-shape
+{
+    -unity-background-image-tint-color: red;
+    background-image: resource("shape");
+}
+.run-state-diamond
+{
+    background-image: resource("diamond");
+}
+.run-state-gear
+{
+    background-image: resource("gear");
+}
+.run-state-heart
+{
+    background-image: resource("heart");
+}
+.run-state-magnifier
+{
+    background-image: resource("magnifier");
+}
+.run-state-quad
+{
+    background-image: resource("quad");
+}
+.run-state-star
+{
+    background-image: resource("star");
+}
+.run-state-triangle
+{
+    background-image: resource("triangle");
+}
+.run-state-wrench
+{
+    background-image: resource("wrench");
 }

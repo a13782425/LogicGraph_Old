@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -12,26 +13,29 @@ namespace Logic.Editor
 {
     public sealed class GroupView : Group
     {
-        public LogicGraphView owner;
-        public BaseLogicGroup group;
+        private LogicGraphView owner;
+        private BaseLogicGroup group;
+        public BaseLogicGroup Group => group;
+
 
         Label titleLabel;
         ColorField colorField;
-
-
 
         public GroupView()
         {
             styleSheets.Add(LogicUtils.GetGridStyle());
         }
 
-        private static void BuildContextualMenu(ContextualMenuPopulateEvent evt)
+        private void BuildContextualMenu(ContextualMenuPopulateEvent evt)
         {
-            evt.menu.AppendAction("删除模板", null);
-            evt.menu.AppendAction("保存模板", null);
-            evt.menu.AppendAction("删除", null);
+            if (group != null)
+            {
+                evt.menu.AppendAction("保存模板", m_onSaveTemplate);
+            }
             evt.StopPropagation();
         }
+
+
 
         public void Initialize(LogicGraphView graphView, BaseLogicGroup group)
         {
@@ -71,6 +75,19 @@ namespace Logic.Editor
 
                 AddElement(nodeView.View);
             }
+        }
+        public override bool AcceptsElement(GraphElement element, ref string reasonWhyNotAccepted)
+        {
+            if (element.userData is BaseNodeView nodeView)
+            {
+                if (owner.LGInfoCache.Graph.StartNodes.Contains(nodeView.Target))
+                {
+                    reasonWhyNotAccepted = "无法将默认节点添加到组";
+                    return false;
+                }
+
+            }
+            return base.AcceptsElement(element, ref reasonWhyNotAccepted);
         }
 
         protected override void OnElementsAdded(IEnumerable<GraphElement> elements)
@@ -123,6 +140,55 @@ namespace Logic.Editor
 
             group.Pos = newPos.position;
             group.Size = newPos.size;
+        }
+
+
+        /// <summary>
+        /// 保存模板
+        /// </summary>
+        /// <param name="obj"></param>
+        private void m_onSaveTemplate(DropdownMenuAction obj)
+        {
+            LGroupEditorCache groupEditorCache = owner.LGEditorCache.Groups.FirstOrDefault(a => a.Name == group.Title);
+            if (groupEditorCache != null)
+            {
+                EditorUtility.DisplayDialog("错误", "存在相同的模板", "确认");
+                return;
+            }
+            saveTemplate(new LGroupEditorCache());
+        }
+
+
+        private void saveTemplate(LGroupEditorCache groupEditorCache)
+        {
+            groupEditorCache.Name = group.Title;
+            int uniqueId = 1000;
+            foreach (var item in group.Nodes)
+            {
+                var nodeView = owner.LGInfoCache.GetNodeView(item);
+                if (nodeView != null && (nodeView as VariableNodeView) == null)
+                {
+                    LGroupNEditorCache nodeCache = new LGroupNEditorCache();
+                    nodeCache.NodeClassFullName = nodeView.Target.GetType().FullName;
+                    nodeCache.Pos = nodeView.Target.Pos - group.Pos;
+                    nodeCache.Id = uniqueId++;
+                    nodeCache.Node = nodeView.Target;
+                    groupEditorCache.Nodes.Add(nodeCache);
+                }
+            }
+            foreach (var item in groupEditorCache.Nodes)
+            {
+                List<BaseLogicNode> childs = item.Node.Childs;
+                foreach (BaseLogicNode child in childs)
+                {
+                    var groupNode = groupEditorCache.Nodes.FirstOrDefault(a => a.Node == child);
+                    if (groupNode != null)
+                    {
+                        item.Childs.Add(groupNode.Id);
+                    }
+                }
+            }
+            owner.LGEditorCache.AddGroupTemplate(groupEditorCache);
         }
     }
 }

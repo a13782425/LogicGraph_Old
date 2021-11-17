@@ -23,11 +23,6 @@ namespace Logic.Editor
         string CONFIG_PATH { get; }
 
         /// <summary>
-        /// 所包含的程序集
-        /// </summary>
-        List<Assembly> INCLUDE_ASSEMBLIES { get; }
-
-        /// <summary>
         /// 打开窗口调用
         /// </summary>
         void OpenWindow();

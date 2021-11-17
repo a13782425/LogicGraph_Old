@@ -14,7 +14,7 @@ namespace Logic.Editor
     /// </summary>
     public sealed class LogicPostprocessor : AssetPostprocessor
     {
-        [UnityEditor.Callbacks.DidReloadScripts()]
+        [UnityEditor.Callbacks.DidReloadScripts(100)]
         static void OnScriptReload()
         {
             LGCacheOp.Refresh();
@@ -45,7 +45,6 @@ namespace Logic.Editor
                 if (ext == ".asset")
                 {
                     LGCacheOp.AddLogicGraph(str);
-                    //Debug.LogError("importedAsset:" + str);
                 }
             }
             foreach (string str in importedAsset)
@@ -54,7 +53,6 @@ namespace Logic.Editor
                 if (ext == ".asset")
                 {
                     LGCacheOp.AddLogicGraph(str);
-                    //Debug.LogError("importedAsset:" + str);
                 }
             }
             foreach (string str in deletedAssets)

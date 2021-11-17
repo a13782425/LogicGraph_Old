@@ -24,7 +24,8 @@ namespace Logic
 
         public string Name
         {
-            get => _name; set
+            get => _name;
+            set
             {
                 _name = value;
 #if UNITY_EDITOR
@@ -33,6 +34,10 @@ namespace Logic
             }
         }
 
+        /// <summary>
+        /// 是否存在默认值
+        /// </summary>
+        public virtual bool HasDefaultValue => false;
         public virtual object Value { get; set; }
         /// <summary>
         /// 获取值的类型
@@ -45,6 +50,27 @@ namespace Logic
         }
 
 #if UNITY_EDITOR
+
+        /// <summary>
+        /// 可以修改变量名
+        /// </summary>
+        [SerializeField]
+        public bool CanEditor = false;
+        /// <summary>
+        /// 描述
+        /// </summary>
+        [SerializeField]
+        private string _describe = "";
+        public string Describe
+        {
+            get => _describe;
+            set
+            {
+                _describe = value;
+                onModifyParam?.Invoke();
+            }
+        }
+
         /// <summary>
         /// 节点信息发生修改
         /// </summary>
@@ -77,6 +103,7 @@ namespace Logic
         public override VisualElement GetUI()
         {
             ColorField field = new ColorField();
+            field.labelElement.style.minWidth = 50;
             field.value = val;
             field.RegisterCallback<ChangeEvent<Color>>((a => this.val = a.newValue));
             return field;

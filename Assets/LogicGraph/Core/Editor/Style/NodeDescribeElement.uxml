@@ -1,0 +1,4 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Label text="节点描述：" display-tooltip-when-elided="true" name="title" style="align-items: stretch; justify-content: flex-start; font-size: 36px; -unity-text-align: upper-center;" />
+    <ui:TextField picking-mode="Ignore" name="des_input" readonly="false" multiline="false" style="margin-left: 10%; margin-right: 10%; align-items: flex-end;" />
+</ui:UXML>

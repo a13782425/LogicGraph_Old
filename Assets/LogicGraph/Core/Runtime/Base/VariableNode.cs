@@ -28,6 +28,20 @@ namespace Logic
             }
         }
 
+#if UNITY_EDITOR
+        public override string Describe
+        {
+            get => base.Describe; set
+            {
+                base.Describe = value;
+                if (variable != null)
+                {
+                    variable.Describe = value;
+                }
+            }
+        }
+#endif
+
         protected override bool OnEnable()
         {
             _variable = logicGraph.GetVariableById(varId);

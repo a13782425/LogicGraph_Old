@@ -13,28 +13,34 @@ MonoBehaviour:
   m_Name: LGConfig
   m_EditorClassIdentifier: 
   _lgInfoList:
-  - OnlyId: a14bf2df-4c53-4ff3-bc05-903cf2a84a57
-    LogicName: 
+  - OnlyId: 4237063f-7775-439c-9156-e750b8730e8a
+    LogicName: Logic2Graph
+    GraphClassName: DefaultLogicGraph
+    FileName: Logic2Graph
+    AssetPath: Assets/Logic2Graph.asset
+    LastFormatPath: 
+    _variableCache:
+      IsShow: 0
+      Pos: {x: 0, y: 20}
+      Size: {x: 180, y: 320}
+    _groupListCache:
+      IsShow: 0
+      Pos: {x: 0, y: 20}
+      Size: {x: 480, y: 120}
+  - OnlyId: 031993aa-e9c5-4b59-a71d-907bd2c7b4f3
+    LogicName: LogicGraph
     GraphClassName: DefaultLogicGraph
     FileName: LogicGraph
     AssetPath: Assets/LogicGraph.asset
-    Pos: {x: 0, y: 48, z: 0}
-    Scale: {x: 1, y: 1, z: 1}
-    VariableCache:
+    LastFormatPath: 
+    _variableCache:
       IsShow: 1
-      Pos: {x: 178, y: 81}
+      Pos: {x: 49, y: 149}
       Size: {x: 180, y: 320}
-  - OnlyId: 1dfc079a-7fe5-4c94-9eac-509d9091ecf6
-    LogicName: LogicGr2aph
-    GraphClassName: DefaultLogicGraph
-    FileName: 
-    AssetPath: Assets/LogicGr2aph.asset
-    Pos: {x: 0, y: 101, z: 0}
-    Scale: {x: 1, y: 1, z: 1}
-    VariableCache:
+    _groupListCache:
       IsShow: 1
-      Pos: {x: 114, y: 129}
-      Size: {x: 180, y: 320}
+      Pos: {x: 767, y: 202}
+      Size: {x: 480, y: 120}
   _lgEditorList:
   - GraphName: "\u9ED8\u8BA4\u903B\u8F91\u56FE"
     GraphClassName: DefaultLogicGraph
@@ -61,7 +67,36 @@ MonoBehaviour:
       PortType: 3
       IsRefresh: 1
       IsShow: 1
-      UseCount: -2147483478
+      UseCount: -2147483648
+    Groups:
+    - Name: "\u9ED8\u8BA4\u5206\u7EC4"
+      Nodes: []
+      CanEditor: 0
+      CanDel: 0
+    - Name: 123
+      Nodes:
+      - Id: 1000
+        NodeClassFullName: DebugNode
+        Pos: {x: 24.883179, y: 59.40564}
+        Childs: e9030000
+      - Id: 1001
+        NodeClassFullName: DebugNode
+        Pos: {x: 288.88318, y: 150.40564}
+        Childs: 
+      - Id: 1002
+        NodeClassFullName: DebugNode
+        Pos: {x: 108.88318, y: 240.61609}
+        Childs: 
+      - Id: 1003
+        NodeClassFullName: DebugNode
+        Pos: {x: 297.88318, y: 349.62585}
+        Childs: 
+      - Id: 1004
+        NodeClassFullName: DebugNode
+        Pos: {x: 748.9645, y: 59.115967}
+        Childs: 
+      CanEditor: 1
+      CanDel: 1
     DefaultNodes:
     - NodeName: "\u5F00\u59CB"
       NodeFullName: "\u7CFB\u7EDF/\u5F00\u59CB"
