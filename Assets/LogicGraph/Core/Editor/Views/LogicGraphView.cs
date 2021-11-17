@@ -785,6 +785,15 @@ namespace Logic.Editor
             BaseLogicGraph graph = ScriptableObject.CreateInstance(configData.GraphClassName) as BaseLogicGraph;
             graph.name = file;
 
+            if (graph.DefaultVars != null)
+            {
+                foreach (var item in graph.DefaultVars)
+                {
+                    item.CanRename = false;
+                    item.CanDel= false;
+                    graph.Variables.Add(item);
+                }
+            }
             path = path.Replace(Application.dataPath, "Assets");
             LGInfoCache graphCache = new LGInfoCache(graph);
             graphCache.LogicName = file;

@@ -50,6 +50,11 @@ namespace Logic.Editor
             });
         }
 
+        public override bool IsRenamable()
+        {
+            return base.IsRenamable() && param.CanRename;
+        }
+
         private bool m_checkVerifyVarName(string varName)
         {
             varName = varName.Trim();
@@ -85,7 +90,7 @@ namespace Logic.Editor
                 }
                 length++;
             }
-        End: if (result)
+        End: if (!result)
             {
                 owner.Window.ShowNotification(new GUIContent("变量名不合法"));
             }
@@ -95,12 +100,17 @@ namespace Logic.Editor
 #if UNITY_2020_1_OR_NEWER
         protected override void BuildFieldContextualMenu(ContextualMenuPopulateEvent evt)
         {
-            evt.menu.AppendAction("重命名", (a) => OpenTextEditor(), DropdownMenuAction.AlwaysEnabled);
-            evt.menu.AppendAction("删除", (a) =>
+            if (param.CanRename)
             {
-                owner.DelLGVariable(param);
-            }, DropdownMenuAction.AlwaysEnabled);
-
+                evt.menu.AppendAction("重命名", (a) => OpenTextEditor(), DropdownMenuAction.AlwaysEnabled);
+            }
+            if (param.CanDel)
+            {
+                evt.menu.AppendAction("删除", (a) =>
+                {
+                    owner.DelLGVariable(param);
+                }, DropdownMenuAction.AlwaysEnabled);
+            }
             evt.StopPropagation();
         }
 #elif UNITY_2019
@@ -110,11 +120,17 @@ namespace Logic.Editor
             {
                 evt.menu.RemoveItemAt(0);
             }
-            evt.menu.AppendAction("重命名", (a) => OpenTextEditor(), DropdownMenuAction.AlwaysEnabled);
-            evt.menu.AppendAction("删除", (a) =>
+            if (param.CanRename)
             {
-                owner.DelLGVariable(param);
-            }, DropdownMenuAction.AlwaysEnabled);
+                evt.menu.AppendAction("重命名", (a) => OpenTextEditor(), DropdownMenuAction.AlwaysEnabled);
+            }
+            if (param.CanDel)
+            {
+                evt.menu.AppendAction("删除", (a) =>
+                {
+                    owner.DelLGVariable(param);
+                }, DropdownMenuAction.AlwaysEnabled);
+            }
 
             evt.StopPropagation();
         }

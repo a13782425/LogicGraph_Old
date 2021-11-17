@@ -172,7 +172,7 @@ namespace Logic.Editor
                         LGroupEditorCache groupCache = new LGroupEditorCache();
                         groupCache.Name = "默认分组";
                         groupCache.CanDel = false;
-                        groupCache.CanEditor = false;
+                        groupCache.CanRename = false;
                         graphData.Groups.Add(groupCache);
                     }
                     graphData.DefaultNodes.Clear();

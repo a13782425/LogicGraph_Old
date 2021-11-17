@@ -4,8 +4,9 @@ using UnityEngine;
 using Logic.Editor;
 using UnityEngine.UIElements;
 using Logic;
+using System;
 
-[LogicNode(typeof(DebugNode), "系统/打印日志")]
+[LogicNode(typeof(DebugNode), "系统/打印日志", IncludeGraphs = new Type[] { typeof(DefaultLogicGraph) })]
 public class DebugNodeView : BaseNodeView
 {
     private DebugNode node;

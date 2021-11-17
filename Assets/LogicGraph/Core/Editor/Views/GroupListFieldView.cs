@@ -53,7 +53,7 @@ namespace Logic.Editor
 
         public override bool IsRenamable()
         {
-            return base.IsRenamable() && groupEditor.CanEditor;
+            return base.IsRenamable() && groupEditor.CanRename;
         }
         private bool m_checkVerifyVarName(string varName)
         {
@@ -90,7 +90,7 @@ namespace Logic.Editor
 #if UNITY_2020_1_OR_NEWER
         protected override void BuildFieldContextualMenu(ContextualMenuPopulateEvent evt)
         {
-            if (groupEditor.CanEditor)
+            if (groupEditor.CanRename)
             {
                 evt.menu.AppendAction("重命名", (a) => OpenTextEditor(), DropdownMenuAction.AlwaysEnabled);
             }

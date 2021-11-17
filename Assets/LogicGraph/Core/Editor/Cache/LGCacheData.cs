@@ -470,7 +470,7 @@ namespace Logic.Editor
         /// <summary>
         /// 可以修改
         /// </summary>
-        public bool CanEditor = true;
+        public bool CanRename = true;
         /// <summary>
         /// 可以删除
         /// </summary>

@@ -23,6 +23,17 @@ namespace Logic.Editor
         /// 逻辑图名字
         /// </summary>
         public List<Type> LogicGraphs { get => _logicGraphs; private set { _logicGraphs = value; } }
+
+        /// <summary>
+        /// 包含的逻辑图
+        /// </summary>
+        public Type[] IncludeGraphs = new Type[0];
+
+        /// <summary>
+        /// 排除的逻辑图
+        /// 优先判断排除的
+        /// </summary>
+        public Type[] ExcludeGraphs = new Type[0];
         /// <summary>
         /// 节点名称
         /// </summary>
@@ -39,23 +50,23 @@ namespace Logic.Editor
         /// <param name="nodeType">节点类型</param>
         /// <param name="menuText">菜单名</param>
         /// <param name="logicGraphs">可用的逻辑图(为空的话都可以用)</param>
-        public LogicNodeAttribute(Type nodeType, string menuText, params Type[] logicGraphs)
+        public LogicNodeAttribute(Type nodeType, string menuText)
         {
             NodeType = nodeType;
             MenuText = menuText;
-            if (logicGraphs != null)
-            {
-                _logicGraphs = logicGraphs.ToList();
-            }
         }
 
         public bool HasType(Type type)
         {
-            if (_logicGraphs.Count == 0)
+            if (IncludeGraphs.Length == 0 && ExcludeGraphs.Length == 0)
             {
                 return true;
             }
-            return _logicGraphs.Contains(type);
+            if (ExcludeGraphs.Contains(type))
+            {
+                return false;
+            }
+            return IncludeGraphs.Contains(type);
         }
     }
 

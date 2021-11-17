@@ -55,7 +55,12 @@ namespace Logic
         /// 可以修改变量名
         /// </summary>
         [SerializeField]
-        public bool CanEditor = false;
+        public bool CanRename = true;
+        /// <summary>
+        /// 可以删除
+        /// </summary>
+        [SerializeField]
+        public bool CanDel = true;
         /// <summary>
         /// 描述
         /// </summary>

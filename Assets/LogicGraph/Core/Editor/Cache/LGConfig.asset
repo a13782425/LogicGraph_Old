@@ -13,33 +13,19 @@ MonoBehaviour:
   m_Name: LGConfig
   m_EditorClassIdentifier: 
   _lgInfoList:
-  - OnlyId: 4237063f-7775-439c-9156-e750b8730e8a
-    LogicName: Logic2Graph
-    GraphClassName: DefaultLogicGraph
-    FileName: Logic2Graph
-    AssetPath: Assets/Logic2Graph.asset
-    LastFormatPath: 
-    _variableCache:
-      IsShow: 0
-      Pos: {x: 0, y: 20}
-      Size: {x: 180, y: 320}
-    _groupListCache:
-      IsShow: 0
-      Pos: {x: 0, y: 20}
-      Size: {x: 480, y: 120}
-  - OnlyId: 031993aa-e9c5-4b59-a71d-907bd2c7b4f3
+  - OnlyId: 0e7d5ce5-4a65-4681-a204-0ef5c4eaca13
     LogicName: LogicGraph
     GraphClassName: DefaultLogicGraph
-    FileName: LogicGraph
+    FileName: 
     AssetPath: Assets/LogicGraph.asset
     LastFormatPath: 
     _variableCache:
       IsShow: 1
-      Pos: {x: 49, y: 149}
+      Pos: {x: 308, y: 197}
       Size: {x: 180, y: 320}
     _groupListCache:
-      IsShow: 1
-      Pos: {x: 767, y: 202}
+      IsShow: 0
+      Pos: {x: 0, y: 20}
       Size: {x: 480, y: 120}
   _lgEditorList:
   - GraphName: "\u9ED8\u8BA4\u903B\u8F91\u56FE"
@@ -67,11 +53,11 @@ MonoBehaviour:
       PortType: 3
       IsRefresh: 1
       IsShow: 1
-      UseCount: -2147483648
+      UseCount: -2147483638
     Groups:
     - Name: "\u9ED8\u8BA4\u5206\u7EC4"
       Nodes: []
-      CanEditor: 0
+      CanRename: 1
       CanDel: 0
     - Name: 123
       Nodes:
@@ -95,7 +81,7 @@ MonoBehaviour:
         NodeClassFullName: DebugNode
         Pos: {x: 748.9645, y: 59.115967}
         Childs: 
-      CanEditor: 1
+      CanRename: 1
       CanDel: 1
     DefaultNodes:
     - NodeName: "\u5F00\u59CB"

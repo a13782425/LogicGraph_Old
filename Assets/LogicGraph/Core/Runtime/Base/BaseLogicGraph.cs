@@ -64,6 +64,12 @@ namespace Logic
         /// 逻辑图组
         /// </summary>
         public List<BaseLogicGroup> Groups => _groups;
+
+        /// <summary>
+        /// 默认变量(仅编辑器)
+        /// </summary>
+        public virtual List<BaseVariable> DefaultVars => new List<BaseVariable>();
+
 #endif
 
         public BaseLogicGraph()
