@@ -142,7 +142,7 @@ namespace Logic.Editor
         /// <summary>
         /// 刷新
         /// </summary>
-        [MenuItem("Framework/逻辑图/扫描逻辑图")]
+        [MenuItem("Framework/逻辑图/扫描逻辑图", priority = 100)]
         private static void RefreshLogic()
         {
             //LGCacheData.Instance.LGEditorList.Clear();

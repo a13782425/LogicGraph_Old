@@ -23,7 +23,7 @@ namespace Logic.Editor
             {
                 LGWindow.ShowLGPanel(LGCacheOp.GetLogicInfo(_logic));
             }
-            UnityEditor.EditorGUI.BeginDisabledGroup(false);
+            UnityEditor.EditorGUI.BeginDisabledGroup(true);
             base.OnInspectorGUI();
             UnityEditor.EditorGUI.EndDisabledGroup();
         }

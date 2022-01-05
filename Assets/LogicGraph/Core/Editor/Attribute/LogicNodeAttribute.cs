@@ -58,15 +58,15 @@ namespace Logic.Editor
 
         public bool HasType(Type type)
         {
-            if (IncludeGraphs.Length == 0 && ExcludeGraphs.Length == 0)
+            if (ExcludeGraphs.Length > 0)
             {
-                return true;
+                return !ExcludeGraphs.Contains(type);
             }
-            if (ExcludeGraphs.Contains(type))
+            if (IncludeGraphs.Length > 0)
             {
-                return false;
+                return IncludeGraphs.Contains(type);
             }
-            return IncludeGraphs.Contains(type);
+            return true;
         }
     }
 

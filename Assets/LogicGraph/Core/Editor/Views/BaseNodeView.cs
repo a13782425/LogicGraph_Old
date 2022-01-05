@@ -522,13 +522,14 @@ namespace Logic.Editor
             field.RegisterCallback<ChangeEvent<BoundsInt>>((e) => changed?.Invoke(e.newValue));
             return field;
         }
-        protected ObjectField GetInputField(string titleText, Object defaultValue, Action<Object> changed = null)
+        protected GameObjectField GetInputField(string titleText, GameObject defaultValue, Action<GameObject> changed = null)
         {
-            ObjectField field = new ObjectField();
+            GameObjectField field = new GameObjectField();
+            field.allowSceneObjects = false;
             field.label = titleText;
-            SetBaseFieldStyle(field);
-            field.value = defaultValue;
-            field.RegisterCallback<ChangeEvent<Object>>((e) => changed?.Invoke(e.newValue));
+            SetBaseFieldStyle(field.objField);
+            field.value = defaultValue; 
+            field.onValueChange += changed;
             return field;
         }
 
@@ -727,11 +728,11 @@ namespace Logic.Editor
                 _lock.ClearClassList();
                 _lock.AddToClassList(nodeView.Target.IsLock ? "lock" : "unlock");
                 _lock.style.display = nodeView.ShowLock ? DisplayStyle.Flex : DisplayStyle.None;
-                _lock.RegisterCallback<ClickEvent>(m_lockClick);
+                _lock.RegisterCallback<PointerUpEvent>(m_lockClick);
                 titleContainer.Add(_lock);
             }
 
-            private void m_lockClick(ClickEvent evt)
+            private void m_lockClick(PointerUpEvent evt)
             {
                 nodeView.Target.IsLock = !nodeView.Target.IsLock;
                 _lock.ClearClassList();

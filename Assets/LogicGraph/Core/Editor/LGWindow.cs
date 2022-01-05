@@ -19,7 +19,7 @@ namespace Logic.Editor
         public LGEditorCache LGEditorCache => _lgEditorCache;
         private LGEditorCache _lgEditorCache = default;
 
-        [MenuItem("Framework/逻辑图/打开逻辑图")]
+        [MenuItem("Framework/逻辑图/打开逻辑图", priority = 99)]
         private static void OpenLogic()
         {
             ShowLGPanel(null);

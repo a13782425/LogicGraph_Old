@@ -19,7 +19,7 @@ namespace Logic.Editor
         }
         public override void OnInspectorGUI()
         {
-            UnityEditor.EditorGUI.BeginDisabledGroup(false);
+            UnityEditor.EditorGUI.BeginDisabledGroup(true);
             base.OnInspectorGUI();
             UnityEditor.EditorGUI.EndDisabledGroup();
         }

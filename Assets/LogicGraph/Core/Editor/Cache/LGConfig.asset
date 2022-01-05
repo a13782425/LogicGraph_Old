@@ -24,6 +24,34 @@ MonoBehaviour:
       Pos: {x: 308, y: 197}
       Size: {x: 180, y: 320}
     _groupListCache:
+      IsShow: 1
+      Pos: {x: 713, y: 136}
+      Size: {x: 480, y: 120}
+  - OnlyId: 87d71204-c1a5-486f-9618-476558ba5151
+    LogicName: LogicGrap1h
+    GraphClassName: DefaultLogicGraph
+    FileName: 
+    AssetPath: Assets/LogicGrap1h.asset
+    LastFormatPath: 
+    _variableCache:
+      IsShow: 0
+      Pos: {x: 0, y: 20}
+      Size: {x: 180, y: 320}
+    _groupListCache:
+      IsShow: 1
+      Pos: {x: 339, y: 139}
+      Size: {x: 480, y: 120}
+  - OnlyId: 2f71fd75-76c4-4f5e-91f7-7a32b2568b4d
+    LogicName: LogicGr111aph
+    GraphClassName: DefaultLogicGraph
+    FileName: 
+    AssetPath: Assets/LogicGr111aph.asset
+    LastFormatPath: 
+    _variableCache:
+      IsShow: 1
+      Pos: {x: 0, y: 20}
+      Size: {x: 180, y: 320}
+    _groupListCache:
       IsShow: 0
       Pos: {x: 0, y: 20}
       Size: {x: 480, y: 120}
@@ -53,36 +81,12 @@ MonoBehaviour:
       PortType: 3
       IsRefresh: 1
       IsShow: 1
-      UseCount: -2147483638
+      UseCount: -2147483598
     Groups:
     - Name: "\u9ED8\u8BA4\u5206\u7EC4"
       Nodes: []
-      CanRename: 1
+      CanRename: 0
       CanDel: 0
-    - Name: 123
-      Nodes:
-      - Id: 1000
-        NodeClassFullName: DebugNode
-        Pos: {x: 24.883179, y: 59.40564}
-        Childs: e9030000
-      - Id: 1001
-        NodeClassFullName: DebugNode
-        Pos: {x: 288.88318, y: 150.40564}
-        Childs: 
-      - Id: 1002
-        NodeClassFullName: DebugNode
-        Pos: {x: 108.88318, y: 240.61609}
-        Childs: 
-      - Id: 1003
-        NodeClassFullName: DebugNode
-        Pos: {x: 297.88318, y: 349.62585}
-        Childs: 
-      - Id: 1004
-        NodeClassFullName: DebugNode
-        Pos: {x: 748.9645, y: 59.115967}
-        Childs: 
-      CanRename: 1
-      CanDel: 1
     DefaultNodes:
     - NodeName: "\u5F00\u59CB"
       NodeFullName: "\u7CFB\u7EDF/\u5F00\u59CB"
@@ -95,4 +99,48 @@ MonoBehaviour:
       IsRefresh: 1
       IsShow: 1
       UseCount: -2147483648
+    Formats: []
+  - GraphName: "\u6D4B\u8BD5"
+    GraphClassName: TestGraph
+    IsRefresh: 1
+    Nodes:
+    - NodeName: "\u5F00\u59CB"
+      NodeFullName: "\u7CFB\u7EDF/\u5F00\u59CB"
+      NodeLayers:
+      - "\u7CFB\u7EDF"
+      - "\u5F00\u59CB"
+      NodeClassName: StartNode
+      NodeViewClassName: Logic.Editor.StartNodeView
+      PortType: 2
+      IsRefresh: 1
+      IsShow: 1
+      UseCount: -2147483648
+    Groups:
+    - Name: "\u9ED8\u8BA4\u5206\u7EC4"
+      Nodes: []
+      CanRename: 0
+      CanDel: 0
+    DefaultNodes: []
+    Formats: []
+  - GraphName: "\u6D4B\u8BD51"
+    GraphClassName: TestGraph1
+    IsRefresh: 1
+    Nodes:
+    - NodeName: "\u5F00\u59CB"
+      NodeFullName: "\u7CFB\u7EDF/\u5F00\u59CB"
+      NodeLayers:
+      - "\u7CFB\u7EDF"
+      - "\u5F00\u59CB"
+      NodeClassName: StartNode
+      NodeViewClassName: Logic.Editor.StartNodeView
+      PortType: 2
+      IsRefresh: 1
+      IsShow: 1
+      UseCount: -2147483648
+    Groups:
+    - Name: "\u9ED8\u8BA4\u5206\u7EC4"
+      Nodes: []
+      CanRename: 0
+      CanDel: 0
+    DefaultNodes: []
     Formats: []

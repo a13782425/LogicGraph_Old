@@ -16,7 +16,7 @@ namespace Logic.Editor
         static readonly string elementStyle = "NodeDescribeView.uss";
         static readonly string elementTree = "NodeDescribeElement.uxml";
 
-        private LogicGraphView _onwer;
+        private LogicGraphView owner;
 
         private VisualElement _main;
         private TextField _desTextField;
@@ -25,7 +25,7 @@ namespace Logic.Editor
         private bool _editCancelled = false;
         public NodeDescribeView(LogicGraphView graphView)
         {
-            _onwer = graphView;
+            owner = graphView;
             var tpl = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(Path.Combine(EDITOR_STYLE_PATH, elementTree));
 
             styleSheets.Add(AssetDatabase.LoadAssetAtPath<StyleSheet>(Path.Combine(EDITOR_STYLE_PATH, elementStyle)));
@@ -78,7 +78,7 @@ namespace Logic.Editor
             _editCancelled = false;
             _desTextField.value = nodeView.Target.Describe;
             _curNodeView = nodeView;
-            _desTextField.Focus();
+            _desTextField.Q(TextInputBaseField<string>.textInputUssName).Focus();
         }
     }
 }

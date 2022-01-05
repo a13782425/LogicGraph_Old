@@ -30,6 +30,10 @@ public class DebugNodeView : BaseNodeView
         this.AddUI(_port);
         this.AddUI(AddPort("测试", UnityEditor.Experimental.GraphView.Direction.Output, UnityEditor.Experimental.GraphView.Port.Capacity.Single, isCube: true));
         this.AddUI(GetInputField("aa", 0));
+
+        var field = GetInputField("测试2", (GameObject)null);
+        field.previewObj = true;
+        this.AddUI(field);
     }
 
     //public override void ShowParamUI()

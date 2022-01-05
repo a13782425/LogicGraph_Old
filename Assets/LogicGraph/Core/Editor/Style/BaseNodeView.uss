@@ -236,7 +236,7 @@
 
 .run-state-shape
 {
-    -unity-background-image-tint-color: red;
+    /*-unity-background-image-tint-color: red;*/
     background-image: resource("shape");
 }
 .run-state-diamond
@@ -245,7 +245,7 @@
 }
 .run-state-gear
 {
-    background-image: resource("gear");
+    background-image: resource("gearwheel");
 }
 .run-state-heart
 {

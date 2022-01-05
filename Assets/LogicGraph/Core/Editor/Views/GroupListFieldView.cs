@@ -110,7 +110,7 @@ namespace Logic.Editor
             {
                 evt.menu.RemoveItemAt(0);
             }
-            if (groupEditor.CanEditor)
+            if (groupEditor.CanRename)
             {
                 evt.menu.AppendAction("重命名", (a) => OpenTextEditor(), DropdownMenuAction.AlwaysEnabled);
             }

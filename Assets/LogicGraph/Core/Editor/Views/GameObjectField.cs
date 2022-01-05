@@ -3,59 +3,81 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Object = UnityEngine.Object;
 
 namespace Logic.Editor
 {
-    public sealed class GameObjectField : BaseField<GameObject>
+    public sealed class GameObjectField : VisualElement
     {
-        /// <summary>
-        ///   <para>USS class name of elements of this type.</para>
-        /// </summary>
-        public new static readonly string ussClassName = "unity-object-field";
 
-        /// <summary>
-        ///   <para>USS class name of labels in elements of this type.</para>
-        /// </summary>
-        public new static readonly string labelUssClassName = ussClassName + "__label";
+        private ObjectField _objField;
+        public ObjectField objField => _objField;
 
-        /// <summary>
-        ///   <para>USS class name of input elements in elements of this type.</para>
-        /// </summary>
-        public new static readonly string inputUssClassName = ussClassName + "__input";
+        public bool allowSceneObjects { get => objField.allowSceneObjects; set => objField.allowSceneObjects = true; }
+        public string label { get => _objField.label; set => _objField.label = value; }
 
-        /// <summary>
-        ///   <para>USS class name of object elements in elements of this type.</para>
-        /// </summary>
-        public static readonly string objectUssClassName = ussClassName + "__object";
+        public GameObject value { get => (GameObject)_objField.value; set => _objField.value = value; }
 
+        public event Action<GameObject> onValueChange;
+
+        private Image _previewImage;
+
+        private bool _previewObj = false;
         /// <summary>
-        ///   <para>USS class name of selector elements in elements of this type.</para>
+        ///  «∑Ò‘§¿¿
         /// </summary>
-        public static readonly string selectorUssClassName = ussClassName + "__selector";
-        public GameObjectField() : this(null)
+        public bool previewObj
         {
-
+            get => _previewObj;
+            set
+            {
+                _previewObj = value;
+                if (value)
+                {
+                    _previewImage.style.display = DisplayStyle.Flex;
+                    m_showPreview(this.value);
+                }
+                else
+                {
+                    _previewImage.style.display = DisplayStyle.None;
+                }
+            }
         }
 
-        public GameObjectField(string label) : base(label, (VisualElement)null)
+        public GameObjectField() : this(null) { }
+
+        public GameObjectField(string label)
         {
-            //base.visualInput.focusable = false;
-            //base.labelElement.focusable = false;
-            //AddToClassList(ussClassName);
-            //base.labelElement.AddToClassList(labelUssClassName);
-            //allowSceneObjects = true;
-            //m_ObjectFieldDisplay = new ObjectFieldDisplay(this)
-            //{
-            //    focusable = true
-            //};
-            //m_ObjectFieldDisplay.AddToClassList(objectUssClassName);
-            //ObjectFieldSelector objectFieldSelector = new ObjectFieldSelector(this);
-            //objectFieldSelector.AddToClassList(selectorUssClassName);
-            //base.visualInput.AddToClassList(inputUssClassName);
-            //base.visualInput.Add(m_ObjectFieldDisplay);
-            //base.visualInput.Add(objectFieldSelector);
+            _objField = new ObjectField();
+            _objField.objectType = typeof(GameObject);
+            _objField.label = label;
+            _objField.allowSceneObjects = false;
+            _objField.RegisterCallback<ChangeEvent<Object>>(m_valueChanged);
+            _previewImage = new Image();
+            this.Add(_objField);
+            this.Add(_previewImage);
+        }
+
+        private void m_valueChanged(ChangeEvent<Object> evt)
+        {
+            m_showPreview((GameObject)evt.newValue);
+            onValueChange?.Invoke((GameObject)evt.newValue);
+        }
+
+        private void m_showPreview(GameObject obj)
+        {
+            if (_previewObj && obj != null)
+            {
+                _previewImage.image = AssetPreview.GetAssetPreview(obj) ?? AssetPreview.GetMiniThumbnail(obj);
+            }
+            else
+            {
+                _previewImage.image = null;
+            }
         }
 
     }

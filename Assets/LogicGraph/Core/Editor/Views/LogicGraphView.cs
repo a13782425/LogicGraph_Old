@@ -427,8 +427,31 @@ namespace Logic.Editor
                         case GroupView groupView:
                             LGInfoCache.Graph.Groups.Remove(groupView.Group);
                             break;
-                        case LGVariableFieldView blackboardField:
-                            DelLGVariable(blackboardField.param);
+                        case LGVariableFieldView varFieldView:
+                            if (varFieldView.param.CanDel)
+                                DelLGVariable(varFieldView.param);
+                            else
+                            {
+                                Window.ShowNotification(new GUIContent("无法删除默认变量"));
+#if UNITY_2019
+                                removeList2.Remove(item);
+#elif UNITY_2021
+                                graphViewChange.elementsToRemove.Remove(item);
+#endif
+                            }
+                            break;
+                        case GroupListFieldView groupListField:
+                            if (groupListField.groupEditor.CanDel)
+                                LGEditorCache.DelGroupTemplate(groupListField.groupEditor);
+                            else
+                            {
+                                Window.ShowNotification(new GUIContent("无法删除默认分组"));
+#if UNITY_2019
+                                removeList2.Remove(item);
+#elif UNITY_2021
+                                graphViewChange.elementsToRemove.Remove(item);
+#endif
+                            }
                             break;
                         default:
                             break;
@@ -644,25 +667,6 @@ namespace Logic.Editor
             SearchWindow.Open(new SearchWindowContext(screenPos), _createLNSearch);
         }
 
-
-        ///// <summary>
-        ///// 创建默认分组
-        ///// </summary>
-        ///// <param name="obj"></param>
-        //private void m_onCreateGroup(DropdownMenuAction obj)
-        //{
-        //    //经过计算得出节点的位置
-
-        //    Vector2 screenPos = _window.GetScreenPosition(obj.eventInfo.mousePosition);
-        //    //经过计算得出节点的位置
-        //    var windowMousePosition = _window.rootVisualElement.ChangeCoordinatesTo(_window.rootVisualElement.parent, screenPos - _window.position.position);
-        //    var nodePosition = this.contentViewContainer.WorldToLocal(windowMousePosition);
-        //    var logicGroup = new BaseLogicGroup();
-        //    this.LGInfoCache.Graph.Groups.Add(logicGroup);
-        //    m_showGroup(logicGroup);
-
-        //}
-
         /// <summary>
         /// 创建默认节点
         /// </summary>
@@ -703,7 +707,14 @@ namespace Logic.Editor
             LFEditorCache formatConfig = obj.userData as LFEditorCache;
             if (formatConfig != null)
             {
-                string filePath = EditorUtility.SaveFilePanel("导出", Application.dataPath, "undefined", formatConfig.Extension);
+                string savePath = Application.dataPath;
+                string saveFile = "undefined";
+                if (!string.IsNullOrEmpty(LGInfoCache.LastFormatPath))
+                {
+                    savePath = Path.GetDirectoryName(LGInfoCache.LastFormatPath);
+                    saveFile = Path.GetFileNameWithoutExtension(LGInfoCache.LastFormatPath);
+                }
+                string filePath = EditorUtility.SaveFilePanel("导出", savePath, saveFile, formatConfig.Extension);
                 if (string.IsNullOrWhiteSpace(filePath))
                 {
                     _window.ShowNotification(new GUIContent("请选择导出路径"));
@@ -713,6 +724,12 @@ namespace Logic.Editor
                 bool res = logicFormat.ToFormat(LGInfoCache, filePath);
                 if (res)
                 {
+                    string tempPath = filePath.Replace("\\", "/");
+                    int index = tempPath.IndexOf("Assets");
+                    if (index > 0)
+                    {
+                        LGInfoCache.LastFormatPath = tempPath.Substring(index, tempPath.Length - index);
+                    }
                     _window.ShowNotification(new GUIContent($"导出: {formatConfig.FormatName} 成功"));
                 }
                 else
@@ -790,7 +807,7 @@ namespace Logic.Editor
                 foreach (var item in graph.DefaultVars)
                 {
                     item.CanRename = false;
-                    item.CanDel= false;
+                    item.CanDel = false;
                     graph.Variables.Add(item);
                 }
             }

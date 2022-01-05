@@ -1,0 +1,19 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
+    <ui:TextField picking-mode="Ignore" label="节点名字" value="filler text" text="filler text" name="inp_title" style="height: 33px; align-items: center; justify-content: flex-start; flex-direction: row;" />
+    <ui:DropdownField label="节点选择" index="-1" />
+    <uie:EnumField label="节点类型" value="Center" name="enum_type" />
+    <ui:VisualElement style="display: flex;">
+        <ui:VisualElement name="view1" style="display: flex; visibility: visible; height: 600px;">
+            <ui:ListView focusable="true" name="list_input1" item-height="66" show-bound-collection-size="true" show-alternating-row-backgrounds="None" reorderable="false" style="height: 360px; margin-bottom: 5px; max-height: 1000px; min-height: auto; background-color: rgb(60, 60, 60); max-width: none; width: auto; visibility: visible; overflow: visible; display: flex; opacity: 1; padding-bottom: 10px;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="view2" style="display: none; visibility: visible; height: 600px;">
+            <ui:Button text="添加输入参数" display-tooltip-when-elided="true" name="btn_add2" style="height: 52px;" />
+            <ui:ListView focusable="true" name="list_input2" item-height="66" show-bound-collection-size="true" show-alternating-row-backgrounds="None" reorderable="false" style="height: 300px; margin-bottom: 5px; max-height: 1000px; min-height: auto; background-color: rgb(60, 60, 60); max-width: none; width: auto; visibility: visible; overflow: visible; display: flex; opacity: 1; padding-bottom: 10px;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="view3" style="display: none; height: 600px;">
+            <ui:Button text="添加输入参数" display-tooltip-when-elided="true" name="btn_add3" style="height: 52px;" />
+            <ui:ListView focusable="true" name="list_input3" item-height="66" show-bound-collection-size="true" show-alternating-row-backgrounds="None" reorderable="false" style="height: 300px; margin-bottom: 5px; max-height: 1000px; min-height: auto; background-color: rgb(60, 60, 60); max-width: none; width: auto; visibility: visible; overflow: visible; display: flex; opacity: 1; padding-bottom: 10px;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+    <ui:Button text="生成" display-tooltip-when-elided="true" name="btn_save" style="height: 40px;" />
+</ui:UXML>
