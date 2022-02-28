@@ -43,6 +43,10 @@ namespace Logic.Editor
         /// 拥有什么端口
         /// </summary>
         public PortEnum PortType = PortEnum.All;
+        /// <summary>
+        /// 是否启用
+        /// </summary>
+        public bool IsEnable = true;
 
         /// <summary>
         /// 
@@ -58,15 +62,16 @@ namespace Logic.Editor
 
         public bool HasType(Type type)
         {
+            bool result = true;
             if (ExcludeGraphs.Length > 0)
             {
-                return !ExcludeGraphs.Contains(type);
+                result = !ExcludeGraphs.Contains(type);
             }
-            if (IncludeGraphs.Length > 0)
+            if (result && IncludeGraphs.Length > 0)
             {
-                return IncludeGraphs.Contains(type);
+                result = IncludeGraphs.Contains(type);
             }
-            return true;
+            return result;
         }
     }
 

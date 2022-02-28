@@ -23,7 +23,7 @@ namespace Logic.Editor
             var searchTrees = new List<SearchTreeEntry>();
             searchTrees.Add(new SearchTreeGroupEntry(new GUIContent("创建节点")));
 
-            AddRecommendTree(searchTrees);
+            //AddRecommendTree(searchTrees);
             AddNodeTree(searchTrees);
             return searchTrees;
         }
@@ -76,7 +76,7 @@ namespace Logic.Editor
             List<string> groups = new List<string>();
             foreach (LNEditorCache nodeConfig in _editorData.Nodes)
             {
-                if (_editorData.DefaultNodes.Contains(nodeConfig))
+                if (_editorData.DefaultNodes.Contains(nodeConfig) || !nodeConfig.IsEnable)
                 {
                     continue;
                 }

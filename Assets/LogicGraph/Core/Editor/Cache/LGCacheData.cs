@@ -380,7 +380,10 @@ namespace Logic.Editor
         /// 节点视图类型全称,含命名空间
         /// </summary>
         public string NodeViewClassName;
-
+        /// <summary>
+        /// 是否启用
+        /// </summary>
+        public bool IsEnable = true;
         /// <summary>
         /// 节点需要的端口
         /// </summary>

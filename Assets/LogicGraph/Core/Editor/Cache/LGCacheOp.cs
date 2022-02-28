@@ -211,6 +211,7 @@ namespace Logic.Editor
                         nodeData.NodeViewClassName = viewType.FullName;
                         nodeData.NodeLayers = strs;
                         nodeData.NodeName = strs[strs.Length - 1];
+                        nodeData.IsEnable = nodeAttr.IsEnable;
                         nodeData.NodeFullName = nodeAttr.MenuText;
                         nodeData.PortType = nodeAttr.PortType;
                         nodeData.IsRefresh = true;

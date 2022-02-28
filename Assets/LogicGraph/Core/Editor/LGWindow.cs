@@ -39,9 +39,7 @@ namespace Logic.Editor
                 LGCacheData.Instance.LogicConfig?.OpenWindow();
                 panel.SetLogic(info);
             }
-            panel.Show();
             panel.Focus();
-            //panel.SetLogic(info);
         }
 
         /// <summary>
@@ -55,26 +53,23 @@ namespace Logic.Editor
                 LGWindow panel = GetLGWindow(info);
                 if (panel == null)
                 {
-                    panel = this;
                     this._lgInfoCache = info;
                     this._lgEditorCache = LGCacheOp.GetEditorCache(info);
-                    BaseLogicGraph graph = LGCacheOp.GetLogicGraph(info);
-                    //删除没有的节点
-                    graph.Nodes.RemoveAll(n => n == null);
-                    graph.Nodes.RemoveAll(n => n.GetType() != typeof(VariableNode) && this._lgEditorCache.GetEditorNode(n.GetType()) == null);
-                    graph.Init();
-                    this._lgInfoCache.Graph = graph;
-                    LGCacheData.Instance.LogicConfig?.OpenLogicGraph(graph);
-                    this._view.ShowLogic();
+                    ShowLogic();
                 }
-                else
-                {
-                    panel.Show();
-                }
-                panel.Focus();
-
-
             }
+        }
+
+        private void ShowLogic()
+        {
+            BaseLogicGraph graph = LGCacheOp.GetLogicGraph(LGInfoCache);
+            //删除没有的节点
+            graph.Nodes.RemoveAll(n => n == null);
+            graph.Nodes.RemoveAll(n => n.GetType() != typeof(VariableNode) && this._lgEditorCache.GetEditorNode(n.GetType()) == null);
+            graph.Init();
+            this._lgInfoCache.Graph = graph;
+            LGCacheData.Instance.LogicConfig?.OpenLogicGraph(graph);
+            this._view.ShowLogic();
         }
 
         private static LGWindow GetLGWindow(LGInfoCache info)
@@ -100,18 +95,15 @@ namespace Logic.Editor
         private void OnEnable()
         {
             titleContent = new GUIContent("逻辑图");
-            ShowGui();
-        }
-
-        /// <summary>
-        /// 当rootVisualElement准备完成后调用
-        /// </summary>
-        private void ShowGui()
-        {
             VisualElement root = rootVisualElement;
             _view = new LogicGraphView(this);
             this.rootVisualElement.Add(_view);
+            if (LGInfoCache != null && !string.IsNullOrWhiteSpace(LGInfoCache.OnlyId))
+            {
+                ShowLogic();
+            }
         }
+
         private void OnDestroy()
         {
             _view.OnDestroy();
