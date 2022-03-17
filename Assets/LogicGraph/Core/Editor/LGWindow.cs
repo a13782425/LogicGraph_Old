@@ -221,18 +221,19 @@ namespace Logic.Editor
                 return false;
             }
             string file = Path.GetFileNameWithoutExtension(path);
-            BaseLogicGraph graph = ScriptableObject.CreateInstance(configData.GraphClassName) as BaseLogicGraph;
+            BaseLogicGraph graph = ScriptableObject.CreateInstance(configData.GraphType) as BaseLogicGraph;
+            BaseGraphView graphView = Activator.CreateInstance(configData.ViewType) as BaseGraphView;
             graph.name = file;
-
-            if (graph.DefaultVars != null)
+            if (graphView.DefaultVars != null)
             {
-                foreach (var item in graph.DefaultVars)
+                foreach (var item in graphView.DefaultVars)
                 {
                     item.CanRename = false;
                     item.CanDel = false;
                     graph.Variables.Add(item);
                 }
             }
+            graphView = null;
             path = path.Replace(Application.dataPath, "Assets");
             graph.Title = file;
             AssetDatabase.CreateAsset(graph, path);

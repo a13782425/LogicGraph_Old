@@ -1,17 +1,22 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
 using UnityEditor.UIElements;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace Logic.Editor
 {
-    public sealed class NodeIntegerField : IntegerField, INodeElement<int>
+    public sealed class NodeVector2Field : Vector2Field, INodeElement<Vector2>
     {
         public BaseNodeView nodeView { get; private set; }
 
         public FieldInfo fieldInfo { get; private set; }
 
-        public event Action<int> onValueChanged;
+        public event Action<Vector2> onValueChanged;
 
         public void Init(BaseNodeView nodeView, FieldInfo fieldInfo, string titleName)
         {
@@ -19,11 +24,11 @@ namespace Logic.Editor
             this.nodeView = nodeView;
             this.fieldInfo = fieldInfo;
             this.label = this.CheckTitle(titleName);
-            this.value = (int)fieldInfo.GetValue(nodeView.target);
-            this.RegisterCallback<ChangeEvent<int>>((e) => OnValueChange(e.newValue));
+            this.value = (Vector2)fieldInfo.GetValue(nodeView.target);
+            this.RegisterCallback<ChangeEvent<Vector2>>((e) => OnValueChange(e.newValue));
         }
 
-        private void OnValueChange(int newValue)
+        private void OnValueChange(Vector2 newValue)
         {
             if (onValueChanged != null)
                 this.onValueChanged?.Invoke(newValue);

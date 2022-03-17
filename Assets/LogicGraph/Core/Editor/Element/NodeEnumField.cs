@@ -1,29 +1,31 @@
-using System;
+﻿using System;
 using System.Reflection;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
 namespace Logic.Editor
 {
-    public sealed class NodeIntegerField : IntegerField, INodeElement<int>
+    public sealed class NodeEnumField : EnumField, INodeElement<Enum>
     {
         public BaseNodeView nodeView { get; private set; }
 
         public FieldInfo fieldInfo { get; private set; }
 
-        public event Action<int> onValueChanged;
+        public event Action<Enum> onValueChanged;
 
         public void Init(BaseNodeView nodeView, FieldInfo fieldInfo, string titleName)
         {
             NodeElementUtils.SetBaseFieldStyle(this);
+            Enum en = (Enum)fieldInfo.GetValue(nodeView.target);
+            this.Init(en);
             this.nodeView = nodeView;
             this.fieldInfo = fieldInfo;
             this.label = this.CheckTitle(titleName);
-            this.value = (int)fieldInfo.GetValue(nodeView.target);
-            this.RegisterCallback<ChangeEvent<int>>((e) => OnValueChange(e.newValue));
+            this.value = en;
+            this.RegisterCallback<ChangeEvent<Enum>>((e) => OnValueChange(e.newValue));
         }
 
-        private void OnValueChange(int newValue)
+        private void OnValueChange(Enum newValue)
         {
             if (onValueChanged != null)
                 this.onValueChanged?.Invoke(newValue);

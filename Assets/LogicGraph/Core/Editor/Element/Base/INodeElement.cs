@@ -12,18 +12,7 @@ namespace Logic.Editor
     {
         BaseNodeView nodeView { get; }
         FieldInfo fieldInfo { get; }
-        void Init(BaseNodeView nodeView, FieldInfo fieldInfo);
-        //object value { get; set; }
-
-        ///// <summary>
-        ///// 显示
-        ///// </summary>
-        //void Show();
-
-        ///// <summary>
-        ///// 隐藏
-        ///// </summary>
-        //void Hide();
+        void Init(BaseNodeView nodeView, FieldInfo fieldInfo, string title);
     }
 
     public interface INodeElement<T> : INodeElement

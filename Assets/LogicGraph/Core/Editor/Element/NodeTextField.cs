@@ -10,21 +10,18 @@ namespace Logic.Editor
 {
     public sealed class NodeTextField : TextField, INodeElement<string>
     {
-        public VisualElement view => this;
-
         public BaseNodeView nodeView { get; private set; }
 
         public FieldInfo fieldInfo { get; private set; }
 
         public event Action<string> onValueChanged;
 
-        public void Init(BaseNodeView nodeView, FieldInfo fieldInfo)
+        public void Init(BaseNodeView nodeView, FieldInfo fieldInfo, string titleName)
         {
             NodeElementUtils.SetBaseFieldStyle(this);
             this.nodeView = nodeView;
             this.fieldInfo = fieldInfo;
-            NodeInputAttribute attr = fieldInfo.GetCustomAttribute<NodeInputAttribute>();
-            this.label = attr.Title;
+            this.label = this.CheckTitle(titleName);
             this.value = fieldInfo.GetValue(nodeView.target) as string;
             this.RegisterCallback<ChangeEvent<string>>((e) => OnValueChange(e.newValue));
         }
@@ -32,9 +29,9 @@ namespace Logic.Editor
         private void OnValueChange(string newValue)
         {
             if (onValueChanged != null)
-                this.onValueChanged?.Invoke(value);
+                this.onValueChanged?.Invoke(newValue);
             else
-                fieldInfo?.SetValue(nodeView.target, value);
+                fieldInfo?.SetValue(nodeView.target, newValue);
         }
     }
 }

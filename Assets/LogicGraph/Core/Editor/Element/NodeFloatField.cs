@@ -1,17 +1,17 @@
-using System;
+﻿using System;
 using System.Reflection;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
 namespace Logic.Editor
 {
-    public sealed class NodeIntegerField : IntegerField, INodeElement<int>
+    public sealed class NodeFloatField : FloatField, INodeElement<float>
     {
         public BaseNodeView nodeView { get; private set; }
 
         public FieldInfo fieldInfo { get; private set; }
 
-        public event Action<int> onValueChanged;
+        public event Action<float> onValueChanged;
 
         public void Init(BaseNodeView nodeView, FieldInfo fieldInfo, string titleName)
         {
@@ -19,11 +19,11 @@ namespace Logic.Editor
             this.nodeView = nodeView;
             this.fieldInfo = fieldInfo;
             this.label = this.CheckTitle(titleName);
-            this.value = (int)fieldInfo.GetValue(nodeView.target);
-            this.RegisterCallback<ChangeEvent<int>>((e) => OnValueChange(e.newValue));
+            this.value = (float)fieldInfo.GetValue(nodeView.target);
+            this.RegisterCallback<ChangeEvent<float>>((e) => OnValueChange(e.newValue));
         }
 
-        private void OnValueChange(int newValue)
+        private void OnValueChange(float newValue)
         {
             if (onValueChanged != null)
                 this.onValueChanged?.Invoke(newValue);

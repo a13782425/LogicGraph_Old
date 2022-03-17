@@ -216,16 +216,21 @@ namespace Logic.Editor
             FieldInfo[] fields = nodeCache.NodeType.GetFields(BindingFlags.Public | BindingFlags.Instance);
             foreach (FieldInfo field in fields)
             {
-                NodeFieldAttribute fieldAttr = field.GetCustomAttribute<NodeFieldAttribute>();
-                if (fieldAttr != null)
+                if (NodeElementUtils.ElementMapping.ContainsKey(field.FieldType))
                 {
-                    Type attrType = fieldAttr.GetType();
-                    if (NodeElementUtils.ElementMapping.ContainsKey(attrType))
-                    {
-                        nodeCache.FieldInfos.Add(field.Name, field);
-                        nodeCache.FieldTypes.Add(field.Name, attrType);
-                    }
+                    nodeCache.FieldInfos.Add(field.Name, field);
+                    //nodeCache.FieldTypes.Add(field.Name, attrType);
                 }
+                //NodeFieldAttribute fieldAttr = field.GetCustomAttribute<NodeFieldAttribute>();
+                //if (fieldAttr != null)
+                //{
+                //    Type attrType = fieldAttr.GetType();
+                //    if (NodeElementUtils.ElementMapping.ContainsKey(attrType))
+                //    {
+                //        nodeCache.FieldInfos.Add(field.Name, field);
+                //        nodeCache.FieldTypes.Add(field.Name, attrType);
+                //    }
+                //}
             }
         }
         /// <summary>

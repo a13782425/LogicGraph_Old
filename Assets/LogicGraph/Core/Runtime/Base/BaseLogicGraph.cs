@@ -69,10 +69,10 @@ namespace Logic
         /// </summary>
         public List<BaseLogicGroup> Groups => _groups;
 
-        /// <summary>
-        /// 默认变量(仅编辑器)
-        /// </summary>
-        public virtual List<BaseVariable> DefaultVars => new List<BaseVariable>();
+        ///// <summary>
+        ///// 默认变量(仅编辑器)
+        ///// </summary>
+        //public virtual List<BaseVariable> DefaultVars => new List<BaseVariable>();
 
 #endif
 

@@ -21,7 +21,7 @@ namespace Logic.Editor
         public LGEditorCache EditorCache { get; private set; }
 
         /// <summary>
-        /// 默认变量(仅编辑器)
+        /// 默认变量
         /// </summary>
         public virtual List<BaseVariable> DefaultVars => new List<BaseVariable>();
 
@@ -327,7 +327,7 @@ namespace Logic.Editor
                         });
                     }
                 }
-                removeList.OfType<BaseNodeView>().ToList().ForEach(a => removeList.AddRange(a.GetCollectElements()));
+                removeList.OfType<BaseNodeView>().ToList().ForEach(a => removeList = removeList.Union(a.GetCollectElements()).ToList());
                 List<GraphElement> removeList2 = removeList.ToList();
 
                 LGUndoData undoData = new LGUndoData(this);

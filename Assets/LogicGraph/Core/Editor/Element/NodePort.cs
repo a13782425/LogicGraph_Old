@@ -87,9 +87,11 @@ namespace Logic.Editor
         {
         }
 
-        public void Init(BaseNodeView nodeView, FieldInfo fieldInfo)
+        public void Init(BaseNodeView nodeView, FieldInfo fieldInfo, string titleName)
         {
             this.nodeView = nodeView;
+
+            this.portName = PortType == PortTypeEnum.Default ? titleName : this.CheckTitle(titleName);
             if (fieldInfo != null)
             {
                 value = fieldInfo.GetValue(nodeView.target);
@@ -320,16 +322,6 @@ namespace Logic.Editor
                 {
                     nodes.Add(value as BaseLogicNode);
                 }
-                //break;
-                //switch (this.PortType)
-                //{
-                //    case PortTypeEnum.Default:
-                //    case PortTypeEnum.Variable:
-                       
-                //    case PortTypeEnum.Custom:
-                //    default:
-                //        break;
-                //}
                 foreach (var item in nodes)
                 {
                     if (item != null)
@@ -476,13 +468,12 @@ namespace Logic.Editor
             return false;
         }
 
-        public static NodePort CreatePort(string labelName, PortDirEnum dir, PortTypeEnum portType, EdgeConnectorListener edgeConnectorListener)
+        public static NodePort CreatePort(PortDirEnum dir, PortTypeEnum portType, EdgeConnectorListener edgeConnectorListener)
         {
             var port = new NodePort(Orientation.Horizontal, dir == PortDirEnum.In ? Direction.Input : Direction.Output, Capacity.Multi, null);
             port.m_EdgeConnector = new BaseEdgeConnector(edgeConnectorListener);
             port.AddManipulator(port.m_EdgeConnector);
             port._isList = true;
-            port.portName = labelName;
             port.PortDir = dir;
             port.PortType = PortTypeEnum.Default;
             port.PortShape = PortShapeEnum.Circle;
@@ -501,7 +492,6 @@ namespace Logic.Editor
             port.varTypes.AddRange(portAttr.VarTypes);
             port.m_EdgeConnector = new BaseEdgeConnector(edgeConnectorListener);
             port.AddManipulator(port.m_EdgeConnector);
-            port.portName = portAttr.Title;
             port.fieldInfo = fieldInfo;
             port.PortDir = portAttr.Dir;
             port.PortShape = portAttr.Shape;

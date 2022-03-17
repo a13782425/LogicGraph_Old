@@ -6,13 +6,10 @@ using System;
 
 public class DebugNode : BaseLogicNode
 {
-    [NodeInput(Title = "日志")]
     public string log = "";
 
-    [NodeInt(Title = "测试")]
     public int abc = 0;
 
-    [NodeInt(Title = "今天天气不错")]
     public int abc1 = 0;
     ///// <summary>
     ///// 条件
@@ -20,36 +17,43 @@ public class DebugNode : BaseLogicNode
     //[SerializeReference]
     //public List<BaseLogicNode> Conditions = new List<BaseLogicNode>();
 
-    [NodePort("aaa", PortShapeEnum.Cube, VarTypes = new Type[] { typeof(float) })]
+    [NodePort(PortShapeEnum.Cube, VarTypes = new Type[] { typeof(float) })]
     [SerializeReference]
     public VariableNode param001;
 
-    [NodePort("bbb", PortShapeEnum.Cube, VarTypes = new Type[] { typeof(float) })]
+    [NodePort(PortShapeEnum.Cube, VarTypes = new Type[] { typeof(float) })]
     [SerializeReference]
     public List<VariableNode> param002;
 
-    [NodePort("ccc", PortDirEnum.Out, PortShapeEnum.Cube, VarTypes = new Type[] { typeof(float) })]
+    [NodePort(PortDirEnum.Out, PortShapeEnum.Cube, VarTypes = new Type[] { typeof(float) })]
     [SerializeReference]
     public VariableNode param003;
 
-    [NodePort("ddd", PortDirEnum.Out, PortShapeEnum.Cube, VarTypes = new Type[] { typeof(float) })]
+    [NodePort(PortDirEnum.Out, PortShapeEnum.Cube, VarTypes = new Type[] { typeof(float) })]
     [SerializeReference]
     public List<VariableNode> param004;
 
-    [NodePort("eee")]
+    [NodePort()]
     [SerializeReference]
     public BaseLogicNode child001;
 
-    [NodePort("fff")]
+    [NodePort()]
     [SerializeReference]
     public List<BaseLogicNode> child002;
 
-    [NodePort("ggg", PortDirEnum.Out)]
+    [NodePort(PortDirEnum.Out)]
     [SerializeReference]
     public BaseLogicNode child003;
 
-    [NodePort("hhh", PortDirEnum.Out)]
+    [NodePort(PortDirEnum.Out)]
     [SerializeReference]
     public List<BaseLogicNode> child004;
 
+    //[NodeToggle]
+    public bool aaa;
+    public double bbb;
+    public PortTypeEnum ccc;
+    public Vector2 ddd;
+    public Vector3 eee;
+    public Color fff;
 }

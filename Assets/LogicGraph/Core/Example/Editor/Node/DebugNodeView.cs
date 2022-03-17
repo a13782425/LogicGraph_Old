@@ -30,68 +30,12 @@ public class DebugNodeView : BaseNodeView<DebugNode>
         ShowPort("child002");
         ShowPort("child003");
         ShowPort("child004");
+        ShowUI("aaa","cc");
+        ShowUI("bbb");
+        ShowUI("ccc");
+        ShowUI("ddd");
+        ShowUI("eee");
+        ShowUI("fff");
     }
 
-
-
-    //public override void AddVariable(VariableNode paramNode, NodePort curPort, ParamAccessor accessor)
-    //{
-    //    //if (accessor == ParamAccessor.Get)
-    //    //{
-    //    //    node.Parameter = paramNode;
-    //    //}
-    //}
-    //public override void DelVariable(VariableNode paramNode, NodePort curPort, ParamAccessor accessor)
-    //{
-    //    //if (accessor == ParamAccessor.Get)
-    //    //{
-    //    //    node.Parameter = null;
-
-    //    //}
-    //}
-    public override void DrawLink()
-    {
-        base.DrawLink();
-        //this.node.Conditions.RemoveAll(a => a == null);
-        //foreach (var item in this.node.Conditions)
-        //{
-        //    var nodeView = graphCache.GetNodeView(item);
-        //    DrawLink(nodeView, _port);
-        //}
-        //if (this.node.Parameter != null && this.node.Parameter.variable != null)
-        //{
-        //    DrawLink(_port, owner.GetNodeView(this.node.Parameter).OutPut);
-        //}
-    }
-
-    //public override bool CanLink(NodePort ownerPort, NodePort waitLinkPort)
-    //{
-    //    if (ownerPort.PortType != PortTypeEnum.Default)
-    //    {
-    //        if (waitLinkPort.nodeView is VariableNodeView parameter)
-    //        {
-    //            if (ownerPort.direction == UnityEditor.Experimental.GraphView.Direction.Input)
-    //            {
-    //                return (parameter.target as VariableNode).variable.Value is float;
-    //            }
-    //            if (ownerPort.direction == UnityEditor.Experimental.GraphView.Direction.Output)
-    //            {
-    //                return (parameter.target as VariableNode).variable.Value is Color;
-    //            }
-    //            return false;
-    //        }
-    //    }
-    //    return base.CanLink(ownerPort, waitLinkPort);
-    //}
-    //public override bool CanLink(PortView ownerPort, PortView waitLinkPort)
-    //{
-    //    if (!ownerPort.IsDefault)
-    //    {
-    //        if (waitLinkPort.Owner is BaseNodeView)
-    //        {
-    //            return false;
-    //        }
-    //    }
-    //    return true;
-    //}
 }

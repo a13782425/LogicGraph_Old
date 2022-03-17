@@ -11,11 +11,21 @@ namespace Logic.Editor
     public static class NodeElementUtils
     {
 
-        public static Dictionary<Type, Type> ElementMapping = new Dictionary<Type, Type>() 
+        public static Dictionary<Type, Type> ElementMapping = new Dictionary<Type, Type>()
         {
-            { typeof(NodeInputAttribute), typeof(NodeTextField) },
-            { typeof(NodeIntAttribute), typeof(NodeIntegerField)},
-            { typeof(NodePortAttribute), typeof(NodePort)},
+            { typeof(string), typeof(NodeTextField) },
+            { typeof(int), typeof(NodeIntegerField)},
+            { typeof(bool), typeof(NodeToggle)},
+            { typeof(double), typeof(NodeDoubleField)},
+            { typeof(float), typeof(NodeFloatField)},
+            { typeof(Enum), typeof(NodeEnumField)},
+            { typeof(Vector2), typeof(NodeVector2Field)},
+            { typeof(Vector3), typeof(NodeVector3Field)},
+            { typeof(Vector4), typeof(NodeVector4Field)},
+            { typeof(Color), typeof(NodeColorField)},
+            { typeof(Gradient), typeof(NodeGradientField)},
+            { typeof(AnimationCurve),typeof(NodeCurveField)},
+            { typeof(Bounds),typeof(NodeBoundsField)},
         };
 
         /// <summary>
@@ -34,6 +44,12 @@ namespace Logic.Editor
             element.labelElement.style.minWidth = 50;
             element.labelElement.style.fontSize = 12;
         }
+
+        public static string CheckTitle(this INodeElement node, string title)
+        {
+            return string.IsNullOrWhiteSpace(title) ? node.fieldInfo.Name : title;
+        }
+
         public static void Show(this INodeElement node)
         {
             if (node is VisualElement visual)

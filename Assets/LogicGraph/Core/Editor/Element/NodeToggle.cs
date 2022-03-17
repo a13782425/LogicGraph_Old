@@ -1,17 +1,20 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
-using UnityEditor.UIElements;
+using System.Text;
+using System.Threading.Tasks;
 using UnityEngine.UIElements;
 
 namespace Logic.Editor
 {
-    public sealed class NodeIntegerField : IntegerField, INodeElement<int>
+    public sealed class NodeToggle : Toggle, INodeElement<bool>
     {
         public BaseNodeView nodeView { get; private set; }
 
         public FieldInfo fieldInfo { get; private set; }
 
-        public event Action<int> onValueChanged;
+        public event Action<bool> onValueChanged;
 
         public void Init(BaseNodeView nodeView, FieldInfo fieldInfo, string titleName)
         {
@@ -19,11 +22,11 @@ namespace Logic.Editor
             this.nodeView = nodeView;
             this.fieldInfo = fieldInfo;
             this.label = this.CheckTitle(titleName);
-            this.value = (int)fieldInfo.GetValue(nodeView.target);
-            this.RegisterCallback<ChangeEvent<int>>((e) => OnValueChange(e.newValue));
+            this.value = (bool)fieldInfo.GetValue(nodeView.target);
+            this.RegisterCallback<ChangeEvent<bool>>((e) => OnValueChange(e.newValue));
         }
 
-        private void OnValueChange(int newValue)
+        private void OnValueChange(bool newValue)
         {
             if (onValueChanged != null)
                 this.onValueChanged?.Invoke(newValue);

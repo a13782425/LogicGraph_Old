@@ -23,19 +23,13 @@ namespace Logic
         public string Name
         {
             get => _name;
-            set
-            {
-                _name = value;
-#if UNITY_EDITOR
-                onModifyParam?.Invoke();
-#endif
-            }
+            set => _name = value;
         }
 
         /// <summary>
         /// 是否存在默认值
         /// </summary>
-        public virtual bool HasDefaultValue => false;
+        public virtual bool HasDefaultValue => true;
         public virtual object Value { get; set; }
         /// <summary>
         /// 获取值的类型
@@ -44,7 +38,11 @@ namespace Logic
         public virtual Type GetValueType() => Value?.GetType();
 
 #if UNITY_EDITOR
-
+        /// <summary>
+        /// 是否导出
+        /// </summary>
+        [SerializeField]
+        public bool Export = false;
         /// <summary>
         /// 可以修改变量名
         /// </summary>
@@ -63,17 +61,8 @@ namespace Logic
         public string Describe
         {
             get => _describe;
-            set
-            {
-                _describe = value;
-                onModifyParam?.Invoke();
-            }
+            set => _describe = value;
         }
-
-        /// <summary>
-        /// 节点信息发生修改
-        /// </summary>
-        public event Action onModifyParam;
         public virtual Color GetColor()
         {
             return new Color32(0, 128, 255, 255);
