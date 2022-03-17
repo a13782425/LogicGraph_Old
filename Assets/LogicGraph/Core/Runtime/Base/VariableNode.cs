@@ -11,6 +11,7 @@ namespace Logic
     public sealed class VariableNode : BaseLogicNode
     {
         public string varId = "";
+        public string varName = "";
 
         private BaseVariable _variable = null;
         /// <summary>
@@ -22,7 +23,7 @@ namespace Logic
             {
                 if (_variable == null)
                 {
-                    _variable = logicGraph.GetVariableById(varId);
+                    _variable = logicGraph.GetVariableByName(varName);
                 }
                 return _variable;
             }
@@ -44,7 +45,7 @@ namespace Logic
 
         protected override bool OnEnable()
         {
-            _variable = logicGraph.GetVariableById(varId);
+            _variable = logicGraph.GetVariableByName(varName);
             return base.OnEnable();
         }
         public object GetValue() => variable.Value;

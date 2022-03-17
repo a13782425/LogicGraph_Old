@@ -16,13 +16,6 @@ namespace Logic.Editor
     public interface ILogicConfig
     {
         /// <summary>
-        /// 配置文件路径
-        /// 主要用于缓存一些信息
-        /// 默认在逻辑图Cache文件夹下,根据项目自行配置
-        /// </summary>
-        string CONFIG_PATH { get; }
-
-        /// <summary>
         /// 打开窗口调用
         /// </summary>
         void OpenWindow();

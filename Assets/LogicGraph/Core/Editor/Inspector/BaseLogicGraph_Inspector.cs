@@ -6,9 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
-using YamlDotNet.RepresentationModel;
-using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
 
 namespace Logic.Editor
 {
@@ -17,38 +14,45 @@ namespace Logic.Editor
     {
         private BaseLogicGraph _logic;
         private LGEditorCache _cache;
-        private LGInfoCache _infoCache;
+        //private LGInfoCache _infoCache;
 
+        /// <summary>
+        /// 是否显示详情
+        /// </summary>
+        private bool _isShowDetail = false;
         void OnEnable()
         {
             _logic = target as BaseLogicGraph;
-            _infoCache = LGCacheOp.GetLogicInfo(_logic);
-            _infoCache.Graph = _logic;
-            _cache = LGCacheOp.GetEditorCache(_infoCache);
+            //_infoCache = LogicProvider.GetLogicInfo(_logic);
+            //_infoCache.Graph = _logic;
+            _cache = LogicProvider.GetEditorCache(_logic);
         }
         public override void OnInspectorGUI()
         {
             if (GUILayout.Button("打开"))
             {
-                LGWindow.ShowLGPanel(LGCacheOp.GetLogicInfo(_logic));
+                LGWindow.ShowLogic(_logic.OnlyId);
             }
-            if (GUILayout.Button("修复"))
+            if (GUILayout.Button("修复变量错误"))
             {
-                string path = AssetDatabase.GetAssetPath(_logic);
-                Debug.LogError(path);
-                using (StreamReader input = new StreamReader(path, Encoding.UTF8))
+                foreach (var item in _logic.Nodes)
                 {
-                    var yaml = new YamlStream();
-                    yaml.Load(input);
-
-                    Debug.LogError(yaml.Documents.Count);
-                    //var node = yaml.Documents[0].RootNode["references"];
-                    foreach (var item in yaml.Documents[0].AllNodes)
+                    if (item is VariableNode varNode)
                     {
-                        Debug.Log(item.ToString());
+                        var node = _logic.GetVariableById(varNode.varId);
+                        if (node != null)
+                        {
+                            varNode.varName = node.Name;
+                        }
                     }
-                   
                 }
+                EditorUtility.SetDirty(_logic);
+                AssetDatabase.SaveAssets();
+                AssetDatabase.Refresh();
+            }
+            if (GUILayout.Button("显示详情,但可能导致崩溃"))
+            {
+                _isShowDetail = !_isShowDetail;
             }
             if (_cache != null)
             {
@@ -60,25 +64,25 @@ namespace Logic.Editor
                     {
                         string savePath = Application.dataPath;
                         string saveFile = "undefined";
-                        if (!string.IsNullOrEmpty(_infoCache.LastFormatPath))
+                        if (!string.IsNullOrEmpty(_logic.LastFormatPath))
                         {
-                            savePath = Path.GetDirectoryName(_infoCache.LastFormatPath);
-                            saveFile = Path.GetFileNameWithoutExtension(_infoCache.LastFormatPath);
+                            savePath = Path.GetDirectoryName(_logic.LastFormatPath);
+                            saveFile = Path.GetFileNameWithoutExtension(_logic.LastFormatPath);
                         }
                         string filePath = EditorUtility.SaveFilePanel("导出", savePath, saveFile, format.Extension);
                         if (string.IsNullOrWhiteSpace(filePath))
                         {
                             return;
                         }
-                        var logicFormat = Activator.CreateInstance(format.GetFormatType()) as ILogicFormat;
-                        bool res = logicFormat.ToFormat(_infoCache, filePath);
+                        var logicFormat = Activator.CreateInstance(format.FormatType) as ILogicFormat;
+                        bool res = logicFormat.ToFormat(_logic, filePath);
                         if (res)
                         {
                             string tempPath = filePath.Replace("\\", "/");
                             int index = tempPath.IndexOf("Assets");
                             if (index > 0)
                             {
-                                _infoCache.LastFormatPath = tempPath.Substring(index, tempPath.Length - index);
+                                _logic.LastFormatPath = tempPath.Substring(index, tempPath.Length - index);
                             }
                             Debug.Log($"导出: {format.FormatName} 成功");
                             AssetDatabase.Refresh();
@@ -90,9 +94,12 @@ namespace Logic.Editor
                     }
                 }
             }
-            UnityEditor.EditorGUI.BeginDisabledGroup(true);
-            base.OnInspectorGUI();
-            UnityEditor.EditorGUI.EndDisabledGroup();
+            if (_isShowDetail)
+            {
+                //UnityEditor.EditorGUI.BeginDisabledGroup(true);
+                base.OnInspectorGUI();
+                //UnityEditor.EditorGUI.EndDisabledGroup();
+            }
         }
     }
 }

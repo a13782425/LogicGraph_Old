@@ -6,14 +6,14 @@
     background-color: rgba(63, 63, 63, 0.8);
 }
 
-#contents .cube #connector, #contents .cube #connector #cap,
+/*#contents .cube #connector, #contents .cube #connector #cap,
 #contents #top .cube #connector, #contents #top .cube #connector #cap,
 #contents #top .true #connector, #contents #top .true #connector #cap,
 #contents #top .false #connector, #contents #top .false #connector #cap,
 #contents #top .loopBody #connector, #contents #top .loopBody #connector #cap,
 #contents #top .loopCompleted #connector, #contents #top .loopCompleted #connector #cap {
     border-radius: 0px;
-}
+}*/
 
 .Highlight {
     background-color: rgba(0, 63, 63, 0.8);

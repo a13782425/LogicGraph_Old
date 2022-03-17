@@ -53,6 +53,10 @@ PortView > #connector > #cap:hover
     background-color: #f0f0f0;
 }
 
+.cube #connector, .cube #connector #cap {
+    border-radius: 0px;
+}
+
 .Port_Input {
 	--port-color: #0080FF;
 }

@@ -14,10 +14,8 @@ namespace Logic
     [Serializable]
     public abstract class BaseVariable
     {
-
         [SerializeField]
-        private string _onlyId = "";
-        public string OnlyId => _onlyId;
+        public string OnlyId;
 
         [SerializeField]
         private string _name;
@@ -44,10 +42,6 @@ namespace Logic
         /// </summary>
         /// <returns></returns>
         public virtual Type GetValueType() => Value?.GetType();
-        public BaseVariable()
-        {
-            _onlyId = Guid.NewGuid().ToString();
-        }
 
 #if UNITY_EDITOR
 

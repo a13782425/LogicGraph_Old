@@ -12,10 +12,10 @@ namespace Logic.Editor
         /// <summary>
         /// 格式化
         /// </summary>
-        /// <param name="graphCache">逻辑图缓存</param>
+        /// <param name="graph">逻辑图</param>
         /// <param name="path">路径</param>
         /// <returns></returns>
-        bool ToFormat(LGInfoCache graphCache, string path);
+        bool ToFormat(BaseLogicGraph graph, string path);
     }
 
 }

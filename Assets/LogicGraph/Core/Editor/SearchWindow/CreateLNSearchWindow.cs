@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
-using static Logic.Editor.LGCacheData;
 
 namespace Logic.Editor
 {
@@ -23,7 +22,6 @@ namespace Logic.Editor
             var searchTrees = new List<SearchTreeEntry>();
             searchTrees.Add(new SearchTreeGroupEntry(new GUIContent("创建节点")));
 
-            //AddRecommendTree(searchTrees);
             AddNodeTree(searchTrees);
             return searchTrees;
         }
@@ -32,39 +30,6 @@ namespace Logic.Editor
         {
             bool? res = onSelectHandler?.Invoke(searchTreeEntry, context);
             return res.HasValue ? res.Value : false;
-        }
-
-        /// <summary>
-        /// 添加常用节点树
-        /// </summary>
-        /// <param name="searchTrees"></param>
-        /// <param name="logicNodes"></param>
-        private void AddRecommendTree(List<SearchTreeEntry> searchTrees)
-        {
-            List<LNEditorCache> logicNodes = _editorData.Nodes.ToList();
-            logicNodes.Sort((a, b) =>
-            {
-                if (a.UseCount == b.UseCount)
-                {
-                    return 0;
-                }
-                else if (a.UseCount < b.UseCount)
-                {
-                    return 1;
-                }
-                return -1;
-            });
-
-            var recommends = logicNodes.Take(10);
-            searchTrees.Add(new SearchTreeGroupEntry(new GUIContent("常用")) { level = 1 });
-            foreach (LNEditorCache nodeConfig in recommends)
-            {
-                if (_editorData.DefaultNodes.Contains(nodeConfig))
-                {
-                    continue;
-                }
-                searchTrees.Add(new SearchTreeEntry(new GUIContent(nodeConfig.NodeFullName)) { level = 2, userData = nodeConfig });
-            }
         }
 
         /// <summary>

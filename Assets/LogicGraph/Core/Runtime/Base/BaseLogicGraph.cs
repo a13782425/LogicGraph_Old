@@ -16,11 +16,15 @@ namespace Logic
         [SerializeField]
         private string _onlyId = "";
         public string OnlyId => _onlyId;
-#if UNITY_EDITOR
         [SerializeField]
         private string _title = "";
         public string Title { get => _title; set => _title = value; }
-
+#if UNITY_EDITOR
+        /// <summary>
+        /// 最后一次Format位置
+        /// </summary>
+        [SerializeField]
+        public string LastFormatPath;
         /// <summary>
         /// 当前图坐标
         /// </summary>
@@ -85,15 +89,10 @@ namespace Logic
         /// <summary>
         /// 获取一个变量
         /// </summary>
-        /// <param name="onlyId"></param>
-        /// <returns></returns>
-        public BaseVariable GetVariableById(string onlyId) => Variables.FirstOrDefault(a => a.OnlyId == onlyId);
-        /// <summary>
-        /// 获取一个变量
-        /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
         public BaseVariable GetVariableByName(string name) => Variables.FirstOrDefault(a => a.Name == name);
+        public BaseVariable GetVariableById(string id) => Variables.FirstOrDefault(a => a.OnlyId == id);
         /// <summary>
         /// 初始化
         /// </summary>
@@ -115,7 +114,6 @@ namespace Logic
         {
             _onlyId = Guid.NewGuid().ToString();
         }
-
         //public void OnBeforeSerialize()
         //{
         //    Debug.LogError("OnBeforeSerialize");

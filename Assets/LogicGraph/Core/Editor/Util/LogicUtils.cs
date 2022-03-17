@@ -133,42 +133,42 @@ namespace Logic.Editor
 
             if (asset != null)
             {
-                LGWindow.ShowLGPanel(LGCacheOp.GetLogicInfo(asset));
+                LGWindow.ShowLogic(asset.OnlyId);
                 return true;
             }
             return false;
         }
 
-        /// <summary>
-        /// 刷新
-        /// </summary>
-        [MenuItem("Framework/逻辑图/扫描逻辑图", priority = 100)]
-        private static void RefreshLogic()
-        {
-            //LGCacheData.Instance.LGEditorList.Clear();
-            LGCacheOp.Refresh();
-            LGCacheData.Instance.LGInfoList.Clear();
-            string[] strs = Directory.GetFiles(Application.dataPath, "*.asset", SearchOption.AllDirectories);
-            foreach (var item in strs)
-            {
-                string fileName = item.Replace(Application.dataPath, "Assets");
-                BaseLogicGraph logicGraph = AssetDatabase.LoadAssetAtPath<BaseLogicGraph>(fileName);
-                if (logicGraph != null)
-                {
-                    LGInfoCache infoCache = new LGInfoCache();
-                    infoCache.AssetPath = fileName.Replace('\\', '/');
-                    infoCache.FileName = Path.GetFileNameWithoutExtension(infoCache.AssetPath);
-                    infoCache.LogicName = logicGraph.Title;
-                    infoCache.GraphClassName = logicGraph.GetType().FullName;
-                    infoCache.OnlyId = logicGraph.OnlyId;
-                    infoCache.LastFormatPath = "";
-                    infoCache.ResetPanelCache();
-                    LGCacheData.Instance.LGInfoList.Add(infoCache);
-                }
-            }
-            LGCacheOp.Save();
-            EditorUtility.DisplayDialog("Successful", "逻辑图扫描完成", "确定");
-        }
+        ///// <summary>
+        ///// 刷新
+        ///// </summary>
+        //[MenuItem("Framework/逻辑图/扫描逻辑图", priority = 100)]
+        //private static void RefreshLogic()
+        //{
+        //    //LGCacheData.Instance.LGEditorList.Clear();
+        //    LGCacheOp.Refresh();
+        //    LGCacheData.Instance.LGInfoList.Clear();
+        //    string[] strs = Directory.GetFiles(Application.dataPath, "*.asset", SearchOption.AllDirectories);
+        //    foreach (var item in strs)
+        //    {
+        //        string fileName = item.Replace(Application.dataPath, "Assets");
+        //        BaseLogicGraph logicGraph = AssetDatabase.LoadAssetAtPath<BaseLogicGraph>(fileName);
+        //        if (logicGraph != null)
+        //        {
+        //            LGInfoCache infoCache = new LGInfoCache();
+        //            infoCache.AssetPath = fileName.Replace('\\', '/');
+        //            infoCache.FileName = Path.GetFileNameWithoutExtension(infoCache.AssetPath);
+        //            infoCache.LogicName = logicGraph.Title;
+        //            infoCache.GraphClassName = logicGraph.GetType().FullName;
+        //            infoCache.OnlyId = logicGraph.OnlyId;
+        //            infoCache.LastFormatPath = "";
+        //            infoCache.ResetPanelCache();
+        //            LGCacheData.Instance.LGInfoList.Add(infoCache);
+        //        }
+        //    }
+        //    LGCacheOp.Save();
+        //    EditorUtility.DisplayDialog("Successful", "逻辑图扫描完成", "确定");
+        //}
 
         ///// <summary>
         ///// 创建节点

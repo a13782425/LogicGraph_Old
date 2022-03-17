@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
-using static Logic.Editor.LGCacheData;
 
 namespace Logic.Editor
 {
@@ -19,10 +18,10 @@ namespace Logic.Editor
         {
             var entries = new List<SearchTreeEntry>();
             entries.Add(new SearchTreeGroupEntry(new GUIContent("打开逻辑图")));
-            foreach (var item in Instance.LGEditorList)
+            foreach (var item in LogicProvider.LGEditorList)
             {
                 entries.Add(new SearchTreeGroupEntry(new GUIContent(item.GraphName)) { level = 1, userData = item });
-                var datas = Instance.LGInfoList.Where(a => a.GraphClassName == item.GraphClassName).ToList();
+                var datas = LogicProvider.LGInfoList.Where(a => a.GraphClassName == item.GraphClassName).ToList();
                 foreach (var graph in datas)
                 {
                     entries.Add(new SearchTreeEntry(new GUIContent(graph.LogicName)) { level = 2, userData = graph });

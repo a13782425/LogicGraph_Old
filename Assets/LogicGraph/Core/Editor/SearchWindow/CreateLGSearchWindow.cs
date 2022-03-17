@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
-using static Logic.Editor.LGCacheData;
 
 namespace Logic.Editor
 {
@@ -20,7 +19,7 @@ namespace Logic.Editor
             var entries = new List<SearchTreeEntry>();
             entries.Add(new SearchTreeGroupEntry(new GUIContent("创建逻辑图")));
 
-            foreach (LGEditorCache item in Instance.LGEditorList)
+            foreach (LGEditorCache item in LogicProvider.LGEditorList)
             {
                 entries.Add(new SearchTreeEntry(new GUIContent(item.GraphName)) { level = 1, userData = item });
             }

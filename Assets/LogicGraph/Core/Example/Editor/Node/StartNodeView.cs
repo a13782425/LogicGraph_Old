@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace Logic.Editor
 {
-    [LogicNode(typeof(StartNode), "系统/开始", PortType = PortEnum.Out)]
+    [LogicNode(typeof(StartNode), "系统/开始", PortType = PortDirEnum.Out)]
     public sealed class StartNodeView : BaseNodeView
     {
         public override bool ShowLock => false;
 
         public override void OnCreate()
         {
-            Width = 100;
+            width = 100;
         }
     }
 }

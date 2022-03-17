@@ -7,72 +7,48 @@ using Logic;
 using System;
 
 [LogicNode(typeof(DebugNode), "系统/打印日志", IncludeGraphs = new Type[] { typeof(DefaultLogicGraph) })]
-public class DebugNodeView : BaseNodeView
+public class DebugNodeView : BaseNodeView<DebugNode>
 {
-    private DebugNode node;
 
-    private PortView _port;
+    private NodePort _port;
     public override LogicIconEnum StateIcon => LogicIconEnum.Triangle;
     public override void OnCreate()
     {
-        node = Target as DebugNode;
         //TitleBackgroundColor = Color.red;
         //ContentBackgroundColor = Color.green;
     }
     public override void ShowUI()
     {
-        var text = GetInputField("日志:", node.log);
-        text.RegisterCallback<InputEvent>(onInputEvent);
-        this.AddUI(text);
-        //_port = AddPort("条件", UnityEditor.Experimental.GraphView.Direction.Output, true);
-        //this.AddUI(_port);
-        _port = AddPort("参数", UnityEditor.Experimental.GraphView.Direction.Input, UnityEditor.Experimental.GraphView.Port.Capacity.Single, isCube: true);
-        this.AddUI(_port);
-        this.AddUI(AddPort("测试", UnityEditor.Experimental.GraphView.Direction.Output, UnityEditor.Experimental.GraphView.Port.Capacity.Single, isCube: true));
-        this.AddUI(GetInputField("aa", 0));
-
-        var field = GetInputField("测试2", (GameObject)null);
-        field.previewObj = true;
-        this.AddUI(field);
+        ShowUI("log");
+        ShowUI("abc");
+        ShowUI("abc1");
+        ShowPort("param001");
+        ShowPort("param002");
+        ShowPort("param003");
+        ShowPort("param004");
+        ShowPort("child001");
+        ShowPort("child002");
+        ShowPort("child003");
+        ShowPort("child004");
     }
 
-    //public override void ShowParamUI()
+
+
+    //public override void AddVariable(VariableNode paramNode, NodePort curPort, ParamAccessor accessor)
     //{
-    //    var text = GetInputField("日志:", node.log);
-    //    text.RegisterCallback<InputEvent>(onInputEvent);
-    //    this.AddUIToParamPanel(text);
-
+    //    //if (accessor == ParamAccessor.Get)
+    //    //{
+    //    //    node.Parameter = paramNode;
+    //    //}
     //}
-
-    private void onInputEvent(InputEvent evt)
-    {
-        node.log = evt.newData;
-    }
-
-    //public override void AddChild(PortView port, BaseLogicNode child)
+    //public override void DelVariable(VariableNode paramNode, NodePort curPort, ParamAccessor accessor)
     //{
-    //    if (child is DebugNode)
-    //    {
-    //        node.Conditions.Add(child);
-    //    }
-    //    else
-    //        base.AddChild(port, child);
-    //}
-    public override void AddVariable(VariableNode paramNode, PortView curPort, ParamAccessor accessor)
-    {
-        if (accessor == ParamAccessor.Get)
-        {
-            node.Parameter = paramNode;
-        }
-    }
-    public override void DelVariable(VariableNode paramNode, PortView curPort, ParamAccessor accessor)
-    {
-        if (accessor == ParamAccessor.Get)
-        {
-            node.Parameter = null;
+    //    //if (accessor == ParamAccessor.Get)
+    //    //{
+    //    //    node.Parameter = null;
 
-        }
-    }
+    //    //}
+    //}
     public override void DrawLink()
     {
         base.DrawLink();
@@ -82,31 +58,31 @@ public class DebugNodeView : BaseNodeView
         //    var nodeView = graphCache.GetNodeView(item);
         //    DrawLink(nodeView, _port);
         //}
-        if (this.node.Parameter != null && this.node.Parameter.variable != null)
-        {
-            DrawLink(_port, owner.LGInfoCache.GetNodeView(this.node.Parameter).OutPut);
-        }
+        //if (this.node.Parameter != null && this.node.Parameter.variable != null)
+        //{
+        //    DrawLink(_port, owner.GetNodeView(this.node.Parameter).OutPut);
+        //}
     }
 
-    public override bool CanLink(PortView ownerPort, PortView waitLinkPort)
-    {
-        if (!ownerPort.IsDefault)
-        {
-            if (waitLinkPort.Owner is VariableNodeView parameter)
-            {
-                if (ownerPort.direction == UnityEditor.Experimental.GraphView.Direction.Input)
-                {
-                    return (parameter.Target as VariableNode).variable.Value is float;
-                }
-                if (ownerPort.direction == UnityEditor.Experimental.GraphView.Direction.Output)
-                {
-                    return (parameter.Target as VariableNode).variable.Value is Color;
-                }
-                return false;
-            }
-        }
-        return base.CanLink(ownerPort, waitLinkPort);
-    }
+    //public override bool CanLink(NodePort ownerPort, NodePort waitLinkPort)
+    //{
+    //    if (ownerPort.PortType != PortTypeEnum.Default)
+    //    {
+    //        if (waitLinkPort.nodeView is VariableNodeView parameter)
+    //        {
+    //            if (ownerPort.direction == UnityEditor.Experimental.GraphView.Direction.Input)
+    //            {
+    //                return (parameter.target as VariableNode).variable.Value is float;
+    //            }
+    //            if (ownerPort.direction == UnityEditor.Experimental.GraphView.Direction.Output)
+    //            {
+    //                return (parameter.target as VariableNode).variable.Value is Color;
+    //            }
+    //            return false;
+    //        }
+    //    }
+    //    return base.CanLink(ownerPort, waitLinkPort);
+    //}
     //public override bool CanLink(PortView ownerPort, PortView waitLinkPort)
     //{
     //    if (!ownerPort.IsDefault)
