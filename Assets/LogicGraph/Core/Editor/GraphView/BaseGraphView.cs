@@ -95,6 +95,9 @@ namespace Logic.Editor
             Target.Nodes.ForEach(n => AddNodeView(n));
             NodeDic.Values.ToList().ForEach(a => a.DrawLink());
             Target.Groups.ForEach(n => AddGroupView(n));
+            Window.onDrawTopLeft = toolbarView_onDrawLeft;
+            Window.onDrawTopRight = toolbarView_onDrawRight;
+            Window.onDrawBottomRight = toolbarView_onDrawBottomRight;
         }
 
         /// <summary>
@@ -270,7 +273,7 @@ namespace Logic.Editor
             }
             if (startPort is NodePort nodePort)
             {
-                foreach (var port in ports)
+                foreach (var port in ports.ToList())
                 {
                     if (port.direction == Direction.Output)
                     {
@@ -401,21 +404,21 @@ namespace Logic.Editor
                         {
                             //保存
                             this.Save();
-                            evt.StopImmediatePropagation();
+                            evt.StopPropagation();
                         }
                         break;
                     case KeyCode.Z:
                         {
                             //撤销
                             _undo.PopUndo();
-                            evt.StopImmediatePropagation();
+                            evt.StopPropagation();
                         }
                         break;
                     case KeyCode.D:
                         {
                             //复制
                             op_Duplicate(evt);
-                            evt.StopImmediatePropagation();
+                            evt.StopPropagation();
                         }
                         break;
                     default:
@@ -449,40 +452,13 @@ namespace Logic.Editor
             }
             var nodeList = selectList.OfType<BaseNodeView>().ToList().Where(x => !EditorCache.DefaultNodeFullNames.Exists(a => a == x.target.GetType().FullName)).ToList();
 
-            Vector2 minPos = new Vector2(float.MaxValue, float.MaxValue);
-            Vector2 maxPos = new Vector2(float.MinValue, float.MinValue);
-
-            foreach (var item in nodeList)
-            {
-                if (item is BaseNodeView nodeView)
-                {
-                    Vector2 pos = nodeView.GetPosition().position;
-                    if (pos.x < minPos.x)
-                    {
-                        minPos.x = pos.x;
-                    }
-                    if (pos.y < minPos.y)
-                    {
-                        minPos.y = pos.y;
-                    }
-                    if (pos.x > maxPos.x)
-                    {
-                        maxPos.x = pos.x;
-                    }
-                    if (pos.y > maxPos.y)
-                    {
-                        maxPos.y = pos.y;
-                    }
-                }
-            }
-            Vector2 centerPos = new Vector2((minPos.x + maxPos.x) * 0.5f, (minPos.y + maxPos.y) * 0.5f);
-
+            Vector2 centerPos = GetNodeCenter(nodeList.OfType<Node>().ToList());
             Dictionary<string, string> mappingDic = new Dictionary<string, string>();
-            foreach (var item in nodeList)
+            List<NodeEdgeData> edgeDatas = new List<NodeEdgeData>();
+            foreach (BaseNodeView item in nodeList)
             {
                 if (item is BaseNodeView nodeView)
                 {
-
                     Vector2 pos = nodePosition + (nodeView.target.Pos - centerPos);
                     BaseLogicNode node = AddNode(nodeView.target.GetType(), pos);
                     if (node is VariableNode varNode)
@@ -492,6 +468,7 @@ namespace Logic.Editor
                         varNode.Title = tarNode.Title;
                     }
                     AddNodeView(node);
+                    edgeDatas.AddRange(GetNodeEdgeData(nodeView));
                     mappingDic.Add(nodeView.OnlyId, node.OnlyId);
                 }
             }
@@ -500,25 +477,6 @@ namespace Logic.Editor
             {
                 switch (item)
                 {
-                    case BaseNodeView nodeView:
-                        {
-                            string nodeId = nodeView.OnlyId;
-                            if (mappingDic.ContainsKey(nodeId))
-                            {
-                                string newId = mappingDic[nodeId];
-                                BaseNodeView newView = GetNodeView(newId);
-                                foreach (var childNode in nodeView.target.Childs)
-                                {
-                                    if (mappingDic.ContainsKey(childNode.OnlyId))
-                                    {
-                                        string tempId = mappingDic[childNode.OnlyId];
-                                        newView.OutPut.AddPort(GetNodeView(tempId).Input);
-                                    }
-                                }
-                                newView.DrawLink();
-                            }
-                        }
-                        break;
                     case GroupView groupView:
                         {
                             BaseLogicGroup group = new BaseLogicGroup();
@@ -539,6 +497,15 @@ namespace Logic.Editor
                         break;
                     default:
                         break;
+                }
+            }
+            foreach (var item in edgeDatas)
+            {
+                if (mappingDic.ContainsKey(item.InputNodeId) && mappingDic.ContainsKey(item.OutputNodeId))
+                {
+                    item.InputNodeId = mappingDic[item.InputNodeId];
+                    item.OutputNodeId = mappingDic[item.OutputNodeId];
+                    item.DrawLink(this);
                 }
             }
         }
@@ -721,134 +688,118 @@ namespace Logic.Editor
     /// </summary>
     partial class BaseGraphView
     {
+        /// <summary>
+        /// 绘制左上工具条
+        /// </summary>
+        private void toolbarView_onDrawLeft()
+        {
+            EditorGUILayout.Separator();
+            GUILayout.Label("逻辑图:");
+            var logicName = EditorGUILayout.TextField(Target.Title, EditorStyles.toolbarTextField, GUILayout.MaxWidth(100));
+            if (logicName != Target.Title)
+            {
+                Target.Title = logicName;
+                LogicProvider.GetLogicInfo(Target).LogicName = logicName;
+            }
+        }
 
-        //private string _toolbarSearch = "";
-        //private string _toolbarTempSearch = "";
-        //private int _toolbarIndex = 0;
+        /// <summary>
+        /// 绘制右边工具条
+        /// </summary>
+        private void toolbarView_onDrawRight()
+        {
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("调试", EditorStyles.toolbarButton))
+            {
 
-        //private List<BaseLogicNode> _toolbarSearchList = new List<BaseLogicNode>();
-        ///// <summary>
-        ///// 绘制左边工具条
-        ///// </summary>
-        //private void toolbarView_onDrawLeft()
-        //{
-        //    if (_hasData)
-        //    {
-        //        GUILayout.Label("逻辑图:");
-        //        var logicName = EditorGUILayout.TextField(LGInfoCache.LogicName, EditorStyles.toolbarTextField, GUILayout.MaxWidth(100));
-        //        if (logicName != LGInfoCache.LogicName)
-        //        {
-        //            LGInfoCache.LogicName = logicName;
-        //            LGInfoCache.Graph.Title = logicName;
-        //        }
-        //        EditorGUILayout.Separator();
-        //    }
-        //    else
-        //        GUILayout.Label("逻辑图:空");
-        //}
-        ///// <summary>
-        ///// 绘制右边工具条
-        ///// </summary>
-        //private void toolbarView_onDrawRight()
-        //{
-        //    if (_hasData)
-        //    {
-        //        EditorGUILayout.BeginHorizontal();
+            }
+            //EditorGUILayout.Space(10);
+            EditorGUILayout.Separator();
+            if (GUILayout.Button("居中", EditorStyles.toolbarButton))
+            {
+                Vector3 pos = GetNodeCenter(this.nodes.ToList());
+                pos = pos * -1;
+                pos.x = pos.x + this.contentRect.size.x * 0.5f;
+                pos.y = pos.y + this.contentRect.size.y * 0.5f;
+                Target.Pos = pos;
+                Target.Scale = Vector3.one;
+                UpdateViewTransform(pos, Vector3.one);
+            }
+            EditorGUILayout.Separator();
+            if (GUILayout.Button("在项目中选中", EditorStyles.toolbarButton))
+            {
+                UnityEditor.EditorGUIUtility.PingObject(Target);
+                UnityEditor.Selection.activeObject = Target;
+            }
+            EditorGUILayout.EndHorizontal();
+        }
 
-        //        toolbarView_showLogicSearch();
+        private void toolbarView_onDrawBottomRight()
+        {
+            GUIStyle textStyle = new GUIStyle(EditorStyles.boldLabel);
+            textStyle.normal.textColor = Color.red;
+            GUILayout.Label("disconnect", textStyle);
+        }
 
-        //        EditorGUILayout.Space(10);
-        //        EditorGUILayout.Separator();
-        //        if (GUILayout.Button("居中", EditorStyles.toolbarButton))
-        //        {
-        //            LGInfoCache.Graph.Pos = Vector3.zero;
-        //            LGInfoCache.Graph.Scale = Vector3.one;
-        //            UpdateViewTransform(Vector3.zero, Vector3.one);
-        //        }
-        //        EditorGUILayout.Separator();
-        //        if (GUILayout.Button("在项目中选中", EditorStyles.toolbarButton))
-        //        {
-        //            UnityEditor.EditorGUIUtility.PingObject(LGInfoCache.Graph);
-        //            UnityEditor.Selection.activeObject = LGInfoCache.Graph;
-        //        }
-        //        EditorGUILayout.EndHorizontal();
-        //    }
-        //}
+    }
 
-        ///// <summary>
-        ///// 工具栏搜索
-        ///// </summary>
-        //private void toolbarView_showLogicSearch()
-        //{
-        //    if (GUILayout.Button("上一个", EditorStyles.toolbarButton))
-        //    {
-        //        if (string.IsNullOrWhiteSpace(_toolbarTempSearch))
-        //        {
-        //            return;
-        //        }
-        //        if (_toolbarTempSearch != _toolbarSearch)
-        //        {
-        //            _toolbarSearch = _toolbarTempSearch;
-        //            _toolbarIndex = 0;
-        //            _toolbarSearchList = LGInfoCache.Graph.Nodes.FindAll(a => a.Title.Contains(_toolbarSearch));
-        //        }
-        //        else
-        //        {
-        //            _toolbarIndex--;
-        //        }
-        //        toolbarSearch();
-        //    }
-        //    _toolbarTempSearch = EditorGUILayout.TextField(_toolbarTempSearch, EditorStyles.toolbarTextField, GUILayout.MaxWidth(150));
-        //    if (GUILayout.Button("下一个", EditorStyles.toolbarButton))
-        //    {
-        //        if (string.IsNullOrWhiteSpace(_toolbarTempSearch))
-        //        {
-        //            return;
-        //        }
-        //        if (_toolbarTempSearch != _toolbarSearch)
-        //        {
-        //            _toolbarSearch = _toolbarTempSearch;
-        //            _toolbarIndex = 0;
-        //            _toolbarSearchList = LGInfoCache.Graph.Nodes.FindAll(a => a.Title.Contains(_toolbarSearch));
-        //        }
-        //        else
-        //        {
-        //            _toolbarIndex++;
-        //        }
-        //        toolbarSearch();
-        //    }
-        //}
+    /// <summary>
+    /// 私有工具方法
+    /// </summary>
+    partial class BaseGraphView
+    {
+        /// <summary>
+        /// 获取一个节点上面所有out端口数据
+        /// </summary>
+        /// <returns></returns>
+        private List<NodeEdgeData> GetNodeEdgeData(BaseNodeView nodeView)
+        {
+            List<NodeEdgeData> list = new List<NodeEdgeData>();
+            List<NodePort> allPorts = new List<NodePort>();
+            if (nodeView.OutPut != null)
+            {
+                allPorts.Add(nodeView.OutPut);
+            }
+            allPorts.AddRange(nodeView.GetAllPorts().Where(a => a.PortDir == PortDirEnum.Out));
+            allPorts.ForEach(port =>
+            {
+                foreach (Edge edge in port.connections)
+                {
+                    NodeEdgeData edgeData = new NodeEdgeData();
+                    edgeData.Init(edge.input as NodePort, port);
+                    list.Add(edgeData);
+                }
+            });
+            return list;
+        }
 
-        //private void toolbarSearch()
-        //{
-        //    if (_toolbarSearchList.Count == 0)
-        //    {
-        //        Window.ShowNotification(new GUIContent("没有搜到"));
-        //        return;
-        //    }
-        //    if (_toolbarIndex < 0)
-        //    {
-        //        _toolbarIndex = _toolbarSearchList.Count - 1;
-        //    }
-        //    else if (_toolbarIndex >= _toolbarSearchList.Count)
-        //    {
-        //        _toolbarIndex = 0;
-        //    }
-        //    BaseLogicNode node = _toolbarSearchList[_toolbarIndex];
-        //    BaseNodeView view = LGInfoCache.GetNodeView(node);
+        private Vector3 GetNodeCenter(List<Node> nodes)
+        {
+            Vector2 minPos = new Vector2(float.MaxValue, float.MaxValue);
+            Vector2 maxPos = new Vector2(float.MinValue, float.MinValue);
 
-        //    float halfW = this.localBound.width * 0.5f;
-        //    float halfH = this.localBound.height * 0.5f;
-
-        //    halfW -= view.View.localBound.width * 0.5f;
-        //    halfH -= view.View.localBound.height * 0.5f;
-        //    Vector2 pos = node.Pos;
-        //    pos.x -= halfW;
-        //    pos.y -= halfH;
-        //    UpdateViewTransform(pos * -1, Vector3.one);
-        //    this.ClearSelection();
-        //    this.AddToSelection(view.View);
-        //}
+            foreach (var item in nodes)
+            {
+                Vector2 pos = item.GetPosition().position;
+                if (pos.x < minPos.x)
+                {
+                    minPos.x = pos.x;
+                }
+                if (pos.y < minPos.y)
+                {
+                    minPos.y = pos.y;
+                }
+                if (pos.x > maxPos.x)
+                {
+                    maxPos.x = pos.x;
+                }
+                if (pos.y > maxPos.y)
+                {
+                    maxPos.y = pos.y;
+                }
+            }
+            return new Vector3((minPos.x + maxPos.x) * 0.5f, (minPos.y + maxPos.y) * 0.5f);
+        }
     }
 
     /// <summary>

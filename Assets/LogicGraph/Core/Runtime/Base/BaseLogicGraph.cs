@@ -92,7 +92,6 @@ namespace Logic
         /// <param name="name"></param>
         /// <returns></returns>
         public BaseVariable GetVariableByName(string name) => Variables.FirstOrDefault(a => a.Name == name);
-        public BaseVariable GetVariableById(string id) => Variables.FirstOrDefault(a => a.OnlyId == id);
         /// <summary>
         /// 初始化
         /// </summary>

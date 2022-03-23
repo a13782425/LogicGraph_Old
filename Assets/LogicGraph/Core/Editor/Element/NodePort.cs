@@ -6,12 +6,15 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEditor.Experimental.GraphView;
+using UnityEditor.UIElements;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace Logic.Editor
 {
     public sealed class NodePort : Port, INodeElement
     {
+        private const BindingFlags FLAG = BindingFlags.Instance | BindingFlags.Public;
         /// <summary>
         /// 端口朝向
         /// </summary>
@@ -41,16 +44,29 @@ namespace Logic.Editor
 
         /// <summary>
         /// 当有Port端口进入
-        /// this=出端口
+        /// this=当前端口
         /// param=入端口
         /// </summary>
         public event Action<NodePort, NodePort> onAddPort;
         /// <summary>
         /// 当有Port端口断开
-        /// this=出端口
+        /// this=当前端口
         /// param=入端口
         /// </summary>
         public event Action<NodePort, NodePort> onDelPort;
+
+        /// <summary>
+        /// 当有Port端口进入后,已经执行完Add操作,请勿在此回调中执行Add操作
+        /// this=当前端口
+        /// param=入端口
+        /// </summary>
+        public event Action<NodePort, NodePort> onAfterAddPort;
+        /// <summary>
+        /// 当有Port端口断开后,已经执行完Del操作,请勿在此回调中执行Del操作
+        /// this=当前端口
+        /// param=入端口
+        /// </summary>
+        public event Action<NodePort, NodePort> onAfterDelPort;
 
 
         private NodePortAttribute _portAttr;
@@ -76,16 +92,16 @@ namespace Logic.Editor
         /// 只有当_isList时才有值
         /// </summary>
         private object value = null;
+        public FieldInfo _linkFieldInfo;
+        private string _linkFieldName;
+        private VisualElement _linkFieldElement;
 
         static NodePort()
         {
             _nodeBaseType = typeof(BaseLogicNode);
-
         }
 
-        public NodePort(Orientation portOrientation, Direction portDirection, Capacity portCapacity, Type type) : base(portOrientation, portDirection, portCapacity, type)
-        {
-        }
+        public NodePort(Orientation portOrientation, Direction portDirection, Capacity portCapacity, Type type) : base(portOrientation, portDirection, portCapacity, type) { }
 
         public void Init(BaseNodeView nodeView, FieldInfo fieldInfo, string titleName)
         {
@@ -98,8 +114,8 @@ namespace Logic.Editor
             }
             if (_isList && value != null)
             {
-                _listAddFunc = value.GetType().GetMethod("Add", BindingFlags.Public | BindingFlags.Instance);
-                _listRemoveFunc = value.GetType().GetMethod("Remove", BindingFlags.Public | BindingFlags.Instance);
+                _listAddFunc = value.GetType().GetMethod("Add", FLAG);
+                _listRemoveFunc = value.GetType().GetMethod("Remove", FLAG);
             }
             if (this.nodeView.target is VariableNode varNode)
             {
@@ -118,7 +134,23 @@ namespace Logic.Editor
                     this.visualClass = "Port_" + direction;
                     break;
             }
+
+            if (!string.IsNullOrWhiteSpace(this._linkFieldName) && !this._isList && this.PortType == PortTypeEnum.Variable && this.PortDir == PortDirEnum.In)
+            {
+                this._linkFieldInfo = nodeView.target.GetType().GetField(this._linkFieldName, FLAG);
+                if (this._linkFieldInfo != null)
+                {
+                    this.schedule.Execute(() =>
+                    {
+                        _linkFieldElement = m_createLinkElement();
+                        _linkFieldElement.AddToClassList("port-input-element");
+                        _linkFieldElement.style.top = this.layout.y;
+                        this.nodeView.inputFieldContainer.Add(_linkFieldElement);
+                    }).ExecuteLater(1);
+                }
+            }
         }
+
         public void AddPort(NodePort input)
         {
             if (onAddPort != null)
@@ -135,6 +167,10 @@ namespace Logic.Editor
                         input._listAddFunc.Invoke(input.value, new object[] { this.nodeView.target });
                     else
                         input.fieldInfo.SetValue(input.nodeView.target, this.nodeView.target);
+                    if (input._linkFieldElement != null)
+                    {
+                        input._linkFieldElement.style.display = DisplayStyle.None;
+                    }
                 }
                 else if (input.PortType == PortTypeEnum.Default)
                 {
@@ -158,6 +194,7 @@ namespace Logic.Editor
                     else
                         this.fieldInfo.SetValue(this.nodeView.target, input.nodeView.target);
                 }
+
             }
             else if (this.PortType == PortTypeEnum.Custom)
             {
@@ -166,6 +203,8 @@ namespace Logic.Editor
                 else
                     this.fieldInfo.SetValue(this.nodeView.target, input.nodeView.target);
             }
+            onAfterAddPort?.Invoke(this, input);
+            input.onAfterAddPort?.Invoke(input, this);
         }
         public void DelPort(NodePort input)
         {
@@ -183,6 +222,10 @@ namespace Logic.Editor
                         input._listRemoveFunc.Invoke(input.value, new object[] { this.nodeView.target });
                     else
                         input.fieldInfo.SetValue(input.nodeView.target, null);
+                    if (input._linkFieldElement != null)
+                    {
+                        input._linkFieldElement.style.display = DisplayStyle.Flex;
+                    }
                 }
                 else if (input.PortType == PortTypeEnum.Default)
                 {
@@ -214,6 +257,8 @@ namespace Logic.Editor
                 else
                     this.fieldInfo.SetValue(this.nodeView.target, null);
             }
+            onAfterDelPort?.Invoke(this, input);
+            input.onAfterDelPort?.Invoke(input, this);
         }
         /// <summary>
         /// 是否接受进入端口的连接(被动)
@@ -248,6 +293,19 @@ namespace Logic.Editor
             return isResult;
         }
 
+        public override void DisconnectAll()
+        {
+            this.schedule.Execute(() =>
+            {
+                this.nodeView.owner.ClearSelection();
+                foreach (var edge in this.connections)
+                {
+                    this.nodeView.owner.AddToSelection(edge);
+                }
+                this.nodeView.owner.DeleteSelection();
+                base.DisconnectAll();
+            }).ExecuteLater(2);
+        }
         /// 是否接受输出端口的连接(主动)
         /// 参数:输入端口的Element
         /// 返回值:是否可以连接
@@ -335,6 +393,13 @@ namespace Logic.Editor
         }
         public bool DrawLink(NodePort inPort)
         {
+            foreach (var item in this.connections)
+            {
+                if (item.input == inPort)
+                {
+                    return true;
+                }
+            }
             EdgeView edge = new EdgeView();
             edge.input = inPort;
             edge.output = this;
@@ -347,7 +412,74 @@ namespace Logic.Editor
             }).ExecuteLater(1);
             return true;
         }
-
+        private VisualElement m_createLinkElement()
+        {
+            void onValueChange(object value)
+            {
+                _linkFieldInfo?.SetValue(nodeView.target, value);
+            }
+            Type type = this._linkFieldInfo.FieldType;
+            if (type == typeof(int))
+            {
+                IntegerField element = new IntegerField();
+                element.RegisterCallback<ChangeEvent<int>>(e => onValueChange(e.newValue));
+                element.value = (int)_linkFieldInfo.GetValue(nodeView.target);
+                return element;
+            }
+            else if (type == typeof(float))
+            {
+                FloatField element = new FloatField();
+                element.RegisterCallback<ChangeEvent<float>>(e => onValueChange(e.newValue));
+                element.value = (float)_linkFieldInfo.GetValue(nodeView.target);
+                return element;
+            }
+            else if (type == typeof(string))
+            {
+                TextField element = new TextField();
+                element.RegisterCallback<ChangeEvent<string>>(e => onValueChange(e.newValue));
+                element.value = (string)_linkFieldInfo.GetValue(nodeView.target);
+                return element;
+            }
+            else if (type == typeof(double))
+            {
+                DoubleField element = new DoubleField();
+                element.RegisterCallback<ChangeEvent<double>>(e => onValueChange(e.newValue));
+                element.value = (int)_linkFieldInfo.GetValue(nodeView.target);
+                return element;
+            }
+            else if (type == typeof(bool))
+            {
+                Toggle element = new Toggle();
+                element.RegisterCallback<ChangeEvent<bool>>(e => onValueChange(e.newValue));
+                element.value = (bool)_linkFieldInfo.GetValue(nodeView.target);
+                return element;
+            }
+            else if (type == typeof(Vector2))
+            {
+                Vector2Field element = new Vector2Field();
+                element.RegisterCallback<ChangeEvent<Vector2>>(e => onValueChange(e.newValue));
+                element.value = (Vector2)_linkFieldInfo.GetValue(nodeView.target);
+                return element;
+            }
+            else if (type == typeof(Vector3))
+            {
+                Vector3Field element = new Vector3Field();
+                element.RegisterCallback<ChangeEvent<Vector3>>(e => onValueChange(e.newValue));
+                element.value = (Vector3)_linkFieldInfo.GetValue(nodeView.target);
+                return element;
+            }
+            else if (type == typeof(Vector4))
+            {
+                Vector4Field element = new Vector4Field();
+                element.RegisterCallback<ChangeEvent<Vector4>>(e => onValueChange(e.newValue));
+                element.value = (Vector4)_linkFieldInfo.GetValue(nodeView.target);
+                return element;
+            }
+            else
+            {
+                throw new NotSupportedException($"暂不支持:{type.Name}类型,请联系开发者");
+            }
+        }
         private bool hasType(Type checkType)
         {
             bool result = true;
@@ -493,6 +625,7 @@ namespace Logic.Editor
             port.m_EdgeConnector = new BaseEdgeConnector(edgeConnectorListener);
             port.AddManipulator(port.m_EdgeConnector);
             port.fieldInfo = fieldInfo;
+            port._linkFieldName = portAttr.LinkName;
             port.PortDir = portAttr.Dir;
             port.PortShape = portAttr.Shape;
             port.styleSheets.Add(LogicUtils.GetPortStyle());

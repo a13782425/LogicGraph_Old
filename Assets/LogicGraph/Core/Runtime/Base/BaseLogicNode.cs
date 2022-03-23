@@ -11,9 +11,9 @@ namespace Logic
     [Serializable]
     public abstract class BaseLogicNode
     {
-#if UNITY_EDITOR
         [SerializeField]
         public string Title;
+#if UNITY_EDITOR
         [SerializeField]
         public Vector2 Pos = Vector2.zero;
         /// <summary>

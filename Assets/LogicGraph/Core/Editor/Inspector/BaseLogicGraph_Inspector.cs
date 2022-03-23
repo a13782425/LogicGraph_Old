@@ -33,23 +33,23 @@ namespace Logic.Editor
             {
                 LGWindow.ShowLogic(_logic.OnlyId);
             }
-            if (GUILayout.Button("修复变量错误"))
-            {
-                foreach (var item in _logic.Nodes)
-                {
-                    if (item is VariableNode varNode)
-                    {
-                        var node = _logic.GetVariableById(varNode.varId);
-                        if (node != null)
-                        {
-                            varNode.varName = node.Name;
-                        }
-                    }
-                }
-                EditorUtility.SetDirty(_logic);
-                AssetDatabase.SaveAssets();
-                AssetDatabase.Refresh();
-            }
+            //if (GUILayout.Button("修复变量错误"))
+            //{
+            //    foreach (var item in _logic.Nodes)
+            //    {
+            //        if (item is VariableNode varNode)
+            //        {
+            //            var node = _logic.GetVariableById(varNode.varId);
+            //            if (node != null)
+            //            {
+            //                varNode.varName = node.Name;
+            //            }
+            //        }
+            //    }
+            //    EditorUtility.SetDirty(_logic);
+            //    AssetDatabase.SaveAssets();
+            //    AssetDatabase.Refresh();
+            //}
             if (GUILayout.Button("显示详情,但可能导致崩溃"))
             {
                 _isShowDetail = !_isShowDetail;

@@ -93,11 +93,11 @@ namespace Logic.Editor
             this.titleContainer.Add(this.inputContainer);
             this.titleContainer.Add(titleLabel);
             this.titleContainer.Add(this.outputContainer);
-            Input = ShowPort("", PortDirEnum.In, PortTypeEnum.Default);
+            Input = ShowPort("", PortDirEnum.In);
             //Input = AddPort("", Direction.Input);
             this.inputContainer.Add(Input);
             //OutPut = AddPort("", Direction.Output);
-            OutPut = ShowPort("", PortDirEnum.Out, PortTypeEnum.Default);
+            OutPut = ShowPort("", PortDirEnum.Out);
             this.outputContainer.Add(OutPut);
             var contents = this.Q("contents");
             contents.RemoveFromHierarchy();

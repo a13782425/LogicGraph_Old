@@ -19,6 +19,15 @@ namespace Logic.Editor
         /// 逻辑图唯一Id
         /// </summary>
         private string _graphOnlyId = null;
+        public string GraphOnlyId
+        {
+            get => _graphOnlyId; 
+            set
+            {
+                _graphOnlyId = value;
+                ShowLogic();
+            }
+        }
         public LGInfoCache LGInfoCache => _lgInfoCache;
         private LGInfoCache _lgInfoCache = default;
         public LGEditorCache LGEditorCache => _lgEditorCache;
@@ -35,7 +44,13 @@ namespace Logic.Editor
         /// 工具栏面板
         /// </summary>
         private ToolbarView _topToolbar;
+        public Action onDrawTopLeft;
+        public Action onDrawTopRight;
         private ToolbarView _bottomToolbar;
+        public Action onDrawBottomLeft;
+        public Action onDrawBottomRight;
+
+        private GraphListPanel _graphPanel;
 
         [MenuItem("Framework/逻辑图/打开逻辑图", priority = 99)]
         private static void OpenLogic()
@@ -151,11 +166,17 @@ namespace Logic.Editor
             this.rootVisualElement.Add(_center);
             this.rootVisualElement.Add(_bottom);
             _topToolbar = new ToolbarView();
-            _topToolbar.onDrawLeft += _toolbarView_onDrawLeft;
+            _topToolbar.onDrawLeft += m_onDrawTopLeft;
+            _topToolbar.onDrawRight += m_onDrawTopRight;
             _top.Add(_topToolbar);
             _bottomToolbar = new ToolbarView();
-            _bottomToolbar.onDrawLeft += _toolbarView_onDrawLeft;
+            _bottomToolbar.onDrawLeft += m_onDrawBottomLeft;
+            _bottomToolbar.onDrawRight += m_onDrawBottomRight;
             _bottom.Add(_bottomToolbar);
+            _graphPanel = new GraphListPanel(this);
+            this.rootVisualElement.Add(_graphPanel);
+            _graphPanel.Hide();
+
         }
 
         private void m_buildContextualMenu(ContextualMenuPopulateEvent evt)
@@ -164,97 +185,18 @@ namespace Logic.Editor
             {
                 evt.menu.RemoveItemAt(0);
             }
-
-            evt.menu.AppendAction("创建逻辑图", m_onCreateLogic, DropdownMenuAction.AlwaysEnabled);
-            evt.menu.AppendAction("打开逻辑图", m_onOpenLogic, DropdownMenuAction.AlwaysEnabled);
         }
-        private void _toolbarView_onDrawLeft()
+        private void m_onDrawTopLeft()
         {
             if (GUILayout.Button("菜单", EditorStyles.toolbarButton))
             {
-                Debug.LogError("点击了菜单");
+                _graphPanel.Show();
             }
+            onDrawTopLeft?.Invoke();
         }
-        /// <summary>
-        /// 创建逻辑图搜索框
-        /// </summary>
-        /// <param name="obj"></param>
-        private void m_onCreateLogic(DropdownMenuAction obj)
-        {
-            var menuWindowProvider = ScriptableObject.CreateInstance<CreateLGSearchWindow>();
-            menuWindowProvider.onSelectHandler += m_onCreateMenuSelectEntry;
-            Vector2 screenPos = this.GetScreenPosition(obj.eventInfo.mousePosition);
-            SearchWindow.Open(new SearchWindowContext(screenPos), menuWindowProvider);
-        }
-
-        /// <summary>
-        /// 打开逻辑图搜索框
-        /// </summary>
-        /// <param name="obj"></param>
-        private void m_onOpenLogic(DropdownMenuAction obj)
-        {
-            var menuWindowProvider = ScriptableObject.CreateInstance<OpenLGSearchWindow>();
-            menuWindowProvider.onSelectHandler += m_onOpenMenuSelectEntry;
-
-            Vector2 screenPos = this.GetScreenPosition(obj.eventInfo.mousePosition);
-            SearchWindow.Open(new SearchWindowContext(screenPos), menuWindowProvider);
-        }
-
-        /// <summary>
-        /// 创建逻辑图搜索框回调
-        /// </summary>
-        /// <param name="searchTreeEntry"></param>
-        /// <param name="context"></param>
-        /// <returns></returns>
-        private bool m_onCreateMenuSelectEntry(SearchTreeEntry searchTreeEntry, SearchWindowContext context)
-        {
-            LGEditorCache configData = searchTreeEntry.userData as LGEditorCache;
-            string path = EditorUtility.SaveFilePanel("创建逻辑图", Application.dataPath, "LogicGraph", "asset");
-            if (string.IsNullOrEmpty(path))
-            {
-                EditorUtility.DisplayDialog("错误", "路径为空", "确定");
-                return false;
-            }
-            if (File.Exists(path))
-            {
-                EditorUtility.DisplayDialog("错误", "创建文件已存在", "确定");
-                return false;
-            }
-            string file = Path.GetFileNameWithoutExtension(path);
-            BaseLogicGraph graph = ScriptableObject.CreateInstance(configData.GraphType) as BaseLogicGraph;
-            BaseGraphView graphView = Activator.CreateInstance(configData.ViewType) as BaseGraphView;
-            graph.name = file;
-            if (graphView.DefaultVars != null)
-            {
-                foreach (var item in graphView.DefaultVars)
-                {
-                    item.CanRename = false;
-                    item.CanDel = false;
-                    graph.Variables.Add(item);
-                }
-            }
-            graphView = null;
-            path = path.Replace(Application.dataPath, "Assets");
-            graph.Title = file;
-            AssetDatabase.CreateAsset(graph, path);
-            this._graphOnlyId = graph.OnlyId;
-            this.ShowLogic();
-            return true;
-        }
-
-        /// <summary>
-        /// 打开逻辑图搜索框回调
-        /// </summary>
-        /// <param name="searchTreeEntry"></param>
-        /// <param name="context"></param>
-        /// <returns></returns>
-        private bool m_onOpenMenuSelectEntry(SearchTreeEntry searchTreeEntry, SearchWindowContext context)
-        {
-            LGInfoCache graphCache = searchTreeEntry.userData as LGInfoCache;
-            this._graphOnlyId = graphCache.OnlyId;
-            this.ShowLogic();
-            return true;
-        }
+        private void m_onDrawTopRight() => onDrawTopRight?.Invoke();
+        private void m_onDrawBottomLeft() => onDrawBottomLeft?.Invoke();
+        private void m_onDrawBottomRight() => onDrawBottomRight?.Invoke();
 
         #endregion
     }

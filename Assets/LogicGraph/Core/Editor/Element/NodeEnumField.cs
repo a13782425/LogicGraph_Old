@@ -5,13 +5,13 @@ using UnityEngine.UIElements;
 
 namespace Logic.Editor
 {
-    public sealed class NodeEnumField : EnumField, INodeElement<Enum>
+    public sealed class NodeEnumField<T> : EnumField, INodeElement<T>
     {
         public BaseNodeView nodeView { get; private set; }
 
         public FieldInfo fieldInfo { get; private set; }
 
-        public event Action<Enum> onValueChanged;
+        public event Action<T> onValueChanged;
 
         public void Init(BaseNodeView nodeView, FieldInfo fieldInfo, string titleName)
         {
@@ -28,7 +28,7 @@ namespace Logic.Editor
         private void OnValueChange(Enum newValue)
         {
             if (onValueChanged != null)
-                this.onValueChanged?.Invoke(newValue);
+                this.onValueChanged?.Invoke((T)Enum.Parse(typeof(T), newValue.ToString()));
             else
                 fieldInfo?.SetValue(nodeView.target, newValue);
         }

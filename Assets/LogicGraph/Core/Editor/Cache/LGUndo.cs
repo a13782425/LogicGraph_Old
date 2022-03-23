@@ -69,29 +69,8 @@ namespace Logic.Editor
         public void AddStep(NodePort input, NodePort output)
         {
             NodeEdgeData nodeEdgeData = new NodeEdgeData();
-            nodeEdgeData.OutputNodeId = output.nodeView.target.OnlyId;
-            nodeEdgeData.InputNodeId = input.nodeView.target.OnlyId;
-            if (output.PortType == PortTypeEnum.Default)
-            {
-                nodeEdgeData.OutputDefult = true;
-                nodeEdgeData.OutputFieldName = "";
-            }
-            else
-            {
-                nodeEdgeData.OutputDefult = false;
-                nodeEdgeData.OutputFieldName = output.fieldInfo.Name;
-            }
-
-            if (input.PortType == PortTypeEnum.Default)
-            {
-                nodeEdgeData.InputDefult = true;
-                nodeEdgeData.InputFieldName = "";
-            }
-            else
-            {
-                nodeEdgeData.InputDefult = false;
-                nodeEdgeData.InputFieldName = input.fieldInfo.Name;
-            }
+            nodeEdgeData.Init(input, output);
+          
             _undoEdgeList.Add(nodeEdgeData);
         }
 

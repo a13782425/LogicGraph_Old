@@ -50,7 +50,7 @@ namespace Logic.Editor
         {
             if (active)
             {
-                e.StopImmediatePropagation();
+                e.StopPropagation();
                 return;
             }
 

@@ -10,6 +10,8 @@ public class DebugNode : BaseLogicNode
 
     public int abc = 0;
 
+    public float test = 0;
+
     public int abc1 = 0;
     ///// <summary>
     ///// 条件
@@ -17,7 +19,7 @@ public class DebugNode : BaseLogicNode
     //[SerializeReference]
     //public List<BaseLogicNode> Conditions = new List<BaseLogicNode>();
 
-    [NodePort(PortShapeEnum.Cube, VarTypes = new Type[] { typeof(float) })]
+    [NodePort(PortShapeEnum.Cube, LinkName = "abc", VarTypes = new Type[] { typeof(float) })]
     [SerializeReference]
     public VariableNode param001;
 
@@ -56,4 +58,7 @@ public class DebugNode : BaseLogicNode
     public Vector2 ddd;
     public Vector3 eee;
     public Color fff;
+    public AnimationCurve ggg;
+
+    public GameObject hhh;
 }

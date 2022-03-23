@@ -15,9 +15,6 @@ namespace Logic
     public abstract class BaseVariable
     {
         [SerializeField]
-        public string OnlyId;
-
-        [SerializeField]
         private string _name;
 
         public string Name
@@ -65,7 +62,7 @@ namespace Logic
         }
         public virtual Color GetColor()
         {
-            return new Color32(0, 128, 255, 255);
+            return new Color32(255, 255, 255, 255);
         }
 
         public virtual VisualElement GetUI()
@@ -86,7 +83,7 @@ namespace Logic
 #if UNITY_EDITOR
         public override Color GetColor()
         {
-            return new Color(1, 0, 1, 1);
+            return new Color32(224, 140, 83, 255);
         }
         public override VisualElement GetUI()
         {
@@ -110,7 +107,7 @@ namespace Logic
 #if UNITY_EDITOR
         public override Color GetColor()
         {
-            return new Color32(32, 128, 255, 255);
+            return new Color32(155, 244, 83, 255);
         }
         public override VisualElement GetUI()
         {
@@ -133,7 +130,7 @@ namespace Logic
 #if UNITY_EDITOR
         public override Color GetColor()
         {
-            return new Color32(50, 93, 255, 255);
+            return new Color32(215, 52, 140, 255);
         }
         public override VisualElement GetUI()
         {
@@ -156,7 +153,7 @@ namespace Logic
 #if UNITY_EDITOR
         public override Color GetColor()
         {
-            return new Color32(128, 255, 128, 255);
+            return new Color32(83, 216, 244, 255);
         }
         public override VisualElement GetUI()
         {
@@ -178,6 +175,10 @@ namespace Logic
         public override Type GetValueType() => typeof(Vector2);
 
 #if UNITY_EDITOR
+        public override Color GetColor()
+        {
+            return new Color32(83, 150, 244, 255);
+        }
         public override VisualElement GetUI()
         {
             Vector2Field field = new Vector2Field();
@@ -197,6 +198,10 @@ namespace Logic
         public override Type GetValueType() => typeof(Vector3);
 
 #if UNITY_EDITOR
+        public override Color GetColor()
+        {
+            return new Color32(100, 83, 244, 255);
+        }
         public override VisualElement GetUI()
         {
             Vector3Field field = new Vector3Field();
@@ -217,7 +222,7 @@ namespace Logic
 #if UNITY_EDITOR
         public override Color GetColor()
         {
-            return new Color32(48, 255, 255, 255);
+            return new Color32(186, 83, 244, 255);
         }
         public override VisualElement GetUI()
         {

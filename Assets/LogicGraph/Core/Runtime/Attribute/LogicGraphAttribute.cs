@@ -25,6 +25,11 @@ namespace Logic
         /// </summary>
         public Type[] VarTypes = new Type[0];
 
+        /// <summary>
+        /// 端口关联的字段名
+        /// </summary>
+        public string LinkName = null;
+
         public NodePortAttribute() : this(PortDirEnum.In, PortShapeEnum.Circle) { }
         public NodePortAttribute(PortDirEnum dir) : this(dir, PortShapeEnum.Circle) { }
         public NodePortAttribute(PortShapeEnum shape) : this(PortDirEnum.In, shape) { }

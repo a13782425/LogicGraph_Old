@@ -40,6 +40,33 @@ namespace Logic.Editor
             }
 
         }
+
+        public void Init(NodePort input, NodePort output)
+        {
+            this.OutputNodeId = output.nodeView.target.OnlyId;
+            this.InputNodeId = input.nodeView.target.OnlyId;
+            if (output.PortType == PortTypeEnum.Default)
+            {
+                this.OutputDefult = true;
+                this.OutputFieldName = "";
+            }
+            else
+            {
+                this.OutputDefult = false;
+                this.OutputFieldName = output.fieldInfo.Name;
+            }
+
+            if (input.PortType == PortTypeEnum.Default)
+            {
+                this.InputDefult = true;
+                this.InputFieldName = "";
+            }
+            else
+            {
+                this.InputDefult = false;
+                this.InputFieldName = input.fieldInfo.Name;
+            }
+        }
     }
 
 }

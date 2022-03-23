@@ -18,7 +18,6 @@ namespace Logic.Editor
             { typeof(bool), typeof(NodeToggle)},
             { typeof(double), typeof(NodeDoubleField)},
             { typeof(float), typeof(NodeFloatField)},
-            { typeof(Enum), typeof(NodeEnumField)},
             { typeof(Vector2), typeof(NodeVector2Field)},
             { typeof(Vector3), typeof(NodeVector3Field)},
             { typeof(Vector4), typeof(NodeVector4Field)},

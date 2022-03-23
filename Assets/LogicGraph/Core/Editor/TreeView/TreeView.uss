@@ -1,0 +1,25 @@
+TreeView {
+	flex-grow: 1;
+}
+
+.tree-view_list-view{
+	flex: 1 0 0;
+}
+.tree-view_item-indent-content{
+	flex-direction: row;
+	flex-shrink: 0;
+}
+.tree-view_item-indent{
+	width: 12px;
+	flex-shrink: 0;
+}
+.tree-view_item-parent -> Toggle{
+	align-items: center;
+}
+
+/*.tree-view_item-parent -> Label{
+	-unity-text-align: middle-center;
+}*/
+.unity-listview-item -> Label{
+	-unity-text-align: middle-center;
+}

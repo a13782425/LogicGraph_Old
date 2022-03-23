@@ -61,6 +61,9 @@ namespace Logic.Editor
         private VisualElement _contentContainer = null;
         public override VisualElement contentContainer => _contentContainer;
 
+        private VisualElement _inputFieldContainer;
+        public VisualElement inputFieldContainer => _inputFieldContainer;
+
         public override string title
         {
             get => base.title;
@@ -121,6 +124,12 @@ namespace Logic.Editor
             _contentContainer.name = "center";
             _contentContainer.style.backgroundColor = new Color(0, 0, 0, 0.5f);
             initNodeTitle();
+            this.Q("node-border").style.overflow = Overflow.Visible;
+            _inputFieldContainer = new VisualElement();
+            _inputFieldContainer.name = "input-field-container";
+
+            _inputFieldContainer.AddToClassList("input-field-container");
+            this.Insert(0, _inputFieldContainer);
         }
 
         private void initNodeTitle()
@@ -129,7 +138,7 @@ namespace Logic.Editor
             var nodeEditorCache = owner.EditorCache.GetEditorNode(target.GetType());
             if ((nodeEditorCache.PortType & PortDirEnum.In) > 0)
             {
-                Input = ShowPort("In", PortDirEnum.In, PortTypeEnum.Default);
+                Input = ShowPort("In", PortDirEnum.In);
                 inputContainer.Add(Input);
             }
             else
@@ -138,7 +147,7 @@ namespace Logic.Editor
             }
             if ((nodeEditorCache.PortType & PortDirEnum.Out) > 0)
             {
-                OutPut = ShowPort("Out", PortDirEnum.Out, PortTypeEnum.Default);
+                OutPut = ShowPort("Out", PortDirEnum.Out);
                 outputContainer.Add(OutPut);
             }
             else
@@ -496,47 +505,46 @@ namespace Logic.Editor
             field.onValueChange += changed;
             return field;
         }
-        protected INodeElement ShowUI(string fieldName, string titleName = null)
+        private INodeElement ShowUI(string fieldName, string titleName, FieldInfo fieldInfo)
         {
-            INodeElement nodeElement = null;
+            INodeElement nodeElement = Activator.CreateInstance(NodeElementUtils.ElementMapping[fieldInfo.FieldType]) as INodeElement;
+            nodeElement.Init(this, fieldInfo, titleName);
+            this.AddUI(nodeElement as VisualElement);
+            return nodeElement;
+        }
+        protected INodeElement<T> ShowUI<T>(string fieldName, T value, string titleName = null)
+        {
+            Type type = typeof(T);
             FieldInfo fieldInfo = this.nodeEditorCache.NodeType.GetField(fieldName, BindingFlags.Public | BindingFlags.Instance);
-            if (fieldInfo != null)
-            {
-                if (fieldInfo.FieldType.IsArray)
-                {
-                    Debug.LogError($"字段 :{fieldName},为数组,无法自动映射");
-                }
-                else if (fieldInfo.FieldType.IsEnum)
-                {
-                    nodeElement = new NodeEnumField();
-                    nodeElement.Init(this, fieldInfo, titleName);
-                    this.AddUI(nodeElement as VisualElement);
-                    return nodeElement;
-                }
-                else
-                {
-                    if (NodeElementUtils.ElementMapping.TryGetValue(fieldInfo.FieldType, out Type elementType))
-                    {
-                        nodeElement = Activator.CreateInstance(elementType) as INodeElement;
-                        nodeElement.Init(this, fieldInfo, titleName);
-                        this.AddUI(nodeElement as VisualElement);
-                        return nodeElement;
-                    }
-                    else
-                    {
-                        Debug.LogError($"字段 :{fieldName},没有找到对应的视图");
-                    }
-                }
-            }
-            else
+            if (fieldInfo == null)
             {
                 Debug.LogError($"字段 :{fieldName},没有找到");
+                return null;
+            }
+            if (type.IsArray)
+            {
+                Debug.LogError($"字段 :{fieldName},为数组,无法自动映射");
+                return null;
+            }
+            else if (type.IsEnum)
+            {
+                NodeEnumField<T> nodeElement = new NodeEnumField<T>();
+                nodeElement.Init(this, fieldInfo, titleName);
+                this.AddUI(nodeElement);
+                return nodeElement;
+            }
+            else if (NodeElementUtils.ElementMapping.ContainsKey(type))
+            {
+                return ShowUI(fieldName, titleName, fieldInfo) as INodeElement<T>;
+            }
+            else if (type.IsSubclassOf(typeof(UnityEngine.Object)))
+            {
+                NodeObjectField<T> nodeElement = new NodeObjectField<T>();
+                nodeElement.Init(this, fieldInfo, titleName);
+                this.AddUI(nodeElement);
+                return nodeElement;
             }
             return null;
-        }
-        protected INodeElement<T> ShowUI<T>(string fieldName, string titleName = null)
-        {
-            return ShowUI(fieldName) as INodeElement<T>;
         }
         protected NodePort ShowPort(string fieldName, string titleName = null)
         {
@@ -562,9 +570,9 @@ namespace Logic.Editor
             }
             return null;
         }
-        protected NodePort ShowPort(string title, PortDirEnum dir, PortTypeEnum portType)
+        protected NodePort ShowPort(string title, PortDirEnum dir)
         {
-            var port = NodePort.CreatePort(dir, portType, owner.ConnectorListener);
+            var port = NodePort.CreatePort(dir, PortTypeEnum.Default, owner.ConnectorListener);
             port.Init(this, null, title);
             return port;
         }
@@ -576,6 +584,10 @@ namespace Logic.Editor
                 return _allPort[fieldName];
             }
             return null;
+        }
+        public List<NodePort> GetAllPorts()
+        {
+            return _allPort.Values.ToList(); ;
         }
         /// <summary>
         /// 获取到连接的线

@@ -17,25 +17,32 @@ public class DebugNodeView : BaseNodeView<DebugNode>
         //TitleBackgroundColor = Color.red;
         //ContentBackgroundColor = Color.green;
     }
+
     public override void ShowUI()
     {
-        ShowUI("log");
-        ShowUI("abc");
-        ShowUI("abc1");
-        ShowPort("param001");
+        ShowUI("log", node.log);
+        ShowUI("abc", node.abc);
+        ShowUI("abc1", node.abc1);
+        ShowPort("param001").onAfterAddPort += DebugNodeView_onAfterAddPort;
+        ShowUI("aaa", node.aaa);
         ShowPort("param002");
-        ShowPort("param003");
+        ShowUI("bbb", node.bbb);
+        ShowPort("param003").onAfterAddPort += DebugNodeView_onAfterAddPort;
+        ShowUI("ccc", node.ccc);
         ShowPort("param004");
+        ShowUI("ddd", node.ddd);
         ShowPort("child001");
+        ShowUI("eee", node.eee);
         ShowPort("child002");
+        ShowUI("fff", node.fff);
         ShowPort("child003");
+        ShowUI("ggg", node.ggg);
         ShowPort("child004");
-        ShowUI("aaa","cc");
-        ShowUI("bbb");
-        ShowUI("ccc");
-        ShowUI("ddd");
-        ShowUI("eee");
-        ShowUI("fff");
+        ShowUI("hhh", node.hhh);
     }
 
+    private void DebugNodeView_onAfterAddPort(NodePort arg1, NodePort arg2)
+    {
+        Debug.LogError("add");
+    }
 }

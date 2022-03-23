@@ -10,7 +10,7 @@ namespace Logic
     [Serializable]
     public sealed class VariableNode : BaseLogicNode
     {
-        public string varId = "";
+        //public string varId = "";
         public string varName = "";
 
         private BaseVariable _variable = null;
