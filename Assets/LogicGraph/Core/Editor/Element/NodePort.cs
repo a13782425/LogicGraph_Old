@@ -140,12 +140,12 @@ namespace Logic.Editor
                 this._linkFieldInfo = nodeView.target.GetType().GetField(this._linkFieldName, FLAG);
                 if (this._linkFieldInfo != null)
                 {
+                    _linkFieldElement = m_createLinkElement();
+                    _linkFieldElement.AddToClassList("port-input-element");
+                    this.nodeView.inputFieldContainer.Add(_linkFieldElement);
                     this.schedule.Execute(() =>
                     {
-                        _linkFieldElement = m_createLinkElement();
-                        _linkFieldElement.AddToClassList("port-input-element");
                         _linkFieldElement.style.top = this.layout.y;
-                        this.nodeView.inputFieldContainer.Add(_linkFieldElement);
                     }).ExecuteLater(1);
                 }
             }
@@ -399,6 +399,10 @@ namespace Logic.Editor
                 {
                     return true;
                 }
+            }
+            if (inPort._linkFieldElement != null)
+            {
+                inPort._linkFieldElement.style.display = DisplayStyle.None;
             }
             EdgeView edge = new EdgeView();
             edge.input = inPort;

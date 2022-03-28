@@ -1,7 +1,0 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="True">
-    <ui:VisualElement style="display: flex;">
-        <ui:VisualElement name="panelBg" style="display: flex; visibility: visible; height: 600px; position: relative;">
-            <ui:VisualElement name="graphListBg" style="width: 122px; height: 428px;" />
-        </ui:VisualElement>
-    </ui:VisualElement>
-</ui:UXML>
