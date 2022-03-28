@@ -28,7 +28,7 @@ namespace Logic.Editor
 
         private void BuildContextualMenu(ContextualMenuPopulateEvent evt)
         {
-            evt.StopPropagation();
+            //evt.StopPropagation();
         }
 
 

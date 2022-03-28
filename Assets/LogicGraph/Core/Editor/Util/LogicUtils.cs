@@ -79,10 +79,6 @@ namespace Logic.Editor
         {
             return AssetDatabase.LoadAssetAtPath<StyleSheet>(Path.Combine(EDITOR_STYLE_PATH, "VariableNodeView.uss"));
         }
-        public static StyleSheet GetGroupListStyle()
-        {
-            return AssetDatabase.LoadAssetAtPath<StyleSheet>(Path.Combine(EDITOR_STYLE_PATH, "GroupListView.uss"));
-        }
         #endregion
 
         #region 拓展
