@@ -21,7 +21,7 @@ namespace Logic.Editor
         private string _graphOnlyId = null;
         public string GraphOnlyId
         {
-            get => _graphOnlyId; 
+            get => _graphOnlyId;
             set
             {
                 _graphOnlyId = value;

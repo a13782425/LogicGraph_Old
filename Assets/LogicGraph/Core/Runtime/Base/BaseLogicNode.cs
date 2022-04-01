@@ -70,6 +70,11 @@ namespace Logic
         }
 
         /// <summary>
+        /// 获取子节点
+        /// </summary>
+        /// <returns></returns>
+        public virtual List<BaseLogicNode> GetChild() => Childs;
+        /// <summary>
         /// 节点初始化的时候调用
         /// </summary>
         protected virtual bool OnEnable() => true;
@@ -89,6 +94,14 @@ namespace Logic
         /// </summary>
         /// <returns></returns>
         public virtual bool OnStop() => true;
+
+        /// <summary>
+        /// 节点退出
+        /// 当逻辑图完成时候
+        /// 无论逻辑图是否正常退出全部节点都会执行
+        /// </summary>
+        /// <returns></returns>
+        public virtual bool OnExit() => true;
     }
 
 }

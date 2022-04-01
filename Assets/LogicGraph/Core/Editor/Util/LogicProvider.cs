@@ -192,6 +192,7 @@ namespace Logic.Editor
         /// </summary>
         private static void BuildGraphAssetCache()
         {
+            HashSet<string> hashKey = new HashSet<string>();
             LGInfoList.Clear();
             string[] guids = AssetDatabase.FindAssets("t:BaseLogicGraph");
             foreach (string guid in guids)
@@ -200,12 +201,17 @@ namespace Logic.Editor
                 BaseLogicGraph logicGraph = AssetDatabase.LoadAssetAtPath<BaseLogicGraph>(assetPath);
                 if (logicGraph == null)
                     continue;
+                if (hashKey.Contains(logicGraph.OnlyId))
+                {
+                    logicGraph.ResetGuid();
+                }
                 string logicTypeName = logicGraph.GetType().FullName;
                 LGInfoCache graphCache = new LGInfoCache();
                 graphCache.GraphClassName = logicTypeName;
                 graphCache.LogicName = logicGraph.Title;
                 graphCache.AssetPath = assetPath;
                 graphCache.OnlyId = logicGraph.OnlyId;
+                hashKey.Add(logicGraph.OnlyId);
                 LGInfoList.Add(graphCache);
             }
         }

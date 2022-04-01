@@ -124,7 +124,6 @@ namespace Logic
         //    Debug.LogError("OnAfterDeserialize");
         //    Debug.LogError(this.OnlyId);
         //}
-
 #endif
     }
 }
