@@ -50,7 +50,7 @@ namespace Logic
 
 
 
-        public virtual void Begin(Action callback)
+        public virtual void Begin(Action callback = null)
         {
             _completeCallBack = callback;
             LogicGraph.Nodes.ForEach(n => n.Initialize(LogicGraph));
@@ -179,7 +179,7 @@ namespace Logic
         {
             if (!node.IsSkip)
             {
-                node.GetChild().ForEach(n => _waitExecuteNodes.Enqueue(node));
+                node.GetChild().ForEach(n => _waitExecuteNodes.Enqueue(n));
             }
         }
         private void Awake()

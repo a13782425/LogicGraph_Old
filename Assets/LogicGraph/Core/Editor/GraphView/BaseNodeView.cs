@@ -323,7 +323,7 @@ namespace Logic.Editor
         /// 断开连接
         /// </summary>
         /// <param name="port"></param>
-        protected void Disconnect(PortView port)
+        protected void Disconnect(NodePort port)
         {
             var connects = port.connections.ToList();
             this.owner.selection.Clear();

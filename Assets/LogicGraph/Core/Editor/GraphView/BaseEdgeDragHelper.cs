@@ -58,7 +58,7 @@ namespace Logic.Editor
             // Clean up ghost edge.
             if ((ghostEdge != null) && (graphView != null))
             {
-                var pv = ghostEdge.input as PortView;
+                var pv = ghostEdge.input as NodePort;
                 graphView.schedule.Execute(() =>
                 {
                     pv.portCapLit = false;

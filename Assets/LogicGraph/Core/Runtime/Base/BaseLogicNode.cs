@@ -81,7 +81,7 @@ namespace Logic
         /// <summary>
         /// 节点初始化的时候执行调用
         /// </summary>
-        public virtual bool OnExecute() => true;
+        public virtual bool OnExecute() { IsComplete = true; return true; }
         /// <summary>
         /// 节点的Update,在OnExecute之后每帧都执行
         /// </summary>
