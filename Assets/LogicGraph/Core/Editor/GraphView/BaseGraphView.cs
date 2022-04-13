@@ -629,6 +629,7 @@ namespace Logic.Editor
                         Target.LastFormatPath = tempPath.Substring(index, tempPath.Length - index);
                     }
                     Window.ShowNotification(new GUIContent($"导出: {formatConfig.FormatName} 成功"));
+                    AssetDatabase.Refresh();
                 }
                 else
                 {
