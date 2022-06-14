@@ -12,8 +12,16 @@ namespace Logic.Editor
     /// </summary>
     public sealed class LGUndo
     {
+        /// <summary>
+        /// 最多记录数
+        /// </summary>
         private const int MAX_STEP = 10;
-        private Stack<LGUndoData> UndoStack = new Stack<LGUndoData>();
+        /// <summary>
+        /// 是否正在撤回
+        /// </summary>
+        private bool _isUndo = false;
+        private Stack<LGUndoData> _undoStack = new Stack<LGUndoData>();
+        private Stack<LGUndoData> _redoStack = new Stack<LGUndoData>();
         private BaseGraphView _graphView;
         public BaseGraphView GraphView => _graphView;
         public LGUndo(BaseGraphView graph)
@@ -24,27 +32,31 @@ namespace Logic.Editor
 
         public void PopUndo()
         {
-            if (UndoStack.Count <= 0)
+            if (_undoStack.Count <= 0)
             {
                 _graphView.Window.ShowNotification(new UnityEngine.GUIContent("最多撤销十步"));
                 return;
             }
-            LGUndoData undoData = UndoStack.Pop();
+            LGUndoData undoData = _undoStack.Pop();
             undoData.Undo();
         }
 
         public void PushUndo(LGUndoData undoData)
         {
-            if (UndoStack.Count >= MAX_STEP)
+            if (_isUndo)
             {
-                LGUndoData[] temps = UndoStack.ToArray();
-                UndoStack.Clear();
+                return;
+            }
+            if (_undoStack.Count >= MAX_STEP)
+            {
+                LGUndoData[] temps = _undoStack.ToArray();
+                _undoStack.Clear();
                 for (int i = 1; i < temps.Length; i++)
                 {
-                    UndoStack.Push(temps[i]);
+                    _undoStack.Push(temps[i]);
                 }
             }
-            UndoStack.Push(undoData);
+            _undoStack.Push(undoData);
         }
 
 
@@ -70,7 +82,7 @@ namespace Logic.Editor
         {
             NodeEdgeData nodeEdgeData = new NodeEdgeData();
             nodeEdgeData.Init(input, output);
-          
+
             _undoEdgeList.Add(nodeEdgeData);
         }
 

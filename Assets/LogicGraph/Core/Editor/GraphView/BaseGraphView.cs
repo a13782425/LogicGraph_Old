@@ -311,14 +311,6 @@ namespace Logic.Editor
     {
         private GraphViewChange m_onGraphViewChanged(GraphViewChange graphViewChange)
         {
-            if (graphViewChange.edgesToCreate != null)
-            {
-                foreach (var fieldView in graphViewChange.edgesToCreate)
-                {
-                    Debug.LogError("123");
-                }
-
-            }
             if (graphViewChange.elementsToRemove != null)
             {
                 List<GraphElement> removeList = graphViewChange.elementsToRemove.ToList();
@@ -383,8 +375,7 @@ namespace Logic.Editor
                     }
                 }
                 graphViewChange.elementsToRemove.AddRange(removeList2);
-                Undo.RegisterCompleteObjectUndo(Target, "Delete");
-                //_undo.PushUndo(undoData);
+                _undo.PushUndo(undoData);
             }
             return graphViewChange;
         }
@@ -420,11 +411,8 @@ namespace Logic.Editor
                         break;
                     case KeyCode.Z:
                         {
-                            Debug.LogError(Undo.GetCurrentGroup());
                             //³·Ïú
-                            Undo.RevertAllDownToGroup(Undo.GetCurrentGroup());
-                            //Undo.PerformUndo();
-                            //_undo.PopUndo();
+                            _undo.PopUndo();
                             evt.StopPropagation();
                         }
                         break;
