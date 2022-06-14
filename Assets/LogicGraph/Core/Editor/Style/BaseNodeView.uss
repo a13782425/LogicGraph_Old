@@ -128,24 +128,6 @@
     visibility: hidden;
 }
 
-#input-container {
-    opacity: 0.6;
-}
-
-.node:checked > #input-container {
-    opacity: 1;
-}
-
-#input-container > .port-input-element IntegerInput,
-#input-container > .port-input-element FloatInput,
-#input-container > .port-input-element TextInput {
-    border-top-left-radius: 1px;
-    border-bottom-left-radius: 1px;
-    border-top-right-radius: 1px;
-    border-bottom-right-radius: 1px;
-    padding-bottom: 1px;
-    height: 15px;
-}
 
 #TopPortContainer, #BottomPortContainer
 {

@@ -142,11 +142,7 @@ namespace Logic.Editor
                 {
                     _linkFieldElement = m_createLinkElement();
                     _linkFieldElement.AddToClassList("port-input-element");
-                    this.nodeView.inputFieldContainer.Add(_linkFieldElement);
-                    this.schedule.Execute(() =>
-                    {
-                        _linkFieldElement.style.top = this.layout.y;
-                    }).ExecuteLater(1);
+                    this.Insert(0, _linkFieldElement);
                 }
             }
         }
@@ -477,6 +473,13 @@ namespace Logic.Editor
                 Vector4Field element = new Vector4Field();
                 element.RegisterCallback<ChangeEvent<Vector4>>(e => onValueChange(e.newValue));
                 element.value = (Vector4)_linkFieldInfo.GetValue(nodeView.target);
+                return element;
+            }
+            else if (type == typeof(Color))
+            {
+                ColorField element = new ColorField();
+                element.RegisterCallback<ChangeEvent<Color>>(e => onValueChange(e.newValue));
+                element.value = (Color)_linkFieldInfo.GetValue(nodeView.target);
                 return element;
             }
             else
